@@ -7,13 +7,12 @@ class WACCModel:
         self.stock = yf.Ticker(stock_code)
         self.stock_code = stock_code
         self.stock_dividends = self.stock.dividends
-        self.max_growth_rate = max_growth_rate  # 永續成長率上限
-        self.risk_free_rate = risk_free_rate  # 無風險利率
-        self.market_return = market_return  # 市場平均回報率
+        self.max_growth_rate = max_growth_rate  
+        self.risk_free_rate = risk_free_rate  
+        self.market_return = market_return  
         self.annual_financials = self.stock.financials
         self.share_outstanding = self.stock.info.get("sharesOutstanding", None)
 
-    ### Cost of Equity Section ###
 
     def get_latest_stock_price(self):
         try:
@@ -64,22 +63,30 @@ class WACCModel:
         print(f"Calculated Cost of Equity (Ke) using CAPM: {cost_of_equity:.2%}")
         return cost_of_equity
 
-    ### Cost of Debt Section ###
 
     def get_valid_annual_data(self, balance_sheet):
         try:
-            total_debt_series = balance_sheet.loc["Total Debt"] if "Total Debt" in balance_sheet.index else None
-            interest_expense_series = self.annual_financials.loc["Interest Expense"] if "Interest Expense" in self.annual_financials.index else None
 
-            if total_debt_series is None or interest_expense_series is None:
+            if "Total Debt" not in balance_sheet.index or "Interest Expense" not in self.annual_financials.index:
                 print(f"Missing 'Total Debt' or 'Interest Expense' data in balance sheet or financials.")
                 return None, None
 
-            for year in total_debt_series.index:
-                total_debt = total_debt_series[year]
-                interest_expense = interest_expense_series[year]
+            total_debt_series = balance_sheet.loc["Total Debt"]
+            interest_expense_series = self.annual_financials.loc["Interest Expense"]
 
-                if pd.notna(total_debt) and pd.notna(interest_expense) and total_debt != 0 and interest_expense != 0:
+            for year in sorted(total_debt_series.index, reverse=True):
+                total_debt = total_debt_series[year]
+                interest_expense = interest_expense_series.get(year, None)  
+
+
+                if (pd.notna(total_debt)
+                    and pd.notna(interest_expense)
+                    and total_debt != 0
+                    and interest_expense != 0):
+                    
+
+                    interest_expense = abs(interest_expense)
+
                     print(f"Using data from {year}: Total Debt = {total_debt}, Interest Expense = {interest_expense}")
                     return total_debt, interest_expense
 
@@ -89,6 +96,7 @@ class WACCModel:
         except Exception as e:
             print(f"Error processing annual data: {e}")
             return None, None
+
 
     def get_tax_data(self):
         """
@@ -126,7 +134,7 @@ class WACCModel:
             tax_rate = self.get_tax_data()
 
             if total_debt is not None and interest_expense is not None:
-                cost_of_debt = interest_expense / total_debt
+                cost_of_debt = abs(interest_expense) / total_debt
                 print(f"Cost of Debt (K_D): {cost_of_debt:.2%}")
 
                 if tax_rate is not None:
@@ -143,7 +151,7 @@ class WACCModel:
             print(f"Error fetching debt data for {self.stock_code}: {e}")
             return None, None
 
-    ### Calculate Debt and Equity Weights ###
+
 
     def calculate_weights(self):
         """
@@ -167,7 +175,6 @@ class WACCModel:
             print(f"Error calculating weights: {e}")
             return None, None
 
-    ### WACC Calculation ###
 
     def calculate_wacc(self):
         cost_of_equity = self.calculate_cost_of_equity_with_capm()

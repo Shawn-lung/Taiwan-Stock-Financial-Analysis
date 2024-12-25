@@ -1,6 +1,8 @@
 from Wacc import WACCModel
 import yfinance as yf
 import pandas as pd
+
+# 從 abnormal_checker.py import 您的檢測器
 from abnormal_checker import AbnormalMetricChecker
 
 
@@ -23,9 +25,9 @@ class DCFModel:
         self.stock = self.wacc_model.stock
 
 
-        self.income_stmt = self.stock.financials  
-        self.cash_flow = self.stock.cashflow      
-        self.balance_sheet = self.stock.balance_sheet  
+        self.income_stmt = self.stock.financials  # 損益表
+        self.cash_flow = self.stock.cashflow      # 現金流量表
+        self.balance_sheet = self.stock.balance_sheet  # 資產負債表
 
 
         self.latest_year_income = None
@@ -57,7 +59,7 @@ class DCFModel:
         self.shares_outstanding = self.stock.info.get("sharesOutstanding", 1) or 1
         self.wacc = self.wacc_model.calculate_wacc()
 
-        self.manual_growth_rates = manual_growth_rates 
+        self.manual_growth_rates = manual_growth_rates  # 若使用者有手動帶入，就儲存起來
 
 
         self.base_year_metrics = {
@@ -68,11 +70,12 @@ class DCFModel:
             "WorkingCapital": self.current_working_capital
         }
 
-
+        # 抓「歷史數據」(多年度)
         self.hist_metrics = self.prepare_historical_metrics()
 
-        self.abnormal_threshold = 3  
-        self.abnormal_count = 0      
+        # 執行「基期年度異常檢測」
+        self.abnormal_threshold = 3  # 超過3個指標異常，就視為「基期太多異常」
+        self.abnormal_count = 0      # 計算異常項目個數
         self.too_many_abnormal = False
 
         self.check_base_year_anomalies()
@@ -162,7 +165,7 @@ class DCFModel:
                 if pd.notna(tmp):
                     td = tmp
 
-
+            # 假設"Cash" / "Cash Equivalents"等
             possible_cash_keys = [
                 "Cash And Cash Equivalents",
                 "Cash",
@@ -181,7 +184,10 @@ class DCFModel:
             return 0
 
     def get_latest_working_capital(self):
-
+        """
+        WorkingCapital = Current Assets - Current Liabilities
+        若要簡化, 就抓 'Current Assets' / 'Current Liabilities' (無 'Total')
+        """
         if self.latest_year_bs is None:
             return 0
         try:
@@ -204,7 +210,16 @@ class DCFModel:
 
 
     def prepare_historical_metrics(self):
-
+        """
+        回傳 dict of list:
+          {
+            "Revenue": [...],
+            "OperatingIncome": [...],
+            "Depreciation": [...],
+            "CAPEX": [...],
+            "WorkingCapital": [...]
+          }
+        """
         hist_data = {
             "Revenue": [],
             "OperatingIncome": [],
@@ -212,18 +227,18 @@ class DCFModel:
             "CAPEX": [],
             "WorkingCapital": []
         }
-
+        # columns sorted
         if self.income_stmt.empty:
             return hist_data
 
         all_cols = sorted(self.income_stmt.columns)
         if len(all_cols) > 1:
-            past_cols = all_cols[:-1]  
+            past_cols = all_cols[:-1]  # 除去最新
         else:
             past_cols = []
 
         for col in past_cols:
-
+            # Revenue
             rev_val = 0
             for possible_key in ["Total Revenue", "Revenue"]:
                 if possible_key in self.income_stmt.index:
@@ -232,13 +247,14 @@ class DCFModel:
                         rev_val = tmp
                         break
 
-
+            # OperatingIncome
             op_val = 0
             if "Operating Income" in self.income_stmt.index:
                 tmp = self.income_stmt.loc["Operating Income", col]
                 if pd.notna(tmp):
                     op_val = tmp
 
+            # Dep
             dep_val = 0
             if not self.cash_flow.empty and col in self.cash_flow.columns:
                 for dk in ["Depreciation", "Depreciation & Amortization"]:
@@ -248,6 +264,7 @@ class DCFModel:
                             dep_val = abs(d_)
                             break
 
+            # CAPEX
             capex_val = 0
             if not self.cash_flow.empty and col in self.cash_flow.columns:
                 if "Capital Expenditure" in self.cash_flow.index:
@@ -255,6 +272,7 @@ class DCFModel:
                     if pd.notna(c_):
                         capex_val = abs(c_)
 
+            # WC
             wc_val = 0
             if not self.balance_sheet.empty and col in self.balance_sheet.columns:
                 ca_ = 0
@@ -278,6 +296,10 @@ class DCFModel:
         return hist_data
 
     def check_base_year_anomalies(self, threshold=0.5):
+        """
+        利用 AbnormalMetricChecker 進行基期 vs 歷史平均的檢測
+        若異常指標 >= self.abnormal_threshold (例: 3)，則 self.too_many_abnormal = True
+        """
         checker = AbnormalMetricChecker(threshold=threshold)
         results = checker.detect_abnormal_base_year_metrics(self.base_year_metrics, self.hist_metrics)
 
@@ -285,7 +307,7 @@ class DCFModel:
         self.abnormal_count = 0
         for var_name, (status, ratio) in results.items():
             print(status)
-
+            # 如果 status 裡包含 "異常偏高" 或 "異常偏低" 就計為一次「異常」
             if ("異常偏高" in status) or ("異常偏低" in status):
                 self.abnormal_count += 1
         print("================================\n")
@@ -294,18 +316,23 @@ class DCFModel:
             self.too_many_abnormal = True
 
     def get_base_fcf(self):
-
+        """
+        基期 FCF = OperatingIncome * (1 - tax_rate) + depreciation - capex
+        """
         ebit_after_tax = self.operating_income * (1 - self.tax_rate)
         fcf = ebit_after_tax + self.depreciation - self.capex
         return fcf
 
     def forecast_fcf_list(self):
-
+        """
+        若 manual_growth_rates 有值 => 用之
+        否則 => 用 estimate_historical_revenue_growth() or 5% 預設
+        """
         base_fcf = self.get_base_fcf()
         if base_fcf is None:
             return []
 
-
+        # 手動
         if self.manual_growth_rates is not None and len(self.manual_growth_rates) == self.forecast_years:
             fcf_list = []
             fcf_t = base_fcf
@@ -314,6 +341,7 @@ class DCFModel:
                 fcf_t = fcf_t * (1 + g)
             return fcf_list
 
+        # 自動
         avg_revenue_growth = self.estimate_historical_revenue_growth()
         if avg_revenue_growth is None:
             avg_revenue_growth = 0.05
@@ -353,8 +381,13 @@ class DCFModel:
         return cagr if cagr > -1 else None
 
     def calculate_intrinsic_value(self):
-
-
+        """
+        1) 若 self.too_many_abnormal => 跳過
+        2) 取得 N 年 FCF => 貼現
+        3) 終值 => 貼現
+        4) 扣除 net_debt => Equity Value
+        """
+        # 若基期過多異常 => 跳過
         if self.too_many_abnormal:
             print("基期年有過多異常指標，可能影響預測結果")
             #return None
@@ -408,7 +441,7 @@ class DCFModel:
 
 if __name__ == "__main__":
     print("=== [Manual Growth DCF] ===")
-    manual_rates = [0.2, 0.15, 0.1, 0.05, 0.05]  
+    manual_rates = [0.2, 0.15, 0.1, 0.05, 0.05]  # 5年
     dcf = DCFModel(
         "8069.TWO",
         forecast_years=5,
