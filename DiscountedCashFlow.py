@@ -17,7 +17,8 @@ class DCFModel:
         # (B) 下面新增三組可手動 yoy 因子
         manual_depr_factors=None,     # 折舊 yoy 調整 (相對前一年)
         manual_opincome_factors=None, # 營業利益 yoy 調整 (相對前一年)
-        manual_tax_factors=None       # 稅率 yoy 調整 (相對前一年)
+        manual_tax_factors=None,       # 稅率 yoy 調整 (相對前一年)
+        manual_mvfirm_sales_ratio=None
     ):
         """
         :param stock_code: 股票代號 (e.g. "2330.TW")
@@ -55,6 +56,7 @@ class DCFModel:
         self.manual_opincome_factors = manual_opincome_factors
         self.manual_tax_factors = manual_tax_factors
 
+        self.manual_mvfirm_sales_ratio = manual_mvfirm_sales_ratio
         # yfinance 抓取財報
         self.stock = None
         self.income_stmt = None
@@ -124,7 +126,8 @@ class DCFModel:
         self.shares_outstanding = so
 
         # 計算 WACC
-        self.wacc = Wacc.WACCModel(self.stock_code).calculate_wacc()
+        self.wacc_for_stock= Wacc.WACCModel(self.stock_code)
+        self.wacc = self.wacc_for_stock.calculate_wacc()
 
         # 可自行做基期異常檢測 (若有需要)
         self.base_year_metrics = {
@@ -419,6 +422,7 @@ class DCFModel:
             # 同步 revenue
             depr_factors = growth_rates
 
+            
         # (D) 第 0 年(基期)
         rev_prev  = float(self.current_revenue)
         op_prev   = float(self.operating_income)
@@ -458,6 +462,7 @@ class DCFModel:
             wc_prev    = wc_i
             depr_prev  = depr_i
             tax_prev   = tax_rate_i
+        self.rev_last = rev_i
 
         return fcf_list
 
@@ -496,7 +501,15 @@ class DCFModel:
 
         enterprise_value = npv_stage_1 + discounted_tv
         equity_value = enterprise_value - self.net_debt
+        if self.manual_mvfirm_sales_ratio:
+            self.mvfirm_sales = self.rev_last * self.manual_mvfirm_sales_ratio
+        else:
+            mvfirm_sales_times = self.wacc_for_stock.get_latest_stock_price()*self.shares_outstanding/float(self.current_revenue)
+            print(mvfirm_sales_times)
+            self.mvfirm_sales = self.rev_last*mvfirm_sales_times
 
+        discounted_tv_with_mvfirm = self.mvfirm_sales / ((1 + self.wacc)**(len(fcf_list)-1))
+        self.equity_value_with_mvfirm = discounted_tv_with_mvfirm - self.net_debt
         # Debug print
         print("----- DCF Calculation -----")
         print(f"Stage 1 (NPV of FCF): {npv_stage_1:,.2f}")
@@ -514,9 +527,10 @@ class DCFModel:
         if self.shares_outstanding <= 0:
             print("Invalid shares_outstanding.")
             return None
-
+        fair_price_with_mvfirm = self.equity_value_with_mvfirm / self.shares_outstanding
         fair_price = eqv / self.shares_outstanding
         print(f"Fair Price= {fair_price:.2f} per share")
+        print(f"Fair Price with MV/Firm Sales: {fair_price_with_mvfirm:.2f} per share")
         return fair_price
 
 
