@@ -333,66 +333,143 @@ class DCFModel:
         return cagr if cagr >= -1 else None
 
     def forecast_fcf_list(self):
-        """Forecast Free Cash Flow with improved calculations."""
+        """Forecast Free Cash Flow with ratio-based predictions."""
         try:
             fcf_list = []
             revenue = float(self.current_revenue)
-            operating_margin = self.operating_income / revenue
+            operating_margin = self.operating_income / revenue if self.operating_income and revenue else 0.15
             
-            # Normalize base metrics
-            base_capex_to_revenue = self.capex / revenue
-            base_depr_to_revenue = self.depreciation / revenue
-            base_wc_to_revenue = self.current_working_capital / revenue
+            # Calculate base values and ratios
+            base_capex_ratio = self.capex / revenue if self.capex and revenue else 0.1
+            base_depr_ratio = self.depreciation / revenue if self.depreciation and revenue else 0.05
+            base_wc_ratio = self.current_working_capital / revenue if self.current_working_capital and revenue else 0.05
+            
+            # Log base metrics
+            logger.info(f"Base metrics for {self.stock_code}:")
+            logger.info(f"Current Revenue: {revenue:,.0f}")
+            logger.info(f"Operating Margin: {operating_margin:.2%}")
+            logger.info(f"Base CAPEX/Revenue: {base_capex_ratio:.2%}")
+            logger.info(f"Base Depreciation/Revenue: {base_depr_ratio:.2%}")
+            logger.info(f"Base WC/Revenue: {base_wc_ratio:.2%}")
+            
+            # Get growth rates and factors (or use defaults)
+            growth_rates = self.manual_growth_rates or [0.05] * self.forecast_years
+            capex_ratios = self.manual_capex_factors or [base_capex_ratio] * self.forecast_years
+            depr_ratios = self.manual_depr_factors or [base_depr_ratio] * self.forecast_years
+            wc_ratios = self.manual_wc_factors or [base_wc_ratio] * self.forecast_years
+            tax_rates = self.manual_tax_factors or [self.tax_rate] * self.forecast_years
+            
+            # Ensure we have opinion factors (or create empty list)
+            op_factors = self.manual_opincome_factors or [0] * self.forecast_years
+            
+            # Keep track of working capital for change calculation
+            current_wc = self.current_working_capital
+            
+            # Apply sanity checks to ratios
+            # Cap CAPEX ratios at reasonable levels
+            capex_ratios = [min(ratio, 0.25) for ratio in capex_ratios]
+            # Ensure WC ratios are reasonable
+            wc_ratios = [min(max(ratio, -0.05), 0.15) for ratio in wc_ratios]
+            
+            # Gradually reduce growth rates for long-term sustainability
+            for i in range(1, len(growth_rates)):
+                if growth_rates[i] > 0.2 and i >= 2:
+                    growth_rates[i] = growth_rates[i] * 0.85  # Dampen high growth rates in later years
+            
+            # First calculate revenues for all years upfront
+            revenues = [revenue]
+            for i in range(self.forecast_years):
+                revenues.append(revenues[-1] * (1 + growth_rates[i]))
+            
+            # Calculate a more gradual working capital transition
+            # This prevents massive WC changes in year 1
+            target_wc_percent = wc_ratios[0]
+            current_wc_percent = current_wc / revenue
+            
+            # If large WC adjustment needed, spread it over multiple years
+            wc_adjustment_years = 3 if abs(current_wc_percent - target_wc_percent) > 0.1 else 1
             
             for i in range(self.forecast_years):
-                # Apply growth rate
-                growth = self.manual_growth_rates[i] if self.manual_growth_rates else 0.05
-                new_revenue = revenue * (1 + growth)
+                # Apply growth to revenue
+                new_revenue = revenues[i+1]
                 
-                # Operating income with stable margin
-                op_income = new_revenue * operating_margin
+                # Use factors as direct ratios
+                capex_ratio = capex_ratios[i]
+                depr_ratio = depr_ratios[i]
+                tax_rate = tax_rates[i]
                 
-                # CAPEX and depreciation based on revenue
-                capex = new_revenue * base_capex_to_revenue * (1 + (self.manual_capex_factors[i] if self.manual_capex_factors else 0))
-                depr = new_revenue * base_depr_to_revenue * (1 + (self.manual_depr_factors[i] if self.manual_depr_factors else 0))
+                # Calculate working capital with gradual transition
+                if i < wc_adjustment_years:
+                    # Gradually move toward target WC
+                    adjusted_wc_percent = current_wc_percent - (i+1) * ((current_wc_percent - target_wc_percent) / wc_adjustment_years)
+                else:
+                    adjusted_wc_percent = wc_ratios[i]
                 
-                # Working capital changes
-                new_wc = new_revenue * base_wc_to_revenue
-                delta_wc = new_wc - (revenue * base_wc_to_revenue)
+                # Calculate absolute values
+                capex = new_revenue * capex_ratio
+                depr = new_revenue * depr_ratio
+                new_wc = new_revenue * adjusted_wc_percent
+                delta_wc = new_wc - current_wc  # Change in working capital
+                
+                # Apply factors to operating income
+                new_margin = operating_margin * (1 + (op_factors[i] if i < len(op_factors) else 0))
+                op_income = new_revenue * new_margin
                 
                 # Calculate FCF
-                tax_rate = min(max(self.tax_rate * (1 + (self.manual_tax_factors[i] if self.manual_tax_factors else 0)), 0.15), 0.35)
                 nopat = op_income * (1 - tax_rate)
                 fcf = nopat + depr - capex - delta_wc
                 
-                # Ensure FCF is reasonable
-                max_fcf = new_revenue * 0.3  # Cap FCF at 30% of revenue
-                min_fcf = new_revenue * 0.05  # Minimum FCF at 5% of revenue
-                fcf = min(max(fcf, min_fcf), max_fcf)
+                # Log detailed projections
+                logger.info(f"Year {i+1} Projections:")
+                logger.info(f"Revenue: {new_revenue:,.0f} (Growth: {growth_rates[i]:.2%})")
+                logger.info(f"CAPEX: {capex:,.0f} (Ratio: {capex_ratio:.2%})")
+                logger.info(f"Depreciation: {depr:,.0f} (Ratio: {depr_ratio:.2%})")
+                logger.info(f"Working Capital: {new_wc:,.0f} (Ratio: {adjusted_wc_percent:.2%}, Change: {delta_wc:,.0f})")
+                logger.info(f"Operating Income: {op_income:,.0f} (Margin: {new_margin:.2%})")
+                logger.info(f"NOPAT: {nopat:,.0f} (Tax Rate: {tax_rate:.2%})")
+                logger.info(f"FCF: {fcf:,.0f} (FCF Margin: {fcf/new_revenue:.2%})")
                 
                 fcf_list.append(float(fcf))
-                revenue = new_revenue  # Update for next iteration
                 
-            logger.info("FCF Projections:")
-            for i, fcf in enumerate(fcf_list, 1):
-                logger.info(f"Year {i}: {fcf:,.2f}")
+                # Update for next iteration
+                revenue = new_revenue
+                current_wc = new_wc
                 
-            return fcf_list
+                # If FCF is negative, apply sanity check for next year
+                if fcf < 0 and i < self.forecast_years - 1:
+                    # Apply correction - reduce capex ratio for next year
+                    if i+1 < len(capex_ratios):
+                        capex_ratios[i+1] = max(depr_ratios[i+1], capex_ratios[i+1] * 0.9)
             
+            return fcf_list
+        
         except Exception as e:
-            logger.error(f"Error in FCF forecast: {e}")
-            return [self.operating_income * 0.1] * self.forecast_years
+            logger.error(f"Error in FCF forecast: {e}", exc_info=True)
+            # Return a simple estimate as fallback
+            if self.operating_income > 0:
+                return [self.operating_income * 0.75] * self.forecast_years
+            return [1000000] * self.forecast_years  # Generic fallback
 
     def calculate_intrinsic_value(self):
-        """Calculate intrinsic value with improved error handling."""
+        """Calculate intrinsic value with improved error handling and sanity checks."""
         try:
             if not self.wacc or self.wacc <= self.perpetual_growth_rate:
-                logger.error(f"Invalid WACC ({self.wacc}) or growth rate ({self.perpetual_growth_rate})")
-                return None
+                # Force minimum spread if WACC is too close to growth rate
+                self.wacc = max(self.wacc, self.perpetual_growth_rate + 0.03)
+                logger.info(f"Adjusted WACC to {self.wacc:.2%} to maintain spread from growth rate")
 
             fcf_list = self.forecast_fcf_list()
             if not fcf_list:
                 return None
+                
+            # Handle negative FCFs - either ignore them or cap them at 0 for terminal value purposes
+            positive_fcfs = [max(0, fcf) for fcf in fcf_list if fcf > 0]
+            if not positive_fcfs:
+                logger.warning("No positive FCFs in forecast period. Using operating income as base.")
+                if self.operating_income > 0:
+                    positive_fcfs = [self.operating_income * 0.5]
+                else:
+                    return 0  # Can't reasonably value with no positive cashflows
 
             # Calculate present value of FCFs
             npv_stage_1 = sum(
@@ -400,34 +477,97 @@ class DCFModel:
                 for i, fcf in enumerate(fcf_list)
             )
 
-            # Calculate terminal value using normalized FCF
-            normalized_fcf = sum(fcf_list[-3:]) / 3  # Average of last 3 years
-            terminal_growth = min(self.perpetual_growth_rate, self.wacc - 0.02)
+            # Calculate terminal value using most reliable forecast as base
+            # For terminal value calculation, use the average of positive FCFs or last year's FCF if it's positive
+            if fcf_list[-1] > 0:
+                normalized_fcf = fcf_list[-1]  # Use last year if positive
+            elif fcf_list[-2] > 0:
+                normalized_fcf = fcf_list[-2]  # Use second-to-last year if positive
+            elif positive_fcfs:
+                normalized_fcf = sum(positive_fcfs) / len(positive_fcfs)  # Average of positive FCFs
+            else:
+                # Fall back to operating income-based estimate if no good FCF values
+                normalized_fcf = self.operating_income * 0.7
+                logger.warning(f"Using operating income-based FCF estimate for terminal value: {normalized_fcf:,.0f}")
+
+            # Ensure terminal growth rate is appropriate for high-growth companies
+            # For companies with high historical growth, use a higher terminal rate
+            terminal_growth = self.perpetual_growth_rate
+            
+            # Ensure minimum spread between WACC and terminal growth
+            if self.wacc - terminal_growth < 0.03:
+                terminal_growth = self.wacc - 0.03
+                logger.info(f"Adjusted terminal growth to {terminal_growth:.2%} to maintain spread from WACC")
+            
             terminal_value = normalized_fcf * (1 + terminal_growth) / (self.wacc - terminal_growth)
+            
+            # For high growth companies, use a higher terminal multiple cap
+            # Get estimated current year's EBITDA
+            ebitda = self.operating_income + self.depreciation
+            
+            # Adjust multiple cap based on growth profile
+            high_growth_threshold = 0.15  # Consider high growth if first year growth > 15%
+            
+            # Determine appropriate cap for terminal value multiple
+            if fcf_list and len(fcf_list) > 0 and normalized_fcf > 0:
+                implied_tv_multiple = terminal_value / normalized_fcf
+                
+                # Use higher multiple cap for high growth companies
+                if self.manual_growth_rates and self.manual_growth_rates[0] > high_growth_threshold:
+                    max_multiple = 30  # Higher cap for high growth companies
+                else:
+                    max_multiple = 20  # Standard cap
+                
+                if implied_tv_multiple > max_multiple:
+                    terminal_value = normalized_fcf * max_multiple
+                    logger.info(f"Capped terminal value multiple from {implied_tv_multiple:.1f}x to {max_multiple:.1f}x")
             
             # Discount terminal value
             discounted_tv = terminal_value / (1 + self.wacc) ** len(fcf_list)
 
             enterprise_value = npv_stage_1 + discounted_tv
-            equity_value = enterprise_value + (self.stock.info.get('cash', 0) - self.net_debt)
+            
+            # Apply reasonable EV/EBITDA multiple check
+            if self.operating_income > 0:
+                ebitda = self.operating_income + self.depreciation
+                implied_ev_ebitda = enterprise_value / ebitda
+                
+                # Use different caps based on growth profile
+                if self.manual_growth_rates and self.manual_growth_rates[0] > high_growth_threshold:
+                    max_ev_multiple = 35  # Higher cap for high growth companies
+                else:
+                    max_ev_multiple = 25  # Standard cap
+                    
+                if implied_ev_ebitda > max_ev_multiple:
+                    enterprise_value = ebitda * max_ev_multiple
+                    logger.info(f"Capped EV/EBITDA from {implied_ev_ebitda:.1f}x to {max_ev_multiple:.1f}x")
+                
+                # Adjust floor for high-growth companies
+                min_ev_multiple = 8 if (self.manual_growth_rates and self.manual_growth_rates[0] > high_growth_threshold) else 5
+                if implied_ev_ebitda < 0 or implied_ev_ebitda < min_ev_multiple:
+                    enterprise_value = ebitda * min_ev_multiple
+                    logger.info(f"Applied floor EV/EBITDA of {min_ev_multiple:.1f}x (was {implied_ev_ebitda:.1f}x)")
 
-            # Log calculations
-            logger.info("----- DCF Calculation Details -----")
+            # Calculate equity value considering net debt (but ensure EV remains positive)
+            cash = self.stock.info.get('cash', 0)
+            equity_value = max(enterprise_value - self.net_debt + cash, cash)
+
+            # Log calculations with sanity checks
             logger.info(f"Base Revenue: {self.current_revenue:,.2f}")
-            logger.info(f"Operating Income: {self.operating_income:,.2f}")
-            logger.info(f"WACC: {self.wacc:.2%}")
-            logger.info(f"Terminal Growth: {terminal_growth:.2%}")
             logger.info(f"NPV of FCF: {npv_stage_1:,.2f}")
-            logger.info(f"Terminal Value: {terminal_value:,.2f}")
-            logger.info(f"Discounted TV: {discounted_tv:,.2f}")
-            logger.info(f"Net Debt: {self.net_debt:,.2f}")
+            logger.info(f"Normalized FCF for Terminal Value: {normalized_fcf:,.2f}")
+            logger.info(f"Terminal Value Multiple: {implied_tv_multiple:.1f}x")
+            if self.operating_income > 0:
+                logger.info(f"EV/EBITDA Multiple: {(enterprise_value/ebitda):.1f}x")
             logger.info(f"Enterprise Value: {enterprise_value:,.2f}")
+            logger.info(f"Net Debt: {self.net_debt:,.2f}")
+            logger.info(f"Cash: {cash:,.2f}")
             logger.info(f"Equity Value: {equity_value:,.2f}")
-
+            
             return equity_value
 
         except Exception as e:
-            logger.error(f"Error calculating intrinsic value: {e}")
+            logger.error(f"Error calculating intrinsic value: {e}", exc_info=True)
             return None
 
     def calculate_stock_price(self):

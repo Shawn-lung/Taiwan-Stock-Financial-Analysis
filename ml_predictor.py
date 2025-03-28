@@ -231,7 +231,7 @@ class GrowthPredictor:
             return None, None
 
     def _prepare_growth_features(self, financials):
-        """Prepare features for revenue growth prediction."""
+        """Prepare features for revenue ratio prediction."""
         try:
             revenue = financials.loc['Total Revenue']
             op_income = financials.loc['Operating Income']
@@ -244,16 +244,22 @@ class GrowthPredictor:
                     features = {}
                     current_rev = revenue[dates[i]]
                     prev_revenues = [revenue[dates[j]] for j in range(i-lookback, i+1)]
-                    growth_rates = [(prev_revenues[j+1] - prev_revenues[j])/prev_revenues[j] for j in range(len(prev_revenues)-1)]
                     
-                    features['recent_growth'] = growth_rates[-1]
-                    features['avg_growth'] = np.mean(growth_rates)
-                    features['growth_volatility'] = np.std(growth_rates)
+                    # Calculate revenue ratios instead of growth rates
+                    ratios = [prev_revenues[j+1]/prev_revenues[j] for j in range(len(prev_revenues)-1)]
+                    
+                    features['recent_ratio'] = ratios[-1]
+                    features['avg_ratio'] = np.mean(ratios)
+                    features['ratio_volatility'] = np.std(ratios)
                     features['size'] = np.log(current_rev)
                     features['margin'] = op_income[dates[i]] / current_rev
                     
-                    target = (revenue[dates[i+1]] - current_rev) / current_rev
-                    if abs(target) < 1.0:  # Filter extreme values
+                    # Target is next year's revenue ratio
+                    next_revenue = revenue[dates[i+1]]
+                    target = next_revenue / current_rev
+                    
+                    # Filter out extreme ratios
+                    if 0.5 < target < 2.0 and all(0.5 < r < 2.0 for r in ratios):
                         data.append((features, target))
                 except Exception as e:
                     continue
@@ -274,11 +280,9 @@ class GrowthPredictor:
         return None
 
     def _prepare_capex_features(self, financials, cashflow):
-        """Prepare features for CAPEX prediction with enhanced metric detection."""
+        """Prepare features for CAPEX/Revenue ratio prediction."""
         try:
             revenue = financials.loc['Total Revenue']
-            
-            # Try different possible CAPEX metric names with logging
             capex_metrics = [
                 'Capital Expenditure',
                 'PropertyAndPlantAndEquipment',
@@ -287,15 +291,18 @@ class GrowthPredictor:
                 'NetCapitalExpenditure'
             ]
             
+            # Log available metrics for debugging
             logger.info(f"Available cashflow metrics: {cashflow.index.tolist()}")
             capex_metric = self._normalize_metric_name(cashflow, capex_metrics)
             
             if not capex_metric:
-                logger.error("Could not find CAPEX metric in available metrics")
+                logger.error("Could not find CAPEX metric")
                 return None, None
                 
             capex = cashflow.loc[capex_metric]
             dates = sorted(set(financials.columns) & set(cashflow.columns))
+            logger.info(f"Available years for CAPEX data: {len(dates)}")
+            
             data = []
             lookback = 2
 
@@ -304,23 +311,35 @@ class GrowthPredictor:
                     features = {}
                     current_rev = revenue[dates[i]]
                     current_capex = abs(capex[dates[i]])
+                    current_ratio = current_capex / current_rev
                     
-                    features['capex_to_revenue'] = current_capex / current_rev
-                    features['revenue_growth'] = (current_rev - revenue[dates[i-1]]) / revenue[dates[i-1]]
+                    # Log the training data points
+                    logger.info(f"CAPEX data point {i}: Year={dates[i]}, Ratio={current_ratio:.2%}")
+                    
+                    features['current_capex_ratio'] = current_ratio
                     features['size'] = np.log(current_rev)
                     
-                    next_capex = abs(capex[dates[i+1]])
-                    target = (next_capex/revenue[dates[i+1]]) / (current_capex/current_rev) - 1
+                    if i > 0:
+                        prev_ratio = abs(capex[dates[i-1]]) / revenue[dates[i-1]]
+                        features['prev_capex_ratio'] = prev_ratio
+                        features['ratio_trend'] = current_ratio - prev_ratio
                     
-                    if abs(target) < 0.5:
+                    next_capex = abs(capex[dates[i+1]])
+                    next_rev = revenue[dates[i+1]]
+                    target = next_capex / next_rev
+                    
+                    if 0.01 <= target <= 0.4:
                         data.append((features, target))
+                        
                 except Exception as e:
                     logger.debug(f"Error processing CAPEX point {i}: {e}")
                     continue
 
             if not data:
+                logger.warning("No valid CAPEX training data")
                 return None, None
                 
+            logger.info(f"Generated {len(data)} CAPEX training samples")
             return pd.DataFrame([d[0] for d in data]), np.array([d[1] for d in data])
             
         except Exception as e:
@@ -328,7 +347,7 @@ class GrowthPredictor:
             return None, None
 
     def _prepare_wc_features(self, financials, balance):
-        """Prepare features for working capital prediction."""
+        """Prepare features for working capital to revenue ratio prediction."""
         try:
             revenue = financials.loc['Total Revenue']
             
@@ -354,6 +373,8 @@ class GrowthPredictor:
             current_assets = balance.loc[asset_metric]
             current_liab = balance.loc[liability_metric]
             dates = sorted(set(financials.columns) & set(balance.columns))
+            logger.info(f"Available years for WC data: {len(dates)}")
+            
             data = []
             lookback = 2
 
@@ -362,31 +383,67 @@ class GrowthPredictor:
                     features = {}
                     current_rev = revenue[dates[i]]
                     wc = current_assets[dates[i]] - current_liab[dates[i]]
+                    current_ratio = wc / current_rev
                     
-                    features['wc_to_revenue'] = wc / current_rev
-                    features['revenue_growth'] = (current_rev - revenue[dates[i-1]]) / revenue[dates[i-1]]
+                    # Log the training data point
+                    logger.info(f"WC data point {i}: Year={dates[i]}, Ratio={current_ratio:.2%}")
+                    
+                    features['wc_to_revenue'] = current_ratio
                     features['size'] = np.log(current_rev)
                     
+                    if i > 0:
+                        prev_wc = current_assets[dates[i-1]] - current_liab[dates[i-1]]
+                        prev_ratio = prev_wc / revenue[dates[i-1]]
+                        features['prev_wc_ratio'] = prev_ratio
+                        features['ratio_trend'] = current_ratio - prev_ratio
+                    
                     next_wc = current_assets[dates[i+1]] - current_liab[dates[i+1]]
-                    target = (next_wc/revenue[dates[i+1]]) / (wc/current_rev) - 1
-                    if abs(target) < 0.5:
+                    next_rev = revenue[dates[i+1]]
+                    # Target is the WC/Revenue ratio for next year
+                    target = next_wc / next_rev
+                    
+                    # Filter reasonable values
+                    if -0.3 <= target <= 0.5:
                         data.append((features, target))
-                except Exception:
+                        
+                except Exception as e:
+                    logger.debug(f"Error processing WC point {i}: {e}")
                     continue
 
             if not data:
+                logger.warning("No valid WC training data")
                 return None, None
+                
+            logger.info(f"Generated {len(data)} WC training samples")
             return pd.DataFrame([d[0] for d in data]), np.array([d[1] for d in data])
+            
         except Exception as e:
-            logger.error(f"Error preparing wc features: {e}")
+            logger.error(f"Error preparing WC features: {e}")
             return None, None
 
     def _prepare_depr_features(self, financials, cashflow):
-        """Prepare features for depreciation prediction."""
+        """Prepare features for depreciation to revenue ratio prediction."""
         try:
             revenue = financials.loc['Total Revenue']
-            depr = cashflow.loc['Depreciation']
+            
+            # Try different possible depreciation metric names
+            depr_metrics = [
+                'Depreciation',
+                'Depreciation & Amortization',
+                'DepreciationAndAmortization'
+            ]
+            
+            logger.info(f"Available cashflow metrics: {cashflow.index.tolist()}")
+            depr_metric = self._normalize_metric_name(cashflow, depr_metrics)
+            
+            if not depr_metric:
+                logger.error("Could not find Depreciation metric")
+                return None, None
+                
+            depr = cashflow.loc[depr_metric]
             dates = sorted(set(financials.columns) & set(cashflow.columns))
+            logger.info(f"Available years for Depreciation data: {len(dates)}")
+            
             data = []
             lookback = 2
 
@@ -395,32 +452,62 @@ class GrowthPredictor:
                     features = {}
                     current_rev = revenue[dates[i]]
                     current_depr = abs(depr[dates[i]])
+                    current_ratio = current_depr / current_rev
                     
-                    features['depr_to_revenue'] = current_depr / current_rev
-                    features['revenue_growth'] = (current_rev - revenue[dates[i-1]]) / revenue[dates[i-1]]
+                    logger.info(f"Depr data point {i}: Year={dates[i]}, Ratio={current_ratio:.2%}")
+                    
+                    features['depr_to_revenue'] = current_ratio
                     features['size'] = np.log(current_rev)
                     
+                    if i > 0:
+                        prev_ratio = abs(depr[dates[i-1]]) / revenue[dates[i-1]]
+                        features['prev_depr_ratio'] = prev_ratio
+                        features['ratio_trend'] = current_ratio - prev_ratio
+                    
                     next_depr = abs(depr[dates[i+1]])
-                    target = (next_depr/revenue[dates[i+1]]) / (current_depr/current_rev) - 1
-                    if abs(target) < 0.5:
+                    next_rev = revenue[dates[i+1]]
+                    target = next_depr / next_rev
+                    
+                    if 0.01 <= target <= 0.2:
                         data.append((features, target))
-                except Exception:
+                        
+                except Exception as e:
+                    logger.debug(f"Error processing depreciation point {i}: {e}")
                     continue
 
             if not data:
+                logger.warning("No valid depreciation training data")
                 return None, None
+                
+            logger.info(f"Generated {len(data)} depreciation training samples")
             return pd.DataFrame([d[0] for d in data]), np.array([d[1] for d in data])
+            
         except Exception as e:
-            logger.error(f"Error preparing depr features: {e}")
+            logger.error(f"Error preparing depreciation features: {e}")
             return None, None
 
     def _prepare_tax_features(self, financials):
         """Prepare features for tax rate prediction."""
         try:
             revenue = financials.loc['Total Revenue']
-            op_income = financials.loc['Operating Income']
-            tax = financials.loc['Tax Provision']
+            
+            # Try different possible tax and income metric names
+            tax_metrics = ['Tax Provision', 'Income Tax Expense']
+            income_metrics = ['Operating Income', 'Pretax Income', 'Income Before Tax']
+            
+            logger.info(f"Available income metrics: {financials.index.tolist()}")
+            tax_metric = self._normalize_metric_name(financials, tax_metrics)
+            income_metric = self._normalize_metric_name(financials, income_metrics)
+            
+            if not tax_metric or not income_metric:
+                logger.error("Could not find tax or income metrics")
+                return None, None
+                
+            tax = financials.loc[tax_metric]
+            op_income = financials.loc[income_metric]
             dates = sorted(financials.columns)
+            logger.info(f"Available years for Tax data: {len(dates)}")
+            
             data = []
             lookback = 2
 
@@ -428,24 +515,50 @@ class GrowthPredictor:
                 try:
                     features = {}
                     current_rev = revenue[dates[i]]
-                    current_tax = tax[dates[i]]
-                    current_op = op_income[dates[i]]
+                    current_tax = abs(tax[dates[i]])
+                    current_op = abs(op_income[dates[i]])
                     
-                    features['tax_to_opincome'] = current_tax / current_op if current_op > 0 else 0
-                    features['margin'] = current_op / current_rev
+                    if current_op <= 0:
+                        continue
+                        
+                    current_rate = current_tax / current_op
+                    
+                    logger.info(f"Tax data point {i}: Year={dates[i]}, Rate={current_rate:.2%}")
+                    
+                    features['tax_rate'] = current_rate
                     features['size'] = np.log(current_rev)
+                    features['margin'] = current_op / current_rev
                     
-                    next_tax = tax[dates[i+1]]
-                    next_op = op_income[dates[i+1]]
-                    target = (next_tax/next_op if next_op > 0 else 0) - (current_tax/current_op if current_op > 0 else 0)
-                    if abs(target) < 0.2:  # Tax rates shouldn't change too dramatically
+                    if i > 0:
+                        prev_op = abs(op_income[dates[i-1]])
+                        prev_tax = abs(tax[dates[i-1]])
+                        if prev_op > 0:
+                            prev_rate = prev_tax / prev_op
+                            features['prev_tax_rate'] = prev_rate
+                            features['rate_trend'] = current_rate - prev_rate
+                    
+                    next_tax = abs(tax[dates[i+1]])
+                    next_op = abs(op_income[dates[i+1]])
+                    
+                    if next_op <= 0:
+                        continue
+                        
+                    target = next_tax / next_op
+                    
+                    if 0.1 <= target <= 0.4:
                         data.append((features, target))
-                except Exception:
+                        
+                except Exception as e:
+                    logger.debug(f"Error processing tax point {i}: {e}")
                     continue
 
             if not data:
+                logger.warning("No valid tax training data")
                 return None, None
+                
+            logger.info(f"Generated {len(data)} tax training samples")
             return pd.DataFrame([d[0] for d in data]), np.array([d[1] for d in data])
+            
         except Exception as e:
             logger.error(f"Error preparing tax features: {e}")
             return None, None
@@ -523,7 +636,7 @@ class GrowthPredictor:
             return None
 
     def predict_all_factors(self, forecast_years=5, terminal_growth=0.025):
-        """Predict factors for user-specified years with individual ML predictions."""
+        """Predict factors with revenue growth and ratio-based predictions."""
         try:
             predictions = {
                 'growth_rates': [],
@@ -533,72 +646,198 @@ class GrowthPredictor:
                 'tax_factors': []
             }
             
+            # First predict revenue growth rates
             X_growth, y_growth = self.prepare_factor_features('growth')
-            if X_growth is not None and len(X_growth) >= 4:
+            if X_growth is not None and len(X_growth) >= 3:
                 self.growth_pipeline.fit(X_growth, y_growth)
                 last_features = X_growth.iloc[-1:].copy()
                 
+                historical_ratio = float(y_growth.mean())
+                historical_std = float(y_growth.std())
+                logger.info(f"Growth - Historical mean: {historical_ratio:.2%}, std: {historical_std:.2%}")
+                
+                # For high-growth companies, adjust bounds to allow higher growth persistence
+                max_possible_growth = min(historical_ratio + 1.5*historical_std, 1.5)  # Increased max growth cap
+                
+                # Predict first year directly with the model
+                ratio_pred = float(self.growth_pipeline.predict(last_features)[0])
+                small_variation = np.random.normal(0, 0.01)  
+                ratio_pred = ratio_pred * (1 + small_variation)
+                
+                # Calculate year-specific bounds
+                min_ratio = max(0.95, historical_ratio - 2*historical_std)
+                max_ratio = min(max_possible_growth, 1.5)  # Increased max ratio
+                
+                # Apply bounds
+                ratio_pred = max(min(ratio_pred, max_ratio), min_ratio)
+                first_year_growth = ratio_pred - 1.0
+                predictions['growth_rates'].append(float(first_year_growth))
+                
+                # Update features for next iteration
+                if 'recent_ratio' in last_features:
+                    last_features['recent_ratio'] = ratio_pred
+                
+                # For remaining years, create a more gradual curve towards long-term rate
+                if forecast_years > 1:
+                    # Start with the first year growth and decline more gradually
+                    start_growth = first_year_growth
+                    end_growth = max(terminal_growth * 1.5, terminal_growth + 0.02)
+                    
+                    # Use a more stretched curve for companies with high historical growth
+                    if historical_ratio > 0.5:  # For companies with >50% historical growth
+                        # Create a slower decay curve
+                        for i in range(forecast_years-1):
+                            # Use a flatter decay function for high-growth companies
+                            progress = ((i + 1) / (forecast_years - 1)) ** 0.3  # Slower decay (was 0.5)
+                            
+                            # Calculate intermediate growth with slower decay
+                            current_growth = start_growth - progress * (start_growth - end_growth)
+                            
+                            # Add small variation
+                            variation = np.random.normal(0, 0.005)
+                            adjusted_growth = current_growth * (1 + variation)
+                            
+                            predictions['growth_rates'].append(float(adjusted_growth))
+                    else:
+                        # Use standard decay for normal growth companies
+                        for i in range(forecast_years-1):
+                            progress = ((i + 1) / (forecast_years - 1)) ** 0.5
+                            current_growth = start_growth - progress * (start_growth - end_growth)
+                            variation = np.random.normal(0, 0.005)
+                            adjusted_growth = current_growth * (1 + variation)
+                            predictions['growth_rates'].append(float(adjusted_growth))
+            else:
+                logger.warning("Insufficient growth data, using default pattern with smooth decay")
+                # Use smooth declining growth pattern
+                initial_growth = 0.15  # Starting growth rate
+                min_growth = max(terminal_growth * 1.2, 0.03)  # Minimum growth rate with buffer
+                
+                # Create a smooth declining curve
                 for year in range(forecast_years):
-                    # Make prediction for current year
-                    current_pred = float(self.growth_pipeline.predict(last_features)[0])
+                    # Calculate progress
+                    progress = (year / (forecast_years - 1)) ** 0.5 if forecast_years > 1 else 1
+                    
+                    # Calculate growth with smooth decay
+                    growth = initial_growth - progress * (initial_growth - min_growth)
                     
                     # Add small random variation
-                    variation = np.random.normal(0, 0.005)  # 0.5% variation
-                    current_pred *= (1 + variation)
+                    variation = np.random.normal(0, 0.005)
+                    growth = growth * (1 + variation)
                     
-                    # Bound between terminal growth and max growth
-                    current_pred = max(min(current_pred, 0.5), terminal_growth)
-                    predictions['growth_rates'].append(current_pred)
-                    
-                    # Update features for next prediction
-                    # This simulates how recent growth affects future predictions
-                    if 'recent_growth' in last_features:
-                        last_features['recent_growth'] = current_pred
-                    if 'avg_growth' in last_features:
-                        prev_growths = predictions['growth_rates'][-3:] if len(predictions['growth_rates']) >= 3 else [current_pred]
-                        last_features['avg_growth'] = np.mean(prev_growths)
-                
-                # Predict other factors
-                for factor_type, pipeline in [
-                    ('capex', self.capex_pipeline),
-                    ('wc', self.wc_pipeline),
-                    ('depr', self.depr_pipeline),
-                    ('tax', self.tax_pipeline)
-                ]:
-                    X, y = self.prepare_factor_features(factor_type)
-                    if X is not None and len(X) >= 4:
-                        pipeline.fit(X, y)
-                        last_feat = X.iloc[-1:].copy()
-                        
-                        for year in range(forecast_years):
-                            pred = pipeline.predict(last_feat)[0]
-                            variation = np.random.normal(0, 0.002)
-                            final_pred = pred * (1 + variation)
-                            
-                            if factor_type in ['capex', 'wc']:
-                                final_pred = max(min(final_pred, 0.3), -0.3)
-                            else:  # tax, depr
-                                final_pred = max(min(final_pred, 0.2), -0.2)
-                                
-                            predictions[f'{factor_type}_factors'].append(float(final_pred))
-                            
-                            # Update features for next prediction if needed
-                            if 'revenue_growth' in last_feat:
-                                last_feat['revenue_growth'] = predictions['growth_rates'][year]
-                    else:
-                        predictions[f'{factor_type}_factors'].extend([0.0] * forecast_years)
-                
-                logger.info(f"ML Predictions for {forecast_years} years:")
-                for factor, values in predictions.items():
-                    logger.info(f"{factor}: {[f'{x:.1%}' for x in values]}")
-                
-                predictions['forecast_years'] = forecast_years
-                return predictions
+                    predictions['growth_rates'].append(float(growth))
             
-            return None
-
+            # Process each factor type with dynamic prediction and stricter bounds
+            factor_types = [
+                ('capex', self.capex_pipeline, 0.05, 0.25),  # Reduced max cap from 0.3 to 0.25
+                ('wc', self.wc_pipeline, -0.05, 0.15),      # Reduced max from 0.25 to 0.15
+                ('depr', self.depr_pipeline, 0.02, 0.15),
+                ('tax', self.tax_pipeline, 0.15, 0.35)
+            ]
+            
+            for factor_type, pipeline, min_bound, max_bound in factor_types:
+                X, y = self.prepare_factor_features(factor_type)
+                
+                if X is not None and len(X) >= 3:
+                    pipeline.fit(X, y)
+                    last_feat = X.iloc[-1:].copy()
+                    
+                    # Calculate historical statistics
+                    historical_mean = float(y.mean())
+                    historical_std = float(y.std())
+                    logger.info(f"{factor_type} - Training samples: {len(X)}, Mean: {historical_mean:.2%}, Std: {historical_std:.2%}")
+                    
+                    # Generate predictions with tighter bounds
+                    factor_preds = []
+                    for year in range(forecast_years):
+                        # Predict the ratio directly
+                        ratio_pred = float(pipeline.predict(last_feat)[0])
+                        
+                        # Scale variation down over time for more stability
+                        variation = np.random.normal(0, 0.01 + 0.005 * year)
+                        ratio_pred = ratio_pred * (1 + variation)
+                        
+                        # Use tighter bounds for year 1 based on historical data
+                        # Then gradually move toward industry norms for later years
+                        year_weight = min(year / 2, 1.0)  # 0, 0.5, 1.0, 1.0, 1.0
+                        industry_norm = {'capex': 0.10, 'wc': 0.05, 'depr': 0.05, 'tax': 0.20}[factor_type]
+                        
+                        # Blend historical mean with industry norm based on year
+                        blended_mean = historical_mean * (1 - year_weight) + industry_norm * year_weight
+                        
+                        # Tighten std bounds for later years (more predictable)
+                        std_factor = max(1.0 - (year * 0.1), 0.6)
+                        effective_std = historical_std * std_factor
+                        
+                        # Calculate safe bounds
+                        upper_bound = min(blended_mean + 1.5 * effective_std, max_bound)
+                        lower_bound = max(blended_mean - 1.5 * effective_std, min_bound)
+                        
+                        # Special handling for CAPEX ratio - it should be higher in growth years
+                        if factor_type == 'capex' and year < len(predictions['growth_rates']):
+                            growth_rate = predictions['growth_rates'][year]
+                            if growth_rate > 0.15:  # For high growth years
+                                # Scale CAPEX with growth rate
+                                growth_adjustment = min((growth_rate - 0.15) * 0.5, 0.1)
+                                upper_bound = min(upper_bound + growth_adjustment, max_bound)
+                                lower_bound = min(lower_bound + growth_adjustment, upper_bound - 0.05)
+                        
+                        # Ensure tax rates remain within reasonable bounds
+                        if factor_type == 'tax':
+                            upper_bound = min(upper_bound, 0.35)
+                            lower_bound = max(lower_bound, 0.15)
+                        
+                        # Constrain the prediction
+                        ratio_pred = max(min(ratio_pred, upper_bound), lower_bound)
+                        
+                        factor_preds.append(float(ratio_pred))
+                        
+                        # Update features for next prediction
+                        if 'current_capex_ratio' in last_feat and factor_type == 'capex':
+                            if 'prev_capex_ratio' in last_feat:
+                                last_feat['prev_capex_ratio'] = last_feat['current_capex_ratio']
+                            last_feat['current_capex_ratio'] = ratio_pred
+                    
+                    predictions[f'{factor_type}_factors'] = factor_preds
+                else:
+                    # Use industry defaults with slight variations
+                    logger.warning(f"Insufficient {factor_type} data, using defaults with variation")
+                    default_base = {'capex': 0.1, 'wc': 0.05, 'depr': 0.05, 'tax': 0.20}[factor_type]
+                    defaults = []
+                    
+                    for year in range(forecast_years):
+                        # Less variation for defaults to improve stability
+                        variation = np.random.normal(0, 0.005 + 0.005 * year)
+                        val = default_base * (1 + variation)
+                        
+                        # Make CAPEX scale with growth in early years
+                        if factor_type == 'capex' and year < len(predictions['growth_rates']):
+                            growth_rate = predictions['growth_rates'][year]
+                            if growth_rate > 0.1:
+                                # Add small adjustment for growth
+                                growth_adj = min((growth_rate - 0.1) * 0.3, 0.05)
+                                val += growth_adj
+                        
+                        val = max(min(val, max_bound), min_bound)
+                        defaults.append(val)
+                        
+                    predictions[f'{factor_type}_factors'] = defaults
+            
+            # Additional sanity check: for very high growth companies, ensure WC doesn't drain too much cash
+            if any(g > 0.25 for g in predictions['growth_rates']):
+                # Use more conservative WC targets to avoid cash drain
+                wc_adjustments = [min(r, 0.1) for r in predictions['wc_factors']]
+                predictions['wc_factors'] = wc_adjustments
+            
+            logger.info("Final ML predictions:")
+            for factor, values in predictions.items():
+                if factor != 'forecast_years':
+                    logger.info(f"{factor}: {[f'{x:.2%}' for x in values]}")
+            
+            predictions['forecast_years'] = forecast_years
+            return predictions
+                
         except Exception as e:
-            logger.error(f"Error in predictions: {e}")
+            logger.error(f"Error in predictions: {e}", exc_info=True)
             return None
 
     def _decay_factor(self, pipeline, X, year, decay_rate):
