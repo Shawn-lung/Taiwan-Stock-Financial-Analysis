@@ -26,3 +26,27 @@
 2025-04-01 16:59:26,117 - background_data_collector - INFO - Collecting data for 1201 (Food & Beverage) - 10/50
 2025-04-01 16:59:40,275 - background_data_collector - INFO - Collecting data for 1203 (Food & Beverage) - 11/50
 2025-04-01 16:59:54,176 - background_data_collector - INFO - Collecting data for 1210 (Food & Beverage) - 12/50
+2025-04-01 17:00:09,673 - background_data_collector - INFO - Collecting data for 1213 (Food & Beverage) - 13/50
+2025-04-01 17:00:11,034 - background_data_collector - INFO - API call count: 50 in 187.6 seconds
+2025-04-01 17:00:23,380 - background_data_collector - INFO - Collecting data for 1215 (Food & Beverage) - 14/50
+2025-04-01 17:00:38,778 - background_data_collector - INFO - Collecting data for 1216 (Food & Beverage) - 15/50
+2025-04-01 17:00:54,723 - background_data_collector - INFO - Collecting data for 1217 (Food & Beverage) - 16/50
+2025-04-01 17:00:54,945 - background_data_collector - ERROR - Error collecting financial statement for 1217: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:00:55,190 - background_data_collector - ERROR - Error collecting balance sheet for 1217: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:00:55,423 - background_data_collector - ERROR - Error collecting cash flow for 1217: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:00:55,666 - background_data_collector - ERROR - Error collecting price data for 1217: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:04,186 - background_data_collector - INFO - Collecting data for 1218 (Food & Beverage) - 17/50
+2025-04-01 17:01:04,372 - background_data_collector - ERROR - Error collecting financial statement for 1218: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:04,605 - background_data_collector - ERROR - Error collecting balance sheet for 1218: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:04,794 - background_data_collector - ERROR - Error collecting cash flow for 1218: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:04,994 - background_data_collector - ERROR - Error collecting price data for 1218: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:14,097 - background_data_collector - INFO - Collecting data for 1219 (Food & Beverage) - 18/50
+2025-04-01 17:01:14,281 - background_data_collector - ERROR - Error collecting financial statement for 1219: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:14,542 - background_data_collector - ERROR - Error collecting balance sheet for 1219: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:14,859 - background_data_collector - ERROR - Error collecting cash flow for 1219: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:15,078 - background_data_collector - ERROR - Error collecting price data for 1219: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:26,372 - background_data_collector - INFO - Collecting data for 1220 (Food & Beverage) - 19/50
+2025-04-01 17:01:26,644 - background_data_collector - ERROR - Error collecting financial statement for 1220: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:26,812 - background_data_collector - ERROR - Error collecting balance sheet for 1220: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:27,000 - background_data_collector - ERROR - Error collecting cash flow for 1220: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 17:01:27,225 - background_data_collector - ERROR - Error collecting price data for 1220: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}

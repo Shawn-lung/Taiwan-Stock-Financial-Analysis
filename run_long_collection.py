@@ -1,5 +1,14 @@
 import time
 from background_data_collector import BackgroundDataCollector
+import datetime
+
+# Calculate the start time (1 hour from now)
+start_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+print(f"Data collection will start at {start_time.strftime('%Y-%m-%d %H:%M:%S')} (in 1 hour)")
+print("You can safely leave now. The script will wait and then start collection automatically.")
+
+# Wait for 1 hour before starting the collector
+time.sleep(3600)  # 1 hour delay
 
 # Create collector with 1-hour interval
 collector = BackgroundDataCollector(
@@ -8,6 +17,7 @@ collector = BackgroundDataCollector(
 )
 
 # Start collection
+print(f"Starting data collection now: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 collector.start_scheduler()
 
 try:
