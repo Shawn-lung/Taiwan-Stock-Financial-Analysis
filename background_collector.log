@@ -1,0 +1,81 @@
+2025-04-01 00:55:26,692 - __main__ - INFO - Database initialized at finance_data.db
+2025-04-01 00:55:27,070 - __main__ - ERROR - Error getting Taiwan stock list: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 00:55:27,073 - __main__ - ERROR - Failed to get stock information
+2025-04-01 00:55:27,073 - __main__ - INFO - Scheduler started, collecting data every 12 hours
+2025-04-01 00:58:47,629 - __main__ - INFO - Scheduler stopped
+2025-04-01 00:58:47,634 - __main__ - INFO - Exported all data to exported_data
+2025-04-01 01:03:05,611 - __main__ - INFO - Database initialized at finance_data.db
+2025-04-01 01:03:05,778 - __main__ - ERROR - Error getting Taiwan stock list: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
+2025-04-01 01:03:05,779 - __main__ - ERROR - Failed to get stock information
+2025-04-01 01:03:05,780 - __main__ - INFO - Scheduler started, collecting data every 1 hours
+2025-04-01 01:28:36,193 - __main__ - INFO - Scheduler stopped
+2025-04-01 01:28:36,198 - __main__ - INFO - Exported all data to exported_data
+2025-04-01 01:28:38,177 - __main__ - INFO - Database initialized at finance_data.db
+2025-04-01 01:28:39,110 - __main__ - INFO - Retrieved and saved 3934 Taiwan stocks
+2025-04-01 01:28:39,177 - __main__ - INFO - Collecting data for 10 stocks in this batch
+2025-04-01 01:28:40,602 - __main__ - INFO - Collecting data for 0050 (Other) - 1/10
+2025-04-01 01:28:56,412 - __main__ - INFO - Collecting data for 0051 (Other) - 2/10
+2025-04-01 01:29:09,372 - __main__ - INFO - Collecting data for 0052 (Other) - 3/10
+2025-04-01 01:29:24,561 - __main__ - INFO - Collecting data for 0053 (Other) - 4/10
+2025-04-01 01:29:37,926 - __main__ - INFO - Collecting data for 0054 (Other) - 5/10
+2025-04-01 01:29:53,914 - __main__ - INFO - Collecting data for 0055 (Other) - 6/10
+2025-04-01 01:30:10,450 - __main__ - INFO - Collecting data for 0056 (Other) - 7/10
+2025-04-01 01:30:26,041 - __main__ - INFO - Collecting data for 0057 (Other) - 8/10
+2025-04-01 01:30:42,725 - __main__ - INFO - Collecting data for 0058 (Other) - 9/10
+2025-04-01 01:30:57,626 - __main__ - INFO - Collecting data for 0059 (Other) - 10/10
+2025-04-01 01:31:11,554 - __main__ - INFO - Batch collection completed at 2025-04-01 01:31:11.554267
+2025-04-01 01:31:11,555 - __main__ - INFO - Scheduler started, collecting data every 1 hours
+2025-04-01 02:31:11,787 - __main__ - INFO - Using cached stock list with 2931 stocks
+2025-04-01 02:31:11,827 - __main__ - INFO - Collecting data for 10 stocks in this batch
+2025-04-01 02:31:13,156 - __main__ - INFO - Collecting data for 0060 (Other) - 1/10
+2025-04-01 02:31:25,791 - __main__ - INFO - Collecting data for 0061 (Other) - 2/10
+2025-04-01 02:31:42,014 - __main__ - INFO - Collecting data for 006201 (Other) - 3/10
+2025-04-01 02:32:01,289 - __main__ - INFO - Collecting data for 006203 (Other) - 4/10
+2025-04-01 02:32:19,466 - __main__ - INFO - Collecting data for 006204 (Other) - 5/10
+2025-04-01 02:32:35,120 - __main__ - INFO - Collecting data for 006205 (Other) - 6/10
+2025-04-01 02:32:52,970 - __main__ - INFO - Collecting data for 006206 (Other) - 7/10
+2025-04-01 02:33:09,762 - __main__ - INFO - Collecting data for 006207 (Other) - 8/10
+2025-04-01 02:33:25,058 - __main__ - INFO - Collecting data for 006208 (Other) - 9/10
+2025-04-01 02:33:38,068 - __main__ - INFO - Collecting data for 00625K (Other) - 10/10
+2025-04-01 02:33:51,999 - __main__ - INFO - Batch collection completed at 2025-04-01 02:33:51.999922
+2025-04-01 03:33:52,437 - __main__ - INFO - Using cached stock list with 2931 stocks
+2025-04-01 03:33:52,502 - __main__ - INFO - Collecting data for 10 stocks in this batch
+2025-04-01 03:33:55,310 - __main__ - INFO - Collecting data for 00631L (Other) - 1/10
+2025-04-01 03:34:13,208 - __main__ - INFO - Collecting data for 00632R (Other) - 2/10
+2025-04-01 03:34:30,644 - __main__ - INFO - Collecting data for 00633L (Other) - 3/10
+2025-04-01 03:34:46,236 - __main__ - INFO - Collecting data for 00634R (Other) - 4/10
+2025-04-01 03:35:02,950 - __main__ - INFO - Collecting data for 00635U (Other) - 5/10
+2025-04-01 03:35:16,018 - __main__ - INFO - Collecting data for 00636 (Other) - 6/10
+2025-04-01 03:35:33,271 - __main__ - INFO - Collecting data for 00636K (Other) - 7/10
+2025-04-01 03:35:47,501 - __main__ - INFO - Collecting data for 00637L (Other) - 8/10
+2025-04-01 03:36:03,212 - __main__ - INFO - Collecting data for 00638R (Other) - 9/10
+2025-04-01 03:36:17,511 - __main__ - INFO - Collecting data for 00639 (Other) - 10/10
+2025-04-01 03:36:31,024 - __main__ - INFO - Batch collection completed at 2025-04-01 03:36:31.024235
+2025-04-01 04:10:05,234 - __main__ - INFO - Database initialized at finance_data.db
+2025-04-01 04:10:05,241 - __main__ - INFO - Using cached stock list with 2931 stocks
+2025-04-01 04:10:05,296 - __main__ - INFO - Collecting data for 10 stocks in this batch
+2025-04-01 04:10:07,066 - __main__ - INFO - Collecting data for 00640L (Other) - 1/10
+2025-04-01 04:10:24,415 - __main__ - INFO - Collecting data for 00641R (Other) - 2/10
+2025-04-01 04:10:37,713 - __main__ - INFO - Collecting data for 00642U (Other) - 3/10
+2025-04-01 04:10:56,775 - __main__ - INFO - Collecting data for 00643 (Other) - 4/10
+2025-04-01 04:11:10,649 - __main__ - INFO - Collecting data for 00643K (Other) - 5/10
+2025-04-01 04:11:25,526 - __main__ - INFO - Collecting data for 00645 (Other) - 6/10
+2025-04-01 04:11:39,858 - __main__ - INFO - Collecting data for 00646 (Other) - 7/10
+2025-04-01 04:11:55,876 - __main__ - INFO - Collecting data for 00647L (Other) - 8/10
+2025-04-01 04:12:09,738 - __main__ - INFO - Collecting data for 00648R (Other) - 9/10
+2025-04-01 04:12:24,229 - __main__ - INFO - Collecting data for 00649 (Other) - 10/10
+2025-04-01 04:12:35,231 - __main__ - INFO - Batch collection completed at 2025-04-01 04:12:35.231330
+2025-04-01 04:12:35,232 - __main__ - INFO - Scheduler started, collecting data every 1 hours
+2025-04-01 14:49:11,996 - __main__ - INFO - Using cached stock list with 2931 stocks
+2025-04-01 14:49:12,053 - __main__ - INFO - Collecting data for 10 stocks in this batch
+2025-04-01 14:49:14,245 - __main__ - INFO - Collecting data for 00650L (Other) - 1/10
+2025-04-01 14:49:27,571 - __main__ - INFO - Collecting data for 00651R (Other) - 2/10
+2025-04-01 14:49:42,854 - __main__ - INFO - Collecting data for 00652 (Other) - 3/10
+2025-04-01 14:49:58,607 - __main__ - INFO - Collecting data for 00653L (Other) - 4/10
+2025-04-01 14:50:11,218 - __main__ - INFO - Collecting data for 00654R (Other) - 5/10
+2025-04-01 14:50:28,187 - __main__ - INFO - Collecting data for 00655L (Other) - 6/10
+2025-04-01 14:50:40,429 - __main__ - INFO - Collecting data for 00656R (Other) - 7/10
+2025-04-01 14:50:55,872 - __main__ - INFO - Collecting data for 00657 (Other) - 8/10
+2025-04-01 14:51:12,983 - __main__ - INFO - Collecting data for 00657K (Other) - 9/10
+2025-04-01 14:51:30,604 - __main__ - INFO - Collecting data for 00658L (Other) - 10/10
+2025-04-01 14:51:43,072 - __main__ - INFO - Batch collection completed at 2025-04-01 14:51:43.072763

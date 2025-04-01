@@ -1,3 +1,5 @@
+# Add import for the deep learning model at the top of the file
+from deep_learning import DeepFinancialForecaster
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
@@ -20,6 +22,9 @@ class GrowthPredictor:
         self.stock_code = stock_code
         self.data_fetcher = FinancialDataFetcher()
         self.stock = yf.Ticker(stock_code)
+        
+        # Add deep learning forecaster
+        self.deep_forecaster = DeepFinancialForecaster(sequence_length=3)
         
         # Modify model parameters for better stability
         self.pipeline = Pipeline([
@@ -635,7 +640,7 @@ class GrowthPredictor:
             logger.error(f"Error predicting growth: {e}")
             return None
 
-    def predict_all_factors(self, forecast_years=5, terminal_growth=0.025):
+    def predict_all_factors(self, forecast_years=5, terminal_growth=0.025, use_deep_learning=True):
         """Predict factors with revenue growth and ratio-based predictions."""
         try:
             predictions = {
@@ -646,8 +651,12 @@ class GrowthPredictor:
                 'tax_factors': []
             }
             
-            # First predict revenue growth rates
+            # Get financial data for deep learning
+            financial_data = self.data_fetcher.get_financial_data(self.stock_code)
+            
+            # First predict revenue growth rates using ML and optionally Deep Learning
             X_growth, y_growth = self.prepare_factor_features('growth')
+            
             if X_growth is not None and len(X_growth) >= 3:
                 self.growth_pipeline.fit(X_growth, y_growth)
                 last_features = X_growth.iloc[-1:].copy()
@@ -659,7 +668,21 @@ class GrowthPredictor:
                 # For high-growth companies, adjust bounds to allow higher growth persistence
                 max_possible_growth = min(historical_ratio + 1.5*historical_std, 1.5)  # Increased max growth cap
                 
-                # Predict first year directly with the model
+                # Deep Learning Integration: Get DL growth predictions if enabled
+                dl_growth_predictions = None
+                if use_deep_learning and financial_data and 'income_statement' in financial_data:
+                    try:
+                        logger.info("Using deep learning for growth predictions")
+                        dl_growth_predictions = self.deep_forecaster.predict_future_growth(
+                            financial_data['income_statement'], 
+                            forecast_years=forecast_years
+                        )
+                        logger.info(f"DL growth predictions: {[f'{x:.2%}' for x in dl_growth_predictions]}")
+                    except Exception as e:
+                        logger.error(f"Deep learning prediction failed: {e}")
+                        dl_growth_predictions = None
+                
+                # First year prediction from ML model
                 ratio_pred = float(self.growth_pipeline.predict(last_features)[0])
                 small_variation = np.random.normal(0, 0.01)  
                 ratio_pred = ratio_pred * (1 + small_variation)
@@ -671,41 +694,83 @@ class GrowthPredictor:
                 # Apply bounds
                 ratio_pred = max(min(ratio_pred, max_ratio), min_ratio)
                 first_year_growth = ratio_pred - 1.0
-                predictions['growth_rates'].append(float(first_year_growth))
+                
+                # Ensemble ML and DL predictions for first year if available
+                if dl_growth_predictions:
+                    # Weighted ensemble (70% ML, 30% DL)
+                    ensemble_growth = first_year_growth * 0.7 + dl_growth_predictions[0] * 0.3
+                    predictions['growth_rates'].append(float(ensemble_growth))
+                    logger.info(f"Ensemble first year growth: {ensemble_growth:.2%} (ML: {first_year_growth:.2%}, DL: {dl_growth_predictions[0]:.2%})")
+                else:
+                    predictions['growth_rates'].append(float(first_year_growth))
                 
                 # Update features for next iteration
                 if 'recent_ratio' in last_features:
                     last_features['recent_ratio'] = ratio_pred
                 
-                # For remaining years, create a more gradual curve towards long-term rate
+                # For remaining years: Use deep learning if available, otherwise use ML model
                 if forecast_years > 1:
-                    # Start with the first year growth and decline more gradually
-                    start_growth = first_year_growth
-                    end_growth = max(terminal_growth * 1.5, terminal_growth + 0.02)
-                    
-                    # Use a more stretched curve for companies with high historical growth
-                    if historical_ratio > 0.5:  # For companies with >50% historical growth
-                        # Create a slower decay curve
-                        for i in range(forecast_years-1):
-                            # Use a flatter decay function for high-growth companies
-                            progress = ((i + 1) / (forecast_years - 1)) ** 0.3  # Slower decay (was 0.5)
+                    if dl_growth_predictions:
+                        # For years 2+, gradually increase DL weight in ensemble
+                        for i in range(1, forecast_years):
+                            # Increase DL weight over time (years 2+ give more weight to DL)
+                            dl_weight = min(0.3 + (i * 0.15), 0.8)  # 45%, 60%, 75%, 80%
+                            ml_weight = 1.0 - dl_weight
                             
-                            # Calculate intermediate growth with slower decay
-                            current_growth = start_growth - progress * (start_growth - end_growth)
+                            # ML prediction
+                            if 'recent_ratio' in last_features:
+                                ml_ratio = float(self.growth_pipeline.predict(last_features)[0])
+                                # Update the recent ratio for next iteration
+                                last_features['recent_ratio'] = ml_ratio
+                                ml_growth = ml_ratio - 1.0
+                            else:
+                                # Fall back to a reasonable decay if ML can't predict
+                                ml_growth = predictions['growth_rates'][-1] * 0.85
+                            
+                            # Ensemble both predictions
+                            ensemble_growth = ml_growth * ml_weight + dl_growth_predictions[i] * dl_weight
                             
                             # Add small variation
                             variation = np.random.normal(0, 0.005)
-                            adjusted_growth = current_growth * (1 + variation)
+                            adjusted_growth = ensemble_growth * (1 + variation)
+                            
+                            # Ensure reasonable progression
+                            if i >= 2 and adjusted_growth > predictions['growth_rates'][-1] * 1.2:
+                                # Prevent unrealistic growth increases in later years
+                                adjusted_growth = predictions['growth_rates'][-1] * 0.95
                             
                             predictions['growth_rates'].append(float(adjusted_growth))
                     else:
-                        # Use standard decay for normal growth companies
-                        for i in range(forecast_years-1):
-                            progress = ((i + 1) / (forecast_years - 1)) ** 0.5
-                            current_growth = start_growth - progress * (start_growth - end_growth)
-                            variation = np.random.normal(0, 0.005)
-                            adjusted_growth = current_growth * (1 + variation)
-                            predictions['growth_rates'].append(float(adjusted_growth))
+                        # Fall back to the original ML model for years 2+
+                        # Use a more stretched curve for companies with high historical growth
+                        # ...existing ML-only prediction code...
+                        # Start with the first year growth and decline more gradually
+                        start_growth = first_year_growth
+                        end_growth = max(terminal_growth * 1.5, terminal_growth + 0.02)
+                        
+                        # Use a more stretched curve for companies with high historical growth
+                        if historical_ratio > 0.5:  # For companies with >50% historical growth
+                            # Create a slower decay curve
+                            for i in range(forecast_years-1):
+                                # Use a flatter decay function for high-growth companies
+                                progress = ((i + 1) / (forecast_years - 1)) ** 0.3  # Slower decay (was 0.5)
+                                
+                                # Calculate intermediate growth with slower decay
+                                current_growth = start_growth - progress * (start_growth - end_growth)
+                                
+                                # Add small variation
+                                variation = np.random.normal(0, 0.005)
+                                adjusted_growth = current_growth * (1 + variation)
+                                
+                                predictions['growth_rates'].append(float(adjusted_growth))
+                        else:
+                            # Use standard decay for normal growth companies
+                            for i in range(forecast_years-1):
+                                progress = ((i + 1) / (forecast_years - 1)) ** 0.5
+                                current_growth = start_growth - progress * (start_growth - end_growth)
+                                variation = np.random.normal(0, 0.005)
+                                adjusted_growth = current_growth * (1 + variation)
+                                predictions['growth_rates'].append(float(adjusted_growth))
             else:
                 logger.warning("Insufficient growth data, using default pattern with smooth decay")
                 # Use smooth declining growth pattern

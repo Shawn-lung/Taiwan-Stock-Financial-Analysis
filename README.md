@@ -1,217 +1,136 @@
-# Intelligent DCF Valuation: ML-Enhanced Financial Modeling
+# Taiwan Stock Financial Analysis System
 
-A sophisticated financial modeling project that combines traditional Discounted Cash Flow (DCF) analysis with machine learning to create more accurate stock valuations. This project demonstrates the application of advanced analytics to solve real-world financial problems.
+A comprehensive system for financial data collection, analysis, and stock valuation with a focus on Taiwan stock market.
 
-## Technical Overview
+## Overview
 
-### Machine Learning Components
+This project provides a suite of tools for financial analysis and stock valuation with special enhancements for Taiwan stocks. It includes:
 
-#### 1. Growth Prediction Model
-- **Algorithm**: Random Forest Regressor with automated feature engineering
-- **Features**:
-  - Historical growth patterns
-  - Operating margins
-  - Size metrics (log-transformed revenue)
-  - Volatility indicators
-  - Market momentum factors
-- **Model Architecture**:
-  - Ensemble of 200 decision trees
-  - Optimized depth (3) to prevent overfitting
-  - Feature importance analysis for interpretability
-  - Cross-validation with time series split
-- **Advanced Growth Modeling**:
-  - Adaptive decay patterns for high-growth companies
-  - Non-linear convergence to terminal growth rates
-  - Company-specific growth persistence modeling
-  - Historical volatility-based growth constraints
+- Background data collection with rate limiting (respects API constraints)
+- Industry-specific valuation models using machine learning
+- DCF (Discounted Cash Flow) models with ML and deep learning enhancements
+- Data visualization and analysis tools
 
-#### 2. Financial Factor Prediction
-- Predictive models for key financial metrics:
-  - CAPEX forecasting
-  - Working capital requirements
-  - Depreciation patterns
-  - Tax rate evolution
-- Feature engineering includes:
-  - Ratio analysis
-  - Rolling statistics
-  - Trend indicators
-  - Size normalization
-- **Growth-Sensitive Adjustments**:
-  - Dynamic CAPEX scaling based on growth rates
-  - Working capital optimization for high-growth scenarios
-  - Tax rate stability modeling for improved forecasting
-  - Growth-adjusted depreciation forecasting
+## Installation
 
-#### 3. Data Processing Pipeline
-- **Preprocessing**:
-  - Standardization using StandardScaler
-  - Outlier detection with Z-score method
-  - Missing value imputation
-  - Time series feature extraction
-- **Validation**:
-  - Time-series cross-validation
-  - Performance metrics tracking
-  - Anomaly detection
-  - Adaptive confidence scoring
+### Prerequisites
+- Python 3.8 or higher
+- A FinMind API key (for Taiwan stock data collection)
 
-### DCF Model Architecture
+### Setup
 
-#### 1. Financial Modeling Components
-- **Cash Flow Projection**:
-  - ML-driven growth forecasting
-  - Operating margin analysis
-  - Working capital optimization
-  - CAPEX and depreciation modeling
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/Finance_stuff.git
+   cd Finance_stuff
+   ```
 
-- **Valuation Mechanics**:
-  - Two-stage DCF model with smooth transitions
-  - Adaptive terminal value calculation
-  - Context-aware WACC computation
-  - Growth-sensitive multiple adjustments
-  - Industry-specific valuation constraints
+2. Install required packages:
+   ```
+   pip install -r requirements.txt
+   ```
 
-#### 2. Sensitivity Analysis
-- Monte Carlo simulation capabilities
-- Multi-factor sensitivity testing
-- Scenario analysis framework
-- Confidence interval calculations
-- Growth persistence stress-testing
+3. Create a `.env` file in the project root with your API keys:
+   ```
+   FINMIND_TOKEN=your_finmind_token_here
+   ```
 
-## Technical Implementation
+## System Components
+
+### Data Collection
+
+- `background_data_collector.py`: Collects financial data in the background with rate limiting (300 calls per hour)
+- `industry_data_collector.py`: Collects industry-specific financial data for model training
+
+### Valuation Models
+
+- `dcf_model.py`: Discounted Cash Flow model for stock valuation
+- `industry_valuation_model.py`: ML-based industry-specific valuation adjustments
+- `ml_predictor.py`: Machine learning model for growth prediction
+- `deep_learning.py`: Deep learning models for financial forecasting
+
+### Integration
+
+- `dcf_integrator.py`: Integrates all models (DCF, ML, DL, and industry-specific) for comprehensive valuation
+- `train_models_from_db.py`: Trains models using data from the database
+
+## Usage Examples
+
+### Data Collection
+
+Start the background data collector to build your database:
 
 ```python
-# Example of ML model architecture with adaptive growth modeling
-class GrowthPredictor:
-    def __init__(self):
-        self.pipeline = Pipeline([
-            ('scaler', StandardScaler()),
-            ('regressor', RandomForestRegressor(
-                n_estimators=200,
-                max_depth=3,
-                min_samples_split=3,
-                random_state=42,
-                max_features='sqrt'
-            ))
-        ])
+from background_data_collector import BackgroundDataCollector
 
-    def predict_all_factors(self, forecast_years=5, terminal_growth=0.025):
-        # For high-growth companies, use slower decay pattern
-        if historical_ratio > 0.5:  # For companies with >50% historical growth
-            # Create a slower decay curve with non-linear progression
-            progress = ((i + 1) / (forecast_years - 1)) ** 0.3  # Slower decay function
-            current_growth = start_growth - progress * (start_growth - end_growth)
+# Create collector and start it running
+collector = BackgroundDataCollector(
+    db_path="finance_data.db",
+    collection_interval=8  # Check every 8 hours
+)
+
+# Start the background collection scheduler
+collector.start_scheduler()
+
+# Check collection progress
+stats = collector.get_db_stats()
+print(f"Stocks with complete data: {stats.get('stocks_with_complete_data', 0)}")
 ```
 
-### Key Features
+### Training Models
 
-1. **ML-Enhanced Forecasting**
-   - Time series analysis for growth patterns
-   - Feature importance visualization
-   - Automated model retraining
-   - Prediction confidence scoring
-   - Adaptive growth decay modeling
+Train industry-specific valuation models:
 
-2. **Advanced Financial Analytics**
-   - Comprehensive ratio analysis
-   - Industry comparison capabilities
-   - Anomaly detection in financials
-   - Risk factor identification
-   - Growth-sensitive multiple calculations
+```python
+from train_models_from_db import train_industry_models_from_db
 
-3. **Interactive Visualization**
-   - Dynamic sensitivity charts
-   - Factor correlation heatmaps
-   - Growth trajectory plotting
-   - Comparative valuation views
-   - Decay curve visualization
-
-## Technical Stack
-
-- **Core Technologies**:
-  - Python 3.8+
-  - scikit-learn for ML models
-  - pandas for financial data processing
-  - NumPy for numerical computations
-  - Streamlit for interactive analysis
-
-- **Financial Data Integration**:
-  - yfinance API integration
-  - FinMind for Taiwan market data
-  - Custom data validation
-  - Cache management system
-  - Error handling framework
-
-## Algorithmic Innovations
-
-1. **Adaptive Growth Forecasting**
-   - Dynamic feature selection
-   - Automated parameter tuning
-   - Historical pattern recognition
-   - Confidence-weighted predictions
-   - Non-linear growth decay modeling
-
-2. **Intelligent Factor Analysis**
-   - Cross-correlation studies
-   - Temporal dependency modeling
-   - Market condition adaptation
-   - Risk-adjusted projections
-   - High-growth company specialization
-
-## Development Methodology
-
-- **Agile Development**
-  - Test-driven development (TDD)
-  - Continuous integration
-  - Regular performance benchmarking
-  - Iterative model improvement
-
-- **Code Quality**
-  - Comprehensive documentation
-  - Type hints and validation
-  - Performance optimization
-  - Modular architecture
-
-## Project Impact
-
-This project demonstrates the practical application of advanced analytics in financial modeling, showcasing:
-
-1. **Technical Achievement**
-   - Integration of ML with traditional finance
-   - Robust error handling and validation
-   - Scalable and maintainable architecture
-   - Performance optimization techniques
-
-2. **Analytical Depth**
-   - Sophisticated statistical modeling
-   - Complex financial calculations
-   - Data-driven decision making
-   - Risk analysis framework
-   - Specialized handling of high-growth companies
-
-## Future Enhancements
-
-- Deep learning integration for pattern recognition
-- Real-time market data incorporation
-- Advanced risk modeling capabilities
-- Automated report generation system
-- Sector-specific growth modeling
-
-## Installation and Setup
-```bash
-git clone [repository-url]
-cd Finance_stuff
-pip install -r requirements.txt
+# Train models using database data
+success = train_industry_models_from_db()
 ```
 
-## Running Tests
-```bash
-pytest tests/
+### Running Valuations
+
+Run a comprehensive valuation with all model components:
+
+```python
+from dcf_integrator import IntegratedValuationModel
+
+# Initialize the model with all components
+model = IntegratedValuationModel(use_ml=True, use_dl=True, use_industry=True)
+
+# Run valuation for a specific stock
+result = model.run_valuation("2330.TW", "Semiconductors")
+
+# Print results
+print(f"\nValuation Results for {result['ticker']}:")
+for model_name, price in result['models'].items():
+    print(f"  {model_name.replace('_', ' ').title()}: {price:.2f}")
 ```
 
-This project demonstrates proficiency in:
-- Machine Learning
-- Financial Modeling
-- Software Engineering
-- Data Analysis
-- Statistical Computing
-- Risk Management
+## Rate Limiting
+
+Both collectors implement rate limiting to avoid hitting FinMind API limits:
+
+- **Limit**: 300 API calls per hour
+- **Behavior**: Automatically pauses when the limit is reached and resumes after the hour window
+
+## Database Structure
+
+The system uses SQLite to store financial data. Key tables include:
+
+- `stock_info`: Basic stock information and industry classification
+- `financial_statements`: Income statement data
+- `balance_sheets`: Balance sheet data
+- `cash_flows`: Cash flow statement data
+- `stock_prices`: Historical price data
+- `collection_log`: Log of data collection attempts
+
+## Notes
+
+- The system is optimized for Taiwan stocks, particularly those listed on TWSE and TPEx
+- Industry classification is standardized across different data sources
+- Data collection is designed for long-term background operation to build up a comprehensive database
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

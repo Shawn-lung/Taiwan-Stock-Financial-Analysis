@@ -105,8 +105,16 @@ class DCFModel:
             so = self.stock.info.get("sharesOutstanding", 1)
             self.shares_outstanding = so if so and so > 0 else 1
 
-            # Calculate WACC using the external Wacc module
-            self.wacc = Wacc.WACCModel(self.stock_code).calculate_wacc()
+            # Try to calculate WACC using the external Wacc module
+            try:
+                self.wacc = Wacc.WACCModel(self.stock_code).calculate_wacc()
+                if self.wacc is None or self.wacc <= 0:
+                    # Fallback to a default WACC estimate if calculation fails
+                    logger.warning(f"WACC calculation failed for {self.stock_code}. Using default WACC.")
+                    self.wacc = self.estimate_default_wacc()
+            except Exception as e:
+                logger.warning(f"Error calculating WACC: {e}. Using default WACC.")
+                self.wacc = self.estimate_default_wacc()
 
             # Store base year metrics for potential anomaly detection
             self.base_year_metrics = {
@@ -121,6 +129,57 @@ class DCFModel:
             logger.info("Initialization complete for stock: %s", self.stock_code)
         except Exception as e:
             logger.error("Error during initialization: %s", e)
+
+    def estimate_default_wacc(self):
+        """Estimate a default WACC when the calculation fails."""
+        try:
+            # Get country code from ticker to determine default rates
+            country_code = self.stock_code.split('.')[-1] if '.' in self.stock_code else 'US'
+            
+            # Default WACC estimates by country/region
+            default_rates = {
+                'TW': 0.085,   # Taiwan
+                'TWO': 0.085,  # Taiwan OTC
+                'HK': 0.09,    # Hong Kong
+                'CN': 0.10,    # China
+                'US': 0.08,    # United States
+                'UK': 0.075,   # United Kingdom
+                'JP': 0.07,    # Japan
+                'KR': 0.09,    # South Korea
+                'SG': 0.08,    # Singapore
+            }
+            
+            # Get base rate from country, or use 8.5% as ultimate default
+            base_rate = default_rates.get(country_code, 0.085)
+            
+            # Adjust based on industry if available (simplified)
+            try:
+                industry = self.stock.info.get('industry', '')
+                industry_adjustments = {
+                    'Technology': 0.01,       # Higher for tech
+                    'Software': 0.015,        # Higher for software
+                    'Healthcare': 0.005,      # Slightly higher for healthcare
+                    'Utilities': -0.02,       # Lower for utilities
+                    'Energy': 0.01,           # Higher for energy
+                    'Consumer Defensive': -0.01   # Lower for consumer defensive
+                }
+                adjustment = 0
+                for ind_keyword, adj in industry_adjustments.items():
+                    if ind_keyword.lower() in industry.lower():
+                        adjustment += adj
+                
+                wacc = base_rate + adjustment
+                logger.info(f"Using default WACC of {wacc:.2%} for {self.stock_code} (base: {base_rate:.2%}, industry adj: {adjustment:.2%})")
+                return max(wacc, self.perpetual_growth_rate + 0.03)  # Ensure minimum spread
+                
+            except:
+                logger.info(f"Using default WACC of {base_rate:.2%} for {self.stock_code}")
+                return max(base_rate, self.perpetual_growth_rate + 0.03)  # Ensure minimum spread
+                
+        except Exception as e:
+            logger.error(f"Error in default WACC estimation: {e}")
+            # Absolute fallback - 8.5% WACC
+            return max(0.085, self.perpetual_growth_rate + 0.03)
 
     def get_latest_revenue(self):
         """Extract the latest revenue value from the income statement."""
@@ -214,19 +273,51 @@ class DCFModel:
         try:
             total_debt = 0.0
             cash_val = 0.0
+            
+            # Get total debt - ensure positive value regardless of accounting convention
             if "Total Debt" in self.balance_sheet.index:
                 td = self.balance_sheet.loc["Total Debt", self.latest_year_bs]
                 if pd.notna(td):
-                    total_debt = float(td)
+                    total_debt = abs(float(td))  # Use absolute value to ensure positive
+                    logger.info(f"Found Total Debt: {total_debt:,.0f}")
+            
+            # If no direct total debt, try to find long-term debt
+            if total_debt == 0:
+                for debt_key in ["Long Term Debt", "LongTermDebt", "LongTermBorrowings"]:
+                    if debt_key in self.balance_sheet.index:
+                        ltd = self.balance_sheet.loc[debt_key, self.latest_year_bs]
+                        if pd.notna(ltd):
+                            total_debt += abs(float(ltd))
+                            logger.info(f"Found Long Term Debt: {abs(float(ltd)):,.0f}")
+                            break
+            
+            # Add short-term debt/current portion if available
+            for st_key in ["Short Term Debt", "CurrentPortionLongTermDebt", "CurrentDebt"]:
+                if st_key in self.balance_sheet.index:
+                    std = self.balance_sheet.loc[st_key, self.latest_year_bs]
+                    if pd.notna(std):
+                        total_debt += abs(float(std))
+                        logger.info(f"Found Short Term Debt: {abs(float(std)):,.0f}")
+            
+            # Get cash and cash equivalents
             for key in ["Cash And Cash Equivalents", "Cash", "Cash Cash Equivalents And Short Term Investments"]:
                 if key in self.balance_sheet.index:
                     c_val = self.balance_sheet.loc[key, self.latest_year_bs]
                     if pd.notna(c_val):
-                        cash_val += float(c_val)
+                        cash_val = abs(float(c_val))  # Use absolute value to ensure positive
+                        logger.info(f"Found Cash: {cash_val:,.0f}")
                         break
-            return total_debt - cash_val
+            
+            # Net debt calculation and handling of negative net debt
+            net_debt = total_debt - cash_val
+            logger.info(f"Calculated Net Debt: {net_debt:,.0f} (Total Debt: {total_debt:,.0f} - Cash: {cash_val:,.0f})")
+            
+            # Store cash separately for enterprise to equity value calculation
+            self.cash = cash_val
+            
+            return net_debt
         except Exception as e:
-            logger.error("Error calculating net debt: %s", e)
+            logger.error(f"Error calculating net debt: {e}")
             return 0.0
 
     def get_latest_working_capital(self):
@@ -453,7 +544,12 @@ class DCFModel:
     def calculate_intrinsic_value(self):
         """Calculate intrinsic value with improved error handling and sanity checks."""
         try:
-            if not self.wacc or self.wacc <= self.perpetual_growth_rate:
+            if self.wacc is None:
+                # If WACC is still None after initialization, use default
+                logger.warning("WACC is None. Using default WACC for valuation.")
+                self.wacc = self.estimate_default_wacc()
+                
+            if self.wacc <= self.perpetual_growth_rate:
                 # Force minimum spread if WACC is too close to growth rate
                 self.wacc = max(self.wacc, self.perpetual_growth_rate + 0.03)
                 logger.info(f"Adjusted WACC to {self.wacc:.2%} to maintain spread from growth rate")
@@ -548,11 +644,11 @@ class DCFModel:
                     enterprise_value = ebitda * min_ev_multiple
                     logger.info(f"Applied floor EV/EBITDA of {min_ev_multiple:.1f}x (was {implied_ev_ebitda:.1f}x)")
 
-            # Calculate equity value considering net debt (but ensure EV remains positive)
-            cash = self.stock.info.get('cash', 0)
-            equity_value = max(enterprise_value - self.net_debt + cash, cash)
-
-            # Log calculations with sanity checks
+            # Calculate equity value considering net debt correctly
+            # If net_debt is negative (more cash than debt), it will add to enterprise value
+            equity_value = enterprise_value - self.net_debt
+            
+            # Log calculations with better explanations
             logger.info(f"Base Revenue: {self.current_revenue:,.2f}")
             logger.info(f"NPV of FCF: {npv_stage_1:,.2f}")
             logger.info(f"Normalized FCF for Terminal Value: {normalized_fcf:,.2f}")
@@ -561,8 +657,8 @@ class DCFModel:
                 logger.info(f"EV/EBITDA Multiple: {(enterprise_value/ebitda):.1f}x")
             logger.info(f"Enterprise Value: {enterprise_value:,.2f}")
             logger.info(f"Net Debt: {self.net_debt:,.2f}")
-            logger.info(f"Cash: {cash:,.2f}")
-            logger.info(f"Equity Value: {equity_value:,.2f}")
+            logger.info(f"Cash: {self.cash:,.2f}")
+            logger.info(f"Equity Value: {equity_value:,.2f} (EV - Net Debt)")
             
             return equity_value
 

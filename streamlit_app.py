@@ -5,6 +5,12 @@ from ml_predictor import GrowthPredictor
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, 
+                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Initialize session state defaults for manual inputs if not already set
 if 'manual_growth' not in st.session_state:
@@ -62,28 +68,30 @@ def parse_factors(text, expected_length):
         return [0.0] * expected_length
 
 st.subheader("Machine Learning Predictions")
-use_ml = st.checkbox("Use ML model for predictions")
+use_ml = st.checkbox("Use ML model for predictions", value=True)
+use_dl = st.checkbox("Use Deep Learning for enhanced forecasts", value=True)
 
 st.subheader("Prediction Method")
 prediction_method = st.radio(
     "Choose prediction method:",
-    ["ML Predictions", "Manual Inputs"]
+    ["ML/DL Predictions", "Manual Inputs"]
 )
 
 if st.button("Calculate Intrinsic Price"):
     try:
-        if prediction_method == "ML Predictions":
+        if prediction_method == "ML/DL Predictions":
             predictor = GrowthPredictor(stock_code)
-            st.info("Training ML models for factor predictions...")
+            st.info("Training ML and Deep Learning models for factor predictions...")
             
             with st.spinner('Processing...'):
                 predictions = predictor.predict_all_factors(
                     forecast_years=forecast_years,
-                    terminal_growth=perpetual_growth_rate
+                    terminal_growth=perpetual_growth_rate,
+                    use_deep_learning=use_dl
                 )
                 
                 if predictions:
-                    st.write(f"ML Predictions for {forecast_years} years:")
+                    st.write(f"ML/DL Predictions for {forecast_years} years:")
                     # Display predictions with line chart
                     for factor, values in predictions.items():
                         if factor != 'forecast_years':
