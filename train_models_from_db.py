@@ -22,7 +22,7 @@ def train_industry_models_from_db():
     # Initialize the background data collector
     collector = BackgroundDataCollector(
         db_path="finance_data.db",
-        collection_interval=12  # hours
+        collection_interval=1  # Collect every hour instead of 12
     )
     
     # Check if we have enough data

@@ -1,81 +1,28 @@
-2025-04-01 00:55:26,692 - __main__ - INFO - Database initialized at finance_data.db
-2025-04-01 00:55:27,070 - __main__ - ERROR - Error getting Taiwan stock list: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
-2025-04-01 00:55:27,073 - __main__ - ERROR - Failed to get stock information
-2025-04-01 00:55:27,073 - __main__ - INFO - Scheduler started, collecting data every 12 hours
-2025-04-01 00:58:47,629 - __main__ - INFO - Scheduler stopped
-2025-04-01 00:58:47,634 - __main__ - INFO - Exported all data to exported_data
-2025-04-01 01:03:05,611 - __main__ - INFO - Database initialized at finance_data.db
-2025-04-01 01:03:05,778 - __main__ - ERROR - Error getting Taiwan stock list: {"msg":"Requests reach the upper limit. https://finmindtrade.com/","status":402}
-2025-04-01 01:03:05,779 - __main__ - ERROR - Failed to get stock information
-2025-04-01 01:03:05,780 - __main__ - INFO - Scheduler started, collecting data every 1 hours
-2025-04-01 01:28:36,193 - __main__ - INFO - Scheduler stopped
-2025-04-01 01:28:36,198 - __main__ - INFO - Exported all data to exported_data
-2025-04-01 01:28:38,177 - __main__ - INFO - Database initialized at finance_data.db
-2025-04-01 01:28:39,110 - __main__ - INFO - Retrieved and saved 3934 Taiwan stocks
-2025-04-01 01:28:39,177 - __main__ - INFO - Collecting data for 10 stocks in this batch
-2025-04-01 01:28:40,602 - __main__ - INFO - Collecting data for 0050 (Other) - 1/10
-2025-04-01 01:28:56,412 - __main__ - INFO - Collecting data for 0051 (Other) - 2/10
-2025-04-01 01:29:09,372 - __main__ - INFO - Collecting data for 0052 (Other) - 3/10
-2025-04-01 01:29:24,561 - __main__ - INFO - Collecting data for 0053 (Other) - 4/10
-2025-04-01 01:29:37,926 - __main__ - INFO - Collecting data for 0054 (Other) - 5/10
-2025-04-01 01:29:53,914 - __main__ - INFO - Collecting data for 0055 (Other) - 6/10
-2025-04-01 01:30:10,450 - __main__ - INFO - Collecting data for 0056 (Other) - 7/10
-2025-04-01 01:30:26,041 - __main__ - INFO - Collecting data for 0057 (Other) - 8/10
-2025-04-01 01:30:42,725 - __main__ - INFO - Collecting data for 0058 (Other) - 9/10
-2025-04-01 01:30:57,626 - __main__ - INFO - Collecting data for 0059 (Other) - 10/10
-2025-04-01 01:31:11,554 - __main__ - INFO - Batch collection completed at 2025-04-01 01:31:11.554267
-2025-04-01 01:31:11,555 - __main__ - INFO - Scheduler started, collecting data every 1 hours
-2025-04-01 02:31:11,787 - __main__ - INFO - Using cached stock list with 2931 stocks
-2025-04-01 02:31:11,827 - __main__ - INFO - Collecting data for 10 stocks in this batch
-2025-04-01 02:31:13,156 - __main__ - INFO - Collecting data for 0060 (Other) - 1/10
-2025-04-01 02:31:25,791 - __main__ - INFO - Collecting data for 0061 (Other) - 2/10
-2025-04-01 02:31:42,014 - __main__ - INFO - Collecting data for 006201 (Other) - 3/10
-2025-04-01 02:32:01,289 - __main__ - INFO - Collecting data for 006203 (Other) - 4/10
-2025-04-01 02:32:19,466 - __main__ - INFO - Collecting data for 006204 (Other) - 5/10
-2025-04-01 02:32:35,120 - __main__ - INFO - Collecting data for 006205 (Other) - 6/10
-2025-04-01 02:32:52,970 - __main__ - INFO - Collecting data for 006206 (Other) - 7/10
-2025-04-01 02:33:09,762 - __main__ - INFO - Collecting data for 006207 (Other) - 8/10
-2025-04-01 02:33:25,058 - __main__ - INFO - Collecting data for 006208 (Other) - 9/10
-2025-04-01 02:33:38,068 - __main__ - INFO - Collecting data for 00625K (Other) - 10/10
-2025-04-01 02:33:51,999 - __main__ - INFO - Batch collection completed at 2025-04-01 02:33:51.999922
-2025-04-01 03:33:52,437 - __main__ - INFO - Using cached stock list with 2931 stocks
-2025-04-01 03:33:52,502 - __main__ - INFO - Collecting data for 10 stocks in this batch
-2025-04-01 03:33:55,310 - __main__ - INFO - Collecting data for 00631L (Other) - 1/10
-2025-04-01 03:34:13,208 - __main__ - INFO - Collecting data for 00632R (Other) - 2/10
-2025-04-01 03:34:30,644 - __main__ - INFO - Collecting data for 00633L (Other) - 3/10
-2025-04-01 03:34:46,236 - __main__ - INFO - Collecting data for 00634R (Other) - 4/10
-2025-04-01 03:35:02,950 - __main__ - INFO - Collecting data for 00635U (Other) - 5/10
-2025-04-01 03:35:16,018 - __main__ - INFO - Collecting data for 00636 (Other) - 6/10
-2025-04-01 03:35:33,271 - __main__ - INFO - Collecting data for 00636K (Other) - 7/10
-2025-04-01 03:35:47,501 - __main__ - INFO - Collecting data for 00637L (Other) - 8/10
-2025-04-01 03:36:03,212 - __main__ - INFO - Collecting data for 00638R (Other) - 9/10
-2025-04-01 03:36:17,511 - __main__ - INFO - Collecting data for 00639 (Other) - 10/10
-2025-04-01 03:36:31,024 - __main__ - INFO - Batch collection completed at 2025-04-01 03:36:31.024235
-2025-04-01 04:10:05,234 - __main__ - INFO - Database initialized at finance_data.db
-2025-04-01 04:10:05,241 - __main__ - INFO - Using cached stock list with 2931 stocks
-2025-04-01 04:10:05,296 - __main__ - INFO - Collecting data for 10 stocks in this batch
-2025-04-01 04:10:07,066 - __main__ - INFO - Collecting data for 00640L (Other) - 1/10
-2025-04-01 04:10:24,415 - __main__ - INFO - Collecting data for 00641R (Other) - 2/10
-2025-04-01 04:10:37,713 - __main__ - INFO - Collecting data for 00642U (Other) - 3/10
-2025-04-01 04:10:56,775 - __main__ - INFO - Collecting data for 00643 (Other) - 4/10
-2025-04-01 04:11:10,649 - __main__ - INFO - Collecting data for 00643K (Other) - 5/10
-2025-04-01 04:11:25,526 - __main__ - INFO - Collecting data for 00645 (Other) - 6/10
-2025-04-01 04:11:39,858 - __main__ - INFO - Collecting data for 00646 (Other) - 7/10
-2025-04-01 04:11:55,876 - __main__ - INFO - Collecting data for 00647L (Other) - 8/10
-2025-04-01 04:12:09,738 - __main__ - INFO - Collecting data for 00648R (Other) - 9/10
-2025-04-01 04:12:24,229 - __main__ - INFO - Collecting data for 00649 (Other) - 10/10
-2025-04-01 04:12:35,231 - __main__ - INFO - Batch collection completed at 2025-04-01 04:12:35.231330
-2025-04-01 04:12:35,232 - __main__ - INFO - Scheduler started, collecting data every 1 hours
-2025-04-01 14:49:11,996 - __main__ - INFO - Using cached stock list with 2931 stocks
-2025-04-01 14:49:12,053 - __main__ - INFO - Collecting data for 10 stocks in this batch
-2025-04-01 14:49:14,245 - __main__ - INFO - Collecting data for 00650L (Other) - 1/10
-2025-04-01 14:49:27,571 - __main__ - INFO - Collecting data for 00651R (Other) - 2/10
-2025-04-01 14:49:42,854 - __main__ - INFO - Collecting data for 00652 (Other) - 3/10
-2025-04-01 14:49:58,607 - __main__ - INFO - Collecting data for 00653L (Other) - 4/10
-2025-04-01 14:50:11,218 - __main__ - INFO - Collecting data for 00654R (Other) - 5/10
-2025-04-01 14:50:28,187 - __main__ - INFO - Collecting data for 00655L (Other) - 6/10
-2025-04-01 14:50:40,429 - __main__ - INFO - Collecting data for 00656R (Other) - 7/10
-2025-04-01 14:50:55,872 - __main__ - INFO - Collecting data for 00657 (Other) - 8/10
-2025-04-01 14:51:12,983 - __main__ - INFO - Collecting data for 00657K (Other) - 9/10
-2025-04-01 14:51:30,604 - __main__ - INFO - Collecting data for 00658L (Other) - 10/10
-2025-04-01 14:51:43,072 - __main__ - INFO - Batch collection completed at 2025-04-01 14:51:43.072763
+2025-04-01 16:52:47,664 - background_data_collector - INFO - Database initialized at finance_data.db
+2025-04-01 16:52:48,125 - background_data_collector - INFO - Found 57 unique industry categories: ETF, 上櫃ETF, 上櫃指數股票型基金(ETF), 受益證券, ETN, 指數投資證券(ETN), 水泥工業, 其他, 食品工業, 電器電纜, 農業科技業, 觀光事業, 觀光餐旅, 生技醫療業, 塑膠工業, 建材營造, 汽車工業, 電子零組件業, 綠能環保, 紡織纖維, 貿易百貨, 運動休閒, 電子工業, 鋼鐵工業, 電機機械, 電腦及週邊設備業, 運動休閒類, 化學生技醫療, 化學工業, 其他電子類, 玻璃陶瓷, 造紙工業, 居家生活, 橡膠工業, 航運業, 其他電子業, 創新板股票, 創新版股票, 半導體業, 通信網路業, 光電業, 電子通路業, 資訊服務業, 油電燃氣業, 數位雲端類, 金融保險, 居家生活類, 文化創意業, 綠能環保類, 電子商務業, 數位雲端, 金融業, 農業科技, 所有證券, 存託憑證, Index, 大盤
+2025-04-01 16:52:48,126 - background_data_collector - WARNING - Found 32 unmapped categories: ETF, 上櫃ETF, 上櫃指數股票型基金(ETF), 受益證券, ETN, 指數投資證券(ETN), 電器電纜, 農業科技業, 觀光餐旅, 生技醫療業, 綠能環保, 運動休閒, 電子工業, 運動休閒類, 化學生技醫療, 其他電子類, 玻璃陶瓷, 居家生活, 創新板股票, 創新版股票, 油電燃氣業, 數位雲端類, 金融保險, 居家生活類, 文化創意業, 綠能環保類, 電子商務業, 數位雲端, 所有證券, 存託憑證, Index, 大盤
+2025-04-01 16:52:48,134 - background_data_collector - INFO - Filtered out 497 ETFs from stock list, keeping 3437 regular stocks
+2025-04-01 16:52:48,136 - background_data_collector - INFO - 1670 stocks (48.6%) mapped to 'Other' industry
+2025-04-01 16:52:48,185 - background_data_collector - INFO - Retrieved and saved 3437 Taiwan stocks (excluding ETFs)
+2025-04-01 16:52:48,242 - background_data_collector - INFO - Collecting data for 50 stocks in this batch
+2025-04-01 16:52:50,727 - background_data_collector - INFO - Collecting data for 1101 (Cement & Construction Materials) - 1/50
+2025-04-01 16:53:04,431 - background_data_collector - INFO - Collecting data for 1101B (Cement & Construction Materials) - 2/50
+2025-04-01 16:57:02,811 - background_data_collector - INFO - Database initialized at finance_data.db
+2025-04-01 16:57:03,312 - background_data_collector - INFO - Found 57 unique industry categories: ETF, 上櫃ETF, 上櫃指數股票型基金(ETF), 受益證券, ETN, 指數投資證券(ETN), 水泥工業, 其他, 食品工業, 電器電纜, 農業科技業, 觀光事業, 觀光餐旅, 生技醫療業, 塑膠工業, 建材營造, 汽車工業, 電子零組件業, 綠能環保, 紡織纖維, 貿易百貨, 運動休閒, 電子工業, 鋼鐵工業, 電機機械, 電腦及週邊設備業, 運動休閒類, 化學生技醫療, 化學工業, 其他電子類, 玻璃陶瓷, 造紙工業, 居家生活, 橡膠工業, 航運業, 其他電子業, 創新板股票, 創新版股票, 半導體業, 通信網路業, 光電業, 電子通路業, 資訊服務業, 油電燃氣業, 數位雲端類, 金融保險, 居家生活類, 文化創意業, 綠能環保類, 電子商務業, 數位雲端, 金融業, 農業科技, 所有證券, 存託憑證, Index, 大盤
+2025-04-01 16:57:03,313 - background_data_collector - WARNING - Found 10 unmapped categories: ETF, 上櫃ETF, 上櫃指數股票型基金(ETF), 受益證券, ETN, 指數投資證券(ETN), 所有證券, 存託憑證, Index, 大盤
+2025-04-01 16:57:03,320 - background_data_collector - INFO - Filtered out 497 ETFs from stock list, keeping 3437 regular stocks
+2025-04-01 16:57:03,323 - background_data_collector - INFO - 286 stocks (8.3%) mapped to 'Other' industry
+2025-04-01 16:57:03,374 - background_data_collector - INFO - Retrieved and saved 3437 Taiwan stocks (excluding ETFs)
+2025-04-01 16:57:03,434 - background_data_collector - INFO - Collecting data for 50 stocks in this batch
+2025-04-01 16:57:06,067 - background_data_collector - INFO - Collecting data for 1101 (Cement & Construction Materials) - 1/50
+2025-04-01 16:57:20,934 - background_data_collector - INFO - Collecting data for 1101B (Cement & Construction Materials) - 2/50
+2025-04-01 16:57:34,660 - background_data_collector - INFO - Collecting data for 1102 (Cement & Construction Materials) - 3/50
+2025-04-01 16:57:53,084 - background_data_collector - INFO - Collecting data for 1103 (Cement & Construction Materials) - 4/50
+2025-04-01 16:58:09,564 - background_data_collector - INFO - Collecting data for 1104 (Cement & Construction Materials) - 5/50
+2025-04-01 16:58:23,031 - background_data_collector - INFO - Collecting data for 1107 (Other) - 6/50
+2025-04-01 16:58:37,524 - background_data_collector - INFO - Collecting data for 1108 (Cement & Construction Materials) - 7/50
+2025-04-01 16:58:55,534 - background_data_collector - INFO - Collecting data for 1109 (Cement & Construction Materials) - 8/50
+2025-04-01 16:59:12,535 - background_data_collector - INFO - Collecting data for 1110 (Cement & Construction Materials) - 9/50
+2025-04-01 16:59:26,117 - background_data_collector - INFO - Collecting data for 1201 (Food & Beverage) - 10/50
+2025-04-01 16:59:40,275 - background_data_collector - INFO - Collecting data for 1203 (Food & Beverage) - 11/50
+2025-04-01 16:59:54,176 - background_data_collector - INFO - Collecting data for 1210 (Food & Beverage) - 12/50

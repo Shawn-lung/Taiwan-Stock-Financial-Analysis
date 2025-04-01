@@ -125,6 +125,20 @@ The system uses SQLite to store financial data. Key tables include:
 - `stock_prices`: Historical price data
 - `collection_log`: Log of data collection attempts
 
+## ETF Filtering
+
+The system automatically detects and filters out ETFs (Exchange Traded Funds) during data collection, because:
+
+1. ETFs don't have traditional financial statements like companies do
+2. DCF valuation models aren't applicable to ETFs
+3. Including ETFs would waste API calls and storage space
+
+ETF detection is based on Taiwan market stock code patterns, including:
+- Leveraged ETFs (ending with "L" like 00650L)
+- Inverse ETFs (ending with "R" like 00651R)
+- Standard ETF numbering patterns (006xx, 00[6-9]xx series)
+- Famous ETFs like 0050 (Taiwan 50 ETF)
+
 ## Notes
 
 - The system is optimized for Taiwan stocks, particularly those listed on TWSE and TPEx

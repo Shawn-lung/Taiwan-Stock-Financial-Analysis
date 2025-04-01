@@ -12,6 +12,7 @@ import random
 from typing import List, Dict, Optional, Tuple
 import json
 import traceback
+import re
 
 # Configure logging
 logging.basicConfig(
@@ -64,8 +65,9 @@ class BackgroundDataCollector:
         except Exception as e:
             logger.warning(f"Could not authenticate with FinMind: {e}")
         
-        # Industry mapping for Taiwan stocks
+        # Enhanced industry mapping for Taiwan stocks
         self.industry_map = {
+            # Original mappings
             "光電業": "Electronics",
             "半導體業": "Semiconductors",
             "電子零組件業": "Electronics Manufacturing",
@@ -88,7 +90,52 @@ class BackgroundDataCollector:
             "文化創意": "Media & Entertainment",
             "電機機械": "Industrial Equipment",
             "貿易百貨": "Retail",
-            "其他": "Other"
+            "其他": "Other",
+            
+            # Additional mappings for common Taiwan industries
+            "汽車工業": "Automotive",
+            "觀光事業": "Tourism & Hospitality",
+            "航運業": "Shipping & Transportation",
+            "其他金融業": "Financial Services",
+            "鋼鐵工業": "Steel & Metals",
+            "橡膠工業": "Rubber & Plastics",
+            "造紙工業": "Paper & Packaging",
+            "水泥工業": "Cement & Construction Materials",
+            "農業科技": "Agricultural Technology",
+            "電子商務": "E-Commerce",
+            "電信服務": "Telecommunications Services",
+            "交通運輸": "Transportation",
+            "環保工程": "Environmental Services",
+            "公用事業": "Utilities",
+            "薄膜電晶體液晶顯示器": "LCD Manufacturing", 
+            "不動產投資信託": "REITs",
+            "投資控股": "Investment Holdings",
+            
+            # New mappings for unmapped categories
+            "電器電纜": "Electrical Equipment",
+            "農業科技業": "Agricultural Technology",
+            "觀光餐旅": "Tourism & Hospitality",
+            "生技醫療業": "Healthcare",
+            "綠能環保": "Green Energy",
+            "運動休閒": "Sports & Leisure",
+            "電子工業": "Electronics",
+            "運動休閒類": "Sports & Leisure",
+            "化學生技醫療": "Healthcare",
+            "其他電子類": "Electronics",
+            "玻璃陶瓷": "Glass & Ceramics",
+            "居家生活": "Home & Living",
+            "創新板股票": "Innovation Board",
+            "創新版股票": "Innovation Board",
+            "油電燃氣業": "Utilities",
+            "數位雲端類": "Cloud Computing",
+            "金融保險": "Financial Services",
+            "居家生活類": "Home & Living",
+            "文化創意業": "Media & Entertainment",
+            "綠能環保類": "Green Energy",
+            "電子商務業": "E-Commerce",
+            "數位雲端": "Cloud Computing",
+            "建材 營造": "Construction", # Space in original
+            "化 學生技醫療": "Healthcare", # Space in original
         }
     
     def _initialize_database(self):
@@ -287,6 +334,32 @@ class BackgroundDataCollector:
             logger.error(f"Error in batch collection: {e}")
             logger.error(traceback.format_exc())
     
+    def _is_etf(self, stock_id: str) -> bool:
+        """Determine if a stock ID is likely an ETF or other non-company security."""
+        # Pattern detection for ETFs and special financial instruments
+        filter_patterns = [
+            # All stocks starting with "00" are ETFs (like 0050, 0052, 0056, etc.)
+            r'^00\d+',
+            # All stocks starting with single "0" (like 020000)
+            r'^0\d+',
+            # Leveraged and inverse ETFs (e.g., 00657L, 00632R)
+            r'^\d{5}[LR]$',
+            # Trust certificates and REITs (ending with T)
+            r'\d+T$',
+            # Other ETF numbering patterns
+            r'^T[0-9]{2}',  # Known ETF issuers
+            # Other types of ETFs
+            r'^00[0-9]{2}B',
+            r'^00[0-9]{2}U'
+        ]
+        
+        # Check if stock_id matches any filter pattern
+        for pattern in filter_patterns:
+            if re.match(pattern, stock_id):
+                return True
+        
+        return False
+    
     def _get_and_save_stock_list(self) -> pd.DataFrame:
         """Get a list of all Taiwan stocks and save to the database."""
         try:
@@ -319,12 +392,32 @@ class BackgroundDataCollector:
                 logger.error("Failed to get stock info from FinMind")
                 return pd.DataFrame()
             
+            # Log all unique industry categories to help with mapping
+            unique_categories = stock_info['industry_category'].unique()
+            logger.info(f"Found {len(unique_categories)} unique industry categories: {', '.join(unique_categories)}")
+            
+            # Find categories not in mapping
+            unmapped_categories = [cat for cat in unique_categories if cat not in self.industry_map]
+            if unmapped_categories:
+                logger.warning(f"Found {len(unmapped_categories)} unmapped categories: {', '.join(unmapped_categories)}")
+            
+            # Filter out ETFs before saving to database
+            original_count = len(stock_info)
+            stock_info['is_etf'] = stock_info['stock_id'].apply(self._is_etf)
+            non_etf_stocks = stock_info[~stock_info['is_etf']].copy()
+            etf_count = original_count - len(non_etf_stocks)
+            logger.info(f"Filtered out {etf_count} ETFs from stock list, keeping {len(non_etf_stocks)} regular stocks")
+            
             # Map industry codes to standardized names
-            stock_info['industry'] = stock_info['industry_category'].map(self.industry_map).fillna("Other")
+            non_etf_stocks['industry'] = non_etf_stocks['industry_category'].map(self.industry_map).fillna("Other")
+            
+            # Count how many stocks got mapped to "Other"
+            other_count = len(non_etf_stocks[non_etf_stocks['industry'] == 'Other'])
+            logger.info(f"{other_count} stocks ({other_count/len(non_etf_stocks)*100:.1f}%) mapped to 'Other' industry")
             
             # Save to database
             now = datetime.datetime.now().isoformat()
-            for _, row in stock_info.iterrows():
+            for _, row in non_etf_stocks.iterrows():
                 cursor.execute('''
                     INSERT OR REPLACE INTO stock_info (stock_id, stock_name, industry, last_updated)
                     VALUES (?, ?, ?, ?)
@@ -333,8 +426,8 @@ class BackgroundDataCollector:
             conn.commit()
             conn.close()
             
-            logger.info(f"Retrieved and saved {len(stock_info)} Taiwan stocks")
-            return stock_info[['stock_id', 'stock_name', 'industry']]
+            logger.info(f"Retrieved and saved {len(non_etf_stocks)} Taiwan stocks (excluding ETFs)")
+            return non_etf_stocks[['stock_id', 'stock_name', 'industry']]
             
         except Exception as e:
             logger.error(f"Error getting Taiwan stock list: {e}")
@@ -354,7 +447,6 @@ class BackgroundDataCollector:
                 GROUP BY s.stock_id
                 ORDER BY last_collected ASC NULLS FIRST
             ''')
-            
             collection_times = cursor.fetchall()
             conn.close()
             
@@ -368,7 +460,6 @@ class BackgroundDataCollector:
             for _, row in stock_info.iterrows():
                 stock_id = row['stock_id']
                 industry = row['industry']
-                
                 if stock_id not in stock_collection_times:
                     never_collected.append((stock_id, industry))
                 else:
@@ -380,8 +471,8 @@ class BackgroundDataCollector:
             # Combine never collected and last collected stocks
             all_ordered_stocks = [(s[0], s[1]) for s in never_collected] + [(s[0], s[1]) for s in last_collected_stocks]
             
-            # Limit to a small batch size to avoid rate limits
-            batch_size = min(10, len(all_ordered_stocks))
+            # Increased batch size from 10 to 50
+            batch_size = min(50, len(all_ordered_stocks))
             
             # Return the batch to collect
             return all_ordered_stocks[:batch_size]
@@ -391,7 +482,7 @@ class BackgroundDataCollector:
             
             # Fallback to a random selection from stock_info
             if not stock_info.empty:
-                sample_size = min(5, len(stock_info))
+                sample_size = min(25, len(stock_info))  # Increased from 5 to 25
                 sample = stock_info.sample(sample_size)
                 return [(row['stock_id'], row['industry']) for _, row in sample.iterrows()]
             
@@ -562,7 +653,7 @@ class BackgroundDataCollector:
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     stock_id, 
-                    row['date'], 
+                    row['date'],         
                     float(row['open']), 
                     float(row['max']), 
                     float(row['min']), 
@@ -583,7 +674,6 @@ class BackgroundDataCollector:
             cursor = conn.cursor()
             
             now = datetime.datetime.now().isoformat()
-            
             cursor.execute('''
                 INSERT INTO collection_log (timestamp, stock_id, data_type, status, message)
                 VALUES (?, ?, ?, ?, ?)
@@ -689,7 +779,7 @@ class BackgroundDataCollector:
             
             # Get latest successful collection for each stock and data type
             status_df = pd.read_sql_query('''
-                SELECT s.stock_id, s.stock_name, s.industry, 
+                SELECT s.stock_id, s.stock_name, s.industry,
                        MAX(CASE WHEN l.data_type = 'financial_statement' AND l.status = 'success' THEN l.timestamp ELSE NULL END) as fs_last_update,
                        MAX(CASE WHEN l.data_type = 'balance_sheet' AND l.status = 'success' THEN l.timestamp ELSE NULL END) as bs_last_update,
                        MAX(CASE WHEN l.data_type = 'cash_flow' AND l.status = 'success' THEN l.timestamp ELSE NULL END) as cf_last_update,
@@ -701,7 +791,6 @@ class BackgroundDataCollector:
             ''', conn)
             
             conn.close()
-            
             return status_df
             
         except Exception as e:
@@ -712,7 +801,6 @@ class BackgroundDataCollector:
         """Export all data from the database to CSV files."""
         try:
             os.makedirs(output_dir, exist_ok=True)
-            
             conn = sqlite3.connect(self.db_path)
             
             # Export stock info
@@ -758,7 +846,6 @@ class BackgroundDataCollector:
                     json.dump(industry_data, f)
             
             conn.close()
-            
             logger.info(f"Exported all data to {output_dir}")
             return True
             
@@ -805,12 +892,11 @@ class BackgroundDataCollector:
             stats['stocks_with_complete_data'] = cursor.fetchone()[0]
             
             conn.close()
-            
             return stats
             
         except Exception as e:
             logger.error(f"Error getting database stats: {e}")
-            return {}
+            return {}    
 
 # Example usage
 if __name__ == "__main__":
