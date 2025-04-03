@@ -313,11 +313,14 @@ class DCFModel:
             logger.info(f"Calculated Net Debt: {net_debt:,.0f} (Total Debt: {total_debt:,.0f} - Cash: {cash_val:,.0f})")
             
             # Store cash separately for enterprise to equity value calculation
-            self.cash = cash_val
+            self.cash = cash_val  # Initialize self.cash attribute here
+            self.total_debt = total_debt  # Also store total_debt for potential future use
             
             return net_debt
         except Exception as e:
             logger.error(f"Error calculating net debt: {e}")
+            self.cash = 0.0  # Ensure cash is always initialized
+            self.total_debt = 0.0
             return 0.0
 
     def get_latest_working_capital(self):
@@ -792,6 +795,53 @@ class DCFModel:
         }
 
         return results
+
+    def get_financial_data(self):
+        """Get financial data for the stock that can be used by other models.
+        
+        Returns:
+            dict: Dictionary containing key financial metrics
+        """
+        try:
+            # Compile financial data into a dictionary
+            financial_data = {
+                'stock_code': self.stock_code,
+                'revenue': self.current_revenue,
+                'operating_income': self.operating_income,
+                'depreciation': self.depreciation,
+                'capex': self.capex,
+                'tax_rate': self.tax_rate,
+                'net_debt': self.net_debt,
+                'working_capital': self.current_working_capital,
+                'cash': getattr(self, 'cash', 0.0),  # Safely get cash attribute
+                'total_debt': getattr(self, 'total_debt', 0.0),  # Safely get total_debt attribute
+                'wacc': self.wacc
+            }
+            
+            # Add historical financial data if available
+            if hasattr(self, 'hist_metrics') and self.hist_metrics:
+                for key, values in self.hist_metrics.items():
+                    if values:  # Only include non-empty lists
+                        financial_data[f'historical_{key.lower()}'] = values
+            
+            # Add stock market data if available
+            if self.stock and hasattr(self.stock, 'info'):
+                info = self.stock.info
+                
+                # Extract key market data
+                for field in ['marketCap', 'beta', 'dividendYield', 'forwardPE', 'trailingPE']:
+                    if field in info and info[field] is not None:
+                        financial_data[field] = info[field]
+            
+            return financial_data
+        except Exception as e:
+            logger.error(f"Error getting financial data: {e}")
+            # Return minimal data when error occurs
+            return {
+                'stock_code': self.stock_code,
+                'revenue': self.current_revenue or 0.0,
+                'operating_income': self.operating_income or 0.0
+            }
 
 if __name__ == "__main__":
     dcf = DCFModel(

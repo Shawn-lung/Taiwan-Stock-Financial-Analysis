@@ -1,4 +1,5 @@
 import logging
+from util.db_data_provider import DBFinancialDataProvider
 from dcf_model import DCFModel
 from ml_predictor import GrowthPredictor
 from deep_learning import DeepFinancialForecaster
@@ -12,17 +13,20 @@ logger = logging.getLogger(__name__)
 class IntegratedValuationModel:
     """Integrate DCF, ML, DL, and industry-specific valuation adjustments."""
     
-    def __init__(self, use_ml: bool = True, use_dl: bool = True, use_industry: bool = True):
+    def __init__(self, use_ml: bool = True, use_dl: bool = True, use_industry: bool = True, db_path: str = "finance_data.db"):
         """Initialize the integrated valuation model.
         
         Args:
             use_ml: Whether to use ML predictions for growth factors
             use_dl: Whether to use deep learning predictions
             use_industry: Whether to apply industry-specific adjustments
+            db_path: Path to the SQLite database file
         """
         self.use_ml = use_ml
         self.use_dl = use_dl
         self.use_industry = use_industry
+        self.db_path = db_path
+        self.db_provider = DBFinancialDataProvider(db_path)
         
         # Initialize industry model if needed
         if self.use_industry:

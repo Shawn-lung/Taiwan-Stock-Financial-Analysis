@@ -1,0 +1,61 @@
+2025-04-03 02:35:29,239 - __main__ - INFO - Starting data format diagnosis and fix
+2025-04-03 02:35:29,324 - __main__ - INFO - Created database backup at finance_data.db.backup_20250403_023529
+2025-04-03 02:35:29,330 - __main__ - INFO - financial_statements uses 'metric_type' column with values like: [('OperatingExpenses',), ('TAX',), ('EPS',), ('PreTaxIncome',), ('IncomeFromContinuingOperations',)]
+2025-04-03 02:35:29,352 - __main__ - INFO - balance_sheets uses 'metric_type' column with values like: [('AccountsPayable_per',), ('AccountsReceivableDuefromRelatedPartiesNet',), ('AccountsReceivableDuefromRelatedPartiesNet_per',), ('AccountsReceivableNet_per',), ('BondsPayable_per',)]
+2025-04-03 02:35:29,359 - __main__ - INFO - cash_flows uses 'metric_type' column with values like: [('AmortizationExpense',), ('DecreaseInShortTermLoans',), ('OtherNonCurrentLiabilitiesDecrease',), ('CashReceivedThroughOperations',), ('ProceedsFromLongTermDebt',)]
+2025-04-03 02:35:29,369 - __main__ - INFO - Database Structure Summary:
+2025-04-03 02:35:29,369 - __main__ - INFO - - stock_info: 2532 rows, columns: ['stock_id', 'stock_name', 'industry', 'last_updated']
+2025-04-03 02:35:29,370 - __main__ - INFO - - financial_statements: 314491 rows, columns: ['id', 'stock_id', 'date', 'metric_type', 'value']
+2025-04-03 02:35:29,370 - __main__ - INFO - - sqlite_sequence: 5 rows, columns: ['name', 'seq']
+2025-04-03 02:35:29,370 - __main__ - INFO - - balance_sheets: 1699781 rows, columns: ['id', 'stock_id', 'date', 'metric_type', 'value']
+2025-04-03 02:35:29,370 - __main__ - INFO - - cash_flows: 506885 rows, columns: ['id', 'stock_id', 'date', 'metric_type', 'value']
+2025-04-03 02:35:29,370 - __main__ - INFO - - stock_prices: 1403874 rows, columns: ['id', 'stock_id', 'date', 'open', 'high', 'low', 'close', 'volume']
+2025-04-03 02:35:29,370 - __main__ - INFO - - collection_log: 5200 rows, columns: ['id', 'timestamp', 'stock_id', 'data_type', 'status', 'message']
+2025-04-03 02:35:29,370 - __main__ - INFO - Deleted models directory
+2025-04-03 02:35:29,370 - __main__ - INFO - Cleaned up industry_data_from_db directory
+2025-04-03 02:35:29,371 - __main__ - INFO - Found 125 stocks in Semiconductors industry
+2025-04-03 02:35:29,463 - __main__ - INFO - Created sample training file at industry_data_from_db/semiconductors_training.csv with 84 records
+2025-04-03 02:35:29,465 - __main__ - INFO - Found 452 stocks in Electronics industry
+2025-04-03 02:35:29,536 - __main__ - INFO - Created sample training file at industry_data_from_db/electronics_training.csv with 61 records
+2025-04-03 02:35:29,537 - __main__ - INFO - Data diagnosis and fix completed
+2025-04-03 03:30:55,051 - __main__ - INFO - Starting data format diagnosis and fix
+2025-04-03 03:30:55,146 - __main__ - INFO - Created database backup at finance_data.db.backup_20250403_033055
+2025-04-03 03:30:55,167 - __main__ - INFO - financial_statements uses 'metric_type' column with values like: [('OperatingExpenses',), ('TAX',), ('EPS',), ('PreTaxIncome',), ('IncomeFromContinuingOperations',)]
+2025-04-03 03:30:55,189 - __main__ - INFO - balance_sheets uses 'metric_type' column with values like: [('AccountsPayable_per',), ('AccountsReceivableDuefromRelatedPartiesNet',), ('AccountsReceivableDuefromRelatedPartiesNet_per',), ('AccountsReceivableNet_per',), ('BondsPayable_per',)]
+2025-04-03 03:30:55,196 - __main__ - INFO - cash_flows uses 'metric_type' column with values like: [('AmortizationExpense',), ('DecreaseInShortTermLoans',), ('OtherNonCurrentLiabilitiesDecrease',), ('CashReceivedThroughOperations',), ('ProceedsFromLongTermDebt',)]
+2025-04-03 03:30:55,206 - __main__ - INFO - Database Structure Summary:
+2025-04-03 03:30:55,206 - __main__ - INFO - - stock_info: 2532 rows, columns: ['stock_id', 'stock_name', 'industry', 'last_updated']
+2025-04-03 03:30:55,206 - __main__ - INFO - - financial_statements: 314491 rows, columns: ['id', 'stock_id', 'date', 'metric_type', 'value']
+2025-04-03 03:30:55,206 - __main__ - INFO - - sqlite_sequence: 5 rows, columns: ['name', 'seq']
+2025-04-03 03:30:55,206 - __main__ - INFO - - balance_sheets: 1699781 rows, columns: ['id', 'stock_id', 'date', 'metric_type', 'value']
+2025-04-03 03:30:55,206 - __main__ - INFO - - cash_flows: 506885 rows, columns: ['id', 'stock_id', 'date', 'metric_type', 'value']
+2025-04-03 03:30:55,206 - __main__ - INFO - - stock_prices: 1403874 rows, columns: ['id', 'stock_id', 'date', 'open', 'high', 'low', 'close', 'volume']
+2025-04-03 03:30:55,206 - __main__ - INFO - - collection_log: 5200 rows, columns: ['id', 'timestamp', 'stock_id', 'data_type', 'status', 'message']
+2025-04-03 03:30:55,206 - __main__ - INFO - Deleted electronics_training.csv
+2025-04-03 03:30:55,206 - __main__ - INFO - Deleted telecommunications_training.csv
+2025-04-03 03:30:55,206 - __main__ - INFO - Deleted computer_hardware_training.csv
+2025-04-03 03:30:55,207 - __main__ - INFO - Deleted financial_services_training.csv
+2025-04-03 03:30:55,207 - __main__ - INFO - Deleted semiconductors_training.csv
+2025-04-03 03:30:55,207 - __main__ - INFO - Deleted industry_benchmarks.csv
+2025-04-03 03:30:55,211 - __main__ - INFO - Deleted telecommunications_model.keras from models directory
+2025-04-03 03:30:55,213 - __main__ - INFO - Deleted semiconductors_scaler.pkl from models directory
+2025-04-03 03:30:55,213 - __main__ - INFO - Deleted telecommunications_scaler.pkl from models directory
+2025-04-03 03:30:55,213 - __main__ - INFO - Deleted semiconductors_model.keras from models directory
+2025-04-03 03:30:55,213 - __main__ - INFO - Deleted computer_hardware_training.png from models directory
+2025-04-03 03:30:55,213 - __main__ - INFO - Deleted semiconductors_training.png from models directory
+2025-04-03 03:30:55,213 - __main__ - INFO - Deleted financial_services_training.png from models directory
+2025-04-03 03:30:55,214 - __main__ - INFO - Deleted financial_services_model.keras from models directory
+2025-04-03 03:30:55,214 - __main__ - INFO - Deleted computer_hardware_model.keras from models directory
+2025-04-03 03:30:55,214 - __main__ - INFO - Deleted computer_hardware_scaler.pkl from models directory
+2025-04-03 03:30:55,216 - __main__ - INFO - Deleted telecommunications_training.png from models directory
+2025-04-03 03:30:55,216 - __main__ - INFO - Deleted electronics_scaler.pkl from models directory
+2025-04-03 03:30:55,216 - __main__ - INFO - Deleted electronics_training.png from models directory
+2025-04-03 03:30:55,216 - __main__ - INFO - Deleted electronics_model.keras from models directory
+2025-04-03 03:30:55,216 - __main__ - INFO - Deleted financial_services_scaler.pkl from models directory
+2025-04-03 03:30:55,217 - __main__ - INFO - Deleted models directory
+2025-04-03 03:30:55,217 - __main__ - INFO - Cleaned up industry_data_from_db directory
+2025-04-03 03:30:55,223 - __main__ - INFO - Found 125 stocks in Semiconductors industry
+2025-04-03 03:30:55,309 - __main__ - INFO - Created sample training file at industry_data_from_db/semiconductors_training.csv with 84 records
+2025-04-03 03:30:55,310 - __main__ - INFO - Found 452 stocks in Electronics industry
+2025-04-03 03:30:55,373 - __main__ - INFO - Created sample training file at industry_data_from_db/electronics_training.csv with 61 records
+2025-04-03 03:30:55,373 - __main__ - INFO - Data diagnosis and fix completed

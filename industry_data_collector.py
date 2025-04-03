@@ -1,20 +1,20 @@
+import os
 import pandas as pd
 import numpy as np
-import os
-import pickle
 import logging
+import re
+import datetime
+import threading
 import time
 import random
 from FinMind.data import DataLoader
 from typing import Dict, List, Optional, Tuple, Union
 from concurrent.futures import ThreadPoolExecutor
+import pickle
 import traceback
-import threading
-import datetime
-import re
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime%s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class TaiwanIndustryDataCollector:
@@ -52,11 +52,10 @@ class TaiwanIndustryDataCollector:
         try:
             from dotenv import load_dotenv
             load_dotenv()
-            import os
             token = os.getenv("FINMIND_TOKEN")
             if token:
                 self.finmind.login(token=token)
-                logger.info("Authenticated with FinMind API")
+                logger.info(f"Authenticated with FinMind API")
         except Exception as e:
             logger.warning(f"Could not authenticate with FinMind: {e}")
         

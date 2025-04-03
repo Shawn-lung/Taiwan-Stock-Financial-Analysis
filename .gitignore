@@ -10,3 +10,6 @@ __pycache__/
 
 # Data cache
 data_cache/
+
+#database
+finance_data.db

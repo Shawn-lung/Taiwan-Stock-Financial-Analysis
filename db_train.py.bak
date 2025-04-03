@@ -1,0 +1,575 @@
+#!/usr/bin/env python3
+"""
+Optimized training script that uses only database data (no yfinance calls).
+"""
+
+import os
+import pandas as pd
+import numpy as np
+import logging
+import sqlite3
+import tensorflow as tf
+from sklearn.preprocessing import StandardScaler
+import pickle
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+# Add util directory to path
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
+from util.db_data_provider import DBFinancialDataProvider
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("db_train.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+class DBModelTrainer:
+    """Train industry models using only data from the database."""
+    
+    def __init__(self, db_path="finance_data.db", output_dir="industry_data_from_db"):
+        """Initialize the database model trainer.
+        
+        Args:
+            db_path: Path to the SQLite database
+            output_dir: Directory to save training data and models
+        """
+        self.db_path = db_path
+        self.output_dir = output_dir
+        self.data_provider = DBFinancialDataProvider(db_path)
+        self.metrics_to_extract = [
+            'revenue', 'operating_margin', 'net_margin', 'roa', 'roe', 
+            'debt_to_equity', 'operating_cash_flow', 'capex', 'historical_growth'
+        ]
+        
+        # Create output directories
+        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(os.path.join(output_dir, "models"), exist_ok=True)
+    
+    def get_industries(self):
+        """Get list of all industries in the database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            query = "SELECT DISTINCT industry FROM stock_info WHERE industry IS NOT NULL"
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+            
+            # Filter out empty strings
+            industries = [ind for ind in df['industry'].tolist() if ind.strip()]
+            logger.info(f"Found {len(industries)} industries in database")
+            return industries
+        except Exception as e:
+            logger.error(f"Error getting industry list: {e}")
+            return []
+    
+    def get_stocks_by_industry(self, industry):
+        """Get stocks for a specific industry."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            query = "SELECT stock_id FROM stock_info WHERE industry = ?"
+            df = pd.read_sql_query(query, conn, params=(industry,))
+            conn.close()
+            
+            stocks = df['stock_id'].tolist()
+            logger.info(f"Found {len(stocks)} stocks in {industry} industry")
+            return stocks
+        except Exception as e:
+            logger.error(f"Error getting stocks for {industry}: {e}")
+            return []
+    
+    def prepare_training_data(self, industry):
+        """Prepare training data for an industry."""
+        try:
+            stocks = self.get_stocks_by_industry(industry)
+            
+            if not stocks:
+                logger.warning(f"No stocks found for {industry}")
+                return None
+            
+            all_records = []
+            
+            for stock_id in stocks:
+                try:
+                    # Get stock data from database
+                    stock_data = self.data_provider.get_stock_data(stock_id)
+                    
+                    if not stock_data or any(df.empty for df in stock_data.values()):
+                        logger.debug(f"Insufficient data for {stock_id}, skipping")
+                        continue
+                    
+                    # Extract financial metrics for this stock
+                    metrics = self._extract_financial_metrics(stock_id, stock_data)
+                    
+                    if metrics:
+                        all_records.extend(metrics)
+                        logger.debug(f"Added {len(metrics)} records for {stock_id}")
+                except Exception as e:
+                    logger.warning(f"Error processing {stock_id}: {e}")
+            
+            if not all_records:
+                logger.warning(f"No valid records extracted for {industry}")
+                return None
+            
+            # Create training dataframe
+            df = pd.DataFrame(all_records)
+            
+            # Save to CSV
+            csv_path = os.path.join(self.output_dir, f"{industry.lower().replace(' ', '_')}_training.csv")
+            df.to_csv(csv_path, index=False)
+            logger.info(f"Saved {len(df)} records for {industry} to {csv_path}")
+            
+            return df
+        except Exception as e:
+            logger.error(f"Error preparing training data for {industry}: {e}")
+            return None
+    
+    def _extract_financial_metrics(self, stock_id, data):
+        """Extract financial metrics from stock data."""
+        try:
+            # Extract metrics from financial statements, balance sheets, and cash flows
+            financial_records = []
+            
+            # Process financial statements
+            financial_stmt = data.get('financial_statement', pd.DataFrame())
+            balance_sheet = data.get('balance_sheet', pd.DataFrame())
+            cash_flow = data.get('cash_flow', pd.DataFrame())
+            price_data = data.get('price_data', pd.DataFrame())
+            
+            # Check if data exists
+            if financial_stmt.empty or balance_sheet.empty:
+                return []
+            
+            # Determine which column contains metric types
+            type_col = 'metric_type' if 'metric_type' in financial_stmt.columns else 'type'
+            
+            # Get unique dates in financial statements
+            dates = sorted(financial_stmt['date'].unique())
+            
+            for i, report_date in enumerate(dates):
+                try:
+                    # Filter data for this date
+                    period_fs = financial_stmt[financial_stmt['date'] == report_date]
+                    period_bs = balance_sheet[balance_sheet['date'] == report_date]
+                    period_cf = cash_flow[cash_flow['date'] == report_date] if not cash_flow.empty else pd.DataFrame()
+                    
+                    # Skip if essential data is missing
+                    if period_fs.empty or period_bs.empty:
+                        continue
+                    
+                    # Create a record for this period
+                    record = {
+                        'stock_id': stock_id,
+                        'timestamp': pd.to_datetime(report_date),
+                    }
+                    
+                    # Extract revenue
+                    revenue = None
+                    for revenue_type in ['Revenue', 'OperatingRevenue', 'NetRevenue', 'TotalRevenue']:
+                        rev_rows = period_fs[period_fs[type_col] == revenue_type]
+                        if not rev_rows.empty:
+                            try:
+                                revenue = float(rev_rows['value'].iloc[0])
+                                if revenue > 0:
+                                    break
+                            except:
+                                pass
+                    
+                    # Skip if no valid revenue
+                    if revenue is None or revenue <= 0:
+                        continue
+                        
+                    record['revenue'] = revenue
+                    
+                    # Calculate prior period growth if available
+                    if i > 0:
+                        prior_date = dates[i-1]
+                        prior_fs = financial_stmt[financial_stmt['date'] == prior_date]
+                        prior_revenue = None
+                        for revenue_type in ['Revenue', 'OperatingRevenue', 'NetRevenue', 'TotalRevenue']:
+                            prior_rev_rows = prior_fs[prior_fs[type_col] == revenue_type]
+                            if not prior_rev_rows.empty:
+                                try:
+                                    prior_revenue = float(prior_rev_rows['value'].iloc[0])
+                                    if prior_revenue > 0:
+                                        break
+                                except:
+                                    pass
+                        
+                        if prior_revenue is not None and prior_revenue > 0:
+                            growth_rate = (revenue - prior_revenue) / prior_revenue
+                            record['historical_growth'] = growth_rate
+                    
+                    # Extract operating income
+                    operating_income = None
+                    for op_type in ['OperatingIncome', 'OperatingProfit', 'GrossProfit']:
+                        op_rows = period_fs[period_fs[type_col] == op_type]
+                        if not op_rows.empty:
+                            try:
+                                operating_income = float(op_rows['value'].iloc[0])
+                                break
+                            except:
+                                pass
+                    
+                    if operating_income is not None:
+                        record['operating_income'] = operating_income
+                        record['operating_margin'] = operating_income / revenue
+                    
+                    # Extract net income
+                    net_income = None
+                    for net_type in ['NetIncome', 'ProfitAfterTax', 'NetProfit', 'NetIncomeLoss']:
+                        net_rows = period_fs[period_fs[type_col] == net_type]
+                        if not net_rows.empty:
+                            try:
+                                net_income = float(net_rows['value'].iloc[0])
+                                break
+                            except:
+                                pass
+                    
+                    if net_income is not None:
+                        record['net_income'] = net_income
+                        record['net_margin'] = net_income / revenue
+                    
+                    # Extract balance sheet metrics
+                    # Total assets
+                    total_assets = None
+                    for asset_type in ['TotalAssets', 'Assets', 'ConsolidatedTotalAssets']:
+                        asset_rows = period_bs[period_bs[type_col] == asset_type]
+                        if not asset_rows.empty:
+                            try:
+                                total_assets = float(asset_rows['value'].iloc[0])
+                                if total_assets > 0:
+                                    break
+                            except:
+                                pass
+                    
+                    if total_assets is not None and total_assets > 0:
+                        record['total_assets'] = total_assets
+                        # Calculate ROA
+                        if net_income is not None:
+                            record['roa'] = net_income / total_assets
+                    
+                    # Total equity
+                    total_equity = None
+                    for equity_type in ['TotalEquity', 'StockholdersEquity', 'Equity', 'TotalStockholdersEquity']:
+                        equity_rows = period_bs[period_bs[type_col] == equity_type]
+                        if not equity_rows.empty:
+                            try:
+                                total_equity = float(equity_rows['value'].iloc[0])
+                                if total_equity > 0:
+                                    break
+                            except:
+                                pass
+                    
+                    if total_equity is not None and total_equity > 0:
+                        record['total_equity'] = total_equity
+                        # Calculate ROE
+                        if net_income is not None:
+                            record['roe'] = net_income / total_equity
+                        
+                        # Calculate debt-to-equity
+                        if total_assets is not None:
+                            total_liabilities = total_assets - total_equity
+                            record['debt_to_equity'] = total_liabilities / total_equity
+                            record['equity_to_assets'] = total_equity / total_assets
+                    
+                    # Get future performance from price data if available
+                    if not price_data.empty:
+                        try:
+                            # Convert report date to datetime
+                            report_dt = pd.to_datetime(report_date)
+                            
+                            # Make sure price_data date is datetime
+                            if not pd.api.types.is_datetime64_any_dtype(price_data['date']):
+                                price_data['date'] = pd.to_datetime(price_data['date'])
+                            
+                            # Get prices after report date
+                            future_prices = price_data[price_data['date'] >= report_dt]
+                            
+                            if not future_prices.empty:
+                                # Get initial price (closest to report date)
+                                start_price = future_prices.iloc[0]['close']
+                                
+                                # Get price 6 months later
+                                future_date_6m = report_dt + pd.DateOffset(months=6)
+                                future_prices_6m = price_data[price_data['date'] >= future_date_6m]
+                                
+                                if not future_prices_6m.empty:
+                                    future_price_6m = future_prices_6m.iloc[0]['close']
+                                    # Calculate return
+                                    if start_price > 0:
+                                        return_6m = (future_price_6m - start_price) / start_price
+                                        record['future_6m_return'] = return_6m
+                        except Exception as e:
+                            pass  # Continue even if we can't calculate returns
+                    
+                    # Calculate historical growth statistics for this stock
+                    if len(financial_records) > 0:
+                        # Check for previous records of this stock
+                        prev_records = [r for r in financial_records if r['stock_id'] == stock_id]
+                        if prev_records:
+                            growth_rates = []
+                            for prev in prev_records:
+                                if 'revenue' in prev and prev['revenue'] > 0:
+                                    growth_rate = (revenue - prev['revenue']) / prev['revenue']
+                                    growth_rates.append(growth_rate)
+                            
+                            if growth_rates:
+                                record['historical_growth_mean'] = np.mean(growth_rates)
+                                record['historical_growth_std'] = np.std(growth_rates) if len(growth_rates) > 1 else 0.1
+                    
+                    # Add record if it has minimum required fields
+                    min_fields = ['revenue']
+                    useful_fields = ['operating_margin', 'net_margin', 'roe', 'roa']
+                    
+                    if all(f in record for f in min_fields) and any(f in record for f in useful_fields):
+                        financial_records.append(record)
+                
+                except Exception as e:
+                    logger.debug(f"Error processing period {report_date} for {stock_id}: {e}")
+            
+            return financial_records
+            
+        except Exception as e:
+            logger.error(f"Error extracting metrics for {stock_id}: {e}")
+            return []
+    
+    def train_industry_model(self, industry, data=None):
+        """Train a model for an industry."""
+        try:
+            # Use provided data or load from CSV
+            if data is None:
+                csv_file = os.path.join(self.output_dir, f"{industry.lower().replace(' ', '_')}_training.csv")
+                if not os.path.exists(csv_file):
+                    logger.error(f"Training file not found: {csv_file}")
+                    return False
+                
+                data = pd.read_csv(csv_file)
+            
+            if data.empty:
+                logger.error(f"No data for {industry}")
+                return False
+                
+            logger.info(f"Training model for {industry} with {len(data)} records")
+            
+            # Select features
+            potential_features = [
+                'revenue', 'operating_margin', 'net_margin', 'roa', 'roe',
+                'historical_growth_mean', 'historical_growth', 'debt_to_equity'
+            ]
+            
+            # Use features that exist in the data
+            features = [f for f in potential_features if f in data.columns]
+            
+            if len(features) < 2:
+                logger.error(f"Not enough features available for {industry}")
+                return False
+                
+            logger.info(f"Using features: {features}")
+            
+            # Prepare features and target
+            X = data[features].copy()
+            
+            # If future_6m_return doesn't exist, create synthetic values
+            if 'future_6m_return' not in data.columns:
+                logger.warning(f"No future_6m_return in data, using synthetic values")
+                # Generate synthetic target based on features
+                data['future_6m_return'] = 0.05 + 0.1 * data['operating_margin'] - 0.05 * np.random.random(len(data))
+            
+            y = data['future_6m_return']
+            
+            # Handle missing values
+            X = X.fillna(X.mean())
+            y = y.fillna(0.05)  # Default expected return
+            
+            # Scale features
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(X)
+            
+            # Create simple model
+            model = tf.keras.models.Sequential([
+                tf.keras.layers.Dense(8, activation='relu', input_shape=(X.shape[1],)),
+                tf.keras.layers.Dropout(0.2),
+                tf.keras.layers.Dense(1)
+            ])
+            
+            # Compile model
+            model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mse')
+            
+            # Train model
+            history = model.fit(
+                X_scaled, y,
+                epochs=50,
+                batch_size=min(16, len(X)),
+                validation_split=0.2 if len(X) > 10 else 0,
+                verbose=1
+            )
+            
+            # Save model and scaler
+            model_dir = os.path.join(self.output_dir, "models")
+            
+            # Add .keras extension to model path
+            model_path = os.path.join(model_dir, f"{industry.lower().replace(' ', '_')}_model.keras")
+            scaler_path = os.path.join(model_dir, f"{industry.lower().replace(' ', '_')}_scaler.pkl")
+            
+            model.save(model_path)
+            with open(scaler_path, 'wb') as f:
+                pickle.dump(scaler, f)
+                
+            logger.info(f"Model saved to {model_path}")
+            
+            # Plot training history
+            plt.figure(figsize=(10, 6))
+            plt.plot(history.history['loss'], label='Training Loss')
+            if 'val_loss' in history.history:
+                plt.plot(history.history['val_loss'], label='Validation Loss')
+            plt.title(f'Training Loss for {industry}')
+            plt.xlabel('Epoch')
+            plt.ylabel('Loss')
+            plt.legend()
+            plt.savefig(os.path.join(self.output_dir, f"{industry.lower().replace(' ', '_')}_loss.png"))
+            plt.close()
+            
+            return True
+        except Exception as e:
+            logger.error(f"Error training model for {industry}: {e}")
+            return False
+    
+    def create_industry_benchmarks(self):
+        """Create industry benchmarks file from training datasets."""
+        try:
+            # Find training CSV files
+            csv_files = [f for f in os.listdir(self.output_dir) if f.endswith('_training.csv')]
+            
+            if not csv_files:
+                logger.error(f"No training CSV files found in {self.output_dir}")
+                return False
+            
+            logger.info(f"Creating benchmarks from {len(csv_files)} industry datasets")
+            
+            # Process each industry file
+            industry_metrics = []
+            
+            for csv_file in csv_files:
+                industry = csv_file.replace('_training.csv', '').replace('_', ' ')
+                file_path = os.path.join(self.output_dir, csv_file)
+                
+                try:
+                    # Read file
+                    df = pd.read_csv(file_path)
+                    
+                    if df.empty:
+                        logger.warning(f"{csv_file} is empty, skipping")
+                        continue
+                    
+                    # Calculate metrics
+                    metrics = {
+                        'industry': industry,
+                        'stock_count': df['stock_id'].nunique() if 'stock_id' in df.columns else 0,
+                        'record_count': len(df)
+                    }
+                    
+                    # Calculate median values for key metrics
+                    for metric in ['historical_growth_mean', 'operating_margin', 'net_margin', 
+                                 'roa', 'roe', 'debt_to_equity']:
+                        if metric in df.columns:
+                            # Calculate median
+                            median_val = df[metric].median()
+                            if pd.notna(median_val):
+                                metrics[f'{metric}_median'] = median_val
+                            else:
+                                metrics[f'{metric}_median'] = 0.0  # Default value
+                            
+                            # Calculate mean
+                            mean_val = df[metric].mean()
+                            if pd.notna(mean_val):
+                                metrics[f'{metric}_mean'] = mean_val
+                            else:
+                                metrics[f'{metric}_mean'] = 0.0  # Default value
+                    
+                    industry_metrics.append(metrics)
+                    logger.info(f"Processed benchmarks for {industry}: {len(df)} records")
+                    
+                except Exception as e:
+                    logger.error(f"Error processing {csv_file}: {e}")
+            
+            # Create DataFrame from metrics
+            if not industry_metrics:
+                logger.error("No valid benchmarks created")
+                return False
+            
+            # Create benchmarks DataFrame
+            benchmarks_df = pd.DataFrame(industry_metrics)
+            
+            # Save benchmarks
+            benchmark_file = os.path.join(self.output_dir, 'industry_benchmarks.csv')
+            benchmarks_df.to_csv(benchmark_file, index=False)
+            logger.info(f"Saved industry benchmarks to {benchmark_file}")
+            
+            # Also save to original industry_data directory for compatibility
+            orig_dir = "industry_data"
+            if not os.path.exists(orig_dir):
+                os.makedirs(orig_dir, exist_ok=True)
+            benchmark_file2 = os.path.join(orig_dir, 'industry_benchmarks.csv')
+            benchmarks_df.to_csv(benchmark_file2, index=False)
+            logger.info(f"Also saved industry benchmarks to {benchmark_file2}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error creating industry benchmarks: {e}")
+            return False
+    
+    def train_all_industries(self):
+        """Prepare data and train models for all industries."""
+        start_time = datetime.now()
+        logger.info(f"Starting training process at {start_time}")
+        
+        # Get all industries
+        industries = self.get_industries()
+        
+        # Prepare data and train models
+        successful = []
+        processed = 0
+        
+        for industry in industries:
+            processed += 1
+            logger.info(f"Processing industry {processed}/{len(industries)}: {industry}")
+            
+            # Prepare training data
+            data = self.prepare_training_data(industry)
+            
+            if data is not None:
+                # Train model
+                if self.train_industry_model(industry, data):
+                    successful.append(industry)
+        
+        # Create industry benchmarks
+        self.create_industry_benchmarks()
+        
+        end_time = datetime.now()
+        duration = end_time - start_time
+        logger.info(f"Training completed in {duration}. Successful: {len(successful)}/{len(industries)}")
+        logger.info(f"Successful industries: {successful}")
+        
+        return successful
+
+def main():
+    """Main function to train all industry models."""
+    logger.info("Starting DB-only model training")
+    
+    # Create trainer
+    trainer = DBModelTrainer()
+    
+    # Train all industries
+    trainer.train_all_industries()
+    
+    logger.info("Training process completed")
+
+if __name__ == "__main__":
+    main()

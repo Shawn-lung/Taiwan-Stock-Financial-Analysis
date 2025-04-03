@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
-import os
+import os  # Ensure this is at the top level
 import pickle
 import logging
+from util.db_data_provider import DBFinancialDataProvider
 from typing import Dict, List, Optional, Tuple, Union
 import tensorflow as tf
 from tensorflow.keras.models import Sequential, Model # type: ignore
@@ -21,7 +22,16 @@ logger = logging.getLogger(__name__)
 class IndustryValuationModel:
     """ML model for industry-specific financial valuation adjustments."""
     
-    def __init__(self, data_dir: str = "industry_data", background_collector = None):
+    def __init__(self, data_dir: str = "industry_data", background_collector = None, db_path: str = "finance_data.db"):
+        """Initialize the industry valuation model.
+        
+        Args:
+            data_dir: Directory containing industry data
+            background_collector: Optional BackgroundDataCollector instance
+            db_path: Path to the SQLite database file
+        """
+        self.db_path = db_path
+        self.db_provider = DBFinancialDataProvider(db_path)
         """Initialize the industry valuation model.
         
         Args:
@@ -79,7 +89,7 @@ class IndustryValuationModel:
                 industry = training_file.replace('_training.csv', '').replace('_', ' ')
                 
                 # Check if model already exists
-                model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model")
+                model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model.keras")
                 if os.path.exists(model_path) and not force_retrain:
                     logger.info(f"Model for {industry} already exists. Use force_retrain=True to retrain.")
                     
@@ -120,7 +130,7 @@ class IndustryValuationModel:
                     
                     if model:
                         # Save the model
-                        model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model")
+                        model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model.keras")
                         model.save(model_path)
                         
                         # Save the scaler
@@ -207,8 +217,8 @@ class IndustryValuationModel:
                 verbose=0
             )
             
-            # Save the model
-            model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model")
+            # Save the model - add .keras extension
+            model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model.keras")
             model.save(model_path)
             
             # Save the scaler
@@ -358,6 +368,10 @@ class IndustryValuationModel:
             
             logger.info(f"Model training for {industry} completed after {len(history.history['loss'])} epochs")
             
+            # Save the model - add .keras extension
+            model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model.keras")
+            model.save(model_path)
+            
             return model, history, scaler
             
         except Exception as e:
@@ -424,8 +438,36 @@ class IndustryValuationModel:
             return {}
 
         try:
+            # First check if data already exists in the data directory
+            existing_datasets = {}
+            logger.info("Checking for existing training data files...")
+            
+            # Look for CSV files in the data directory
+            for file in os.listdir(self.data_dir):
+                if file.endswith('_training.csv'):
+                    industry = file.replace('_training.csv', '').replace('_', ' ')
+                    file_path = os.path.join(self.data_dir, file)
+                    
+                    try:
+                        df = pd.read_csv(file_path)
+                        if not df.empty:
+                            logger.info(f"Found existing training data for {industry} with {len(df)} records")
+                            existing_datasets[industry] = df
+                    except Exception as e:
+                        logger.warning(f"Error reading existing data file {file}: {e}")
+            
+            # If we found existing datasets, use them instead of generating new ones
+            if existing_datasets:
+                logger.info(f"Using {len(existing_datasets)} existing training datasets")
+                return existing_datasets
+                    
+            # Add detailed debugging logs
             logger.info("Preparing training data from database...")
+            
             training_datasets = {}
+            
+            # Ensure output directory exists
+            os.makedirs(self.data_dir, exist_ok=True)
             
             # Get collection status
             status_df = self.background_collector.get_collection_status()
@@ -455,14 +497,16 @@ class IndustryValuationModel:
                 
                 # Extract financial metrics
                 industry_records = []
-                data_collector = TaiwanIndustryDataCollector(data_dir=self.data_dir)
                 
+                # Use the correct _extract_financial_metrics implementation
+                # The function is defined directly in this class below, not from imported module
                 for stock_id, data in industry_data.items():
                     try:
-                        # Use TaiwanIndustryDataCollector's method to extract metrics
-                        metrics = data_collector._extract_financial_metrics(stock_id, data)
+                        metrics = self._extract_financial_metrics(stock_id, data)
                         if metrics:
                             industry_records.extend(metrics)
+                        else:
+                            logger.debug(f"No metrics extracted for stock {stock_id}")
                     except Exception as e:
                         logger.error(f"Error extracting metrics for {stock_id}: {e}")
                 
@@ -476,6 +520,8 @@ class IndustryValuationModel:
                     
                     training_datasets[industry] = industry_df
                     logger.info(f"Created training dataset for {industry} with {len(industry_df)} records")
+                else:
+                    logger.warning(f"No valid records for {industry}, skipping")
             
             # Generate industry benchmarks
             self.generate_industry_benchmarks(training_datasets)
@@ -484,8 +530,296 @@ class IndustryValuationModel:
                 
         except Exception as e:
             logger.error(f"Error preparing training data from database: {e}")
+            # Add stack trace
+            import traceback
+            logger.error(f"Stack trace: {traceback.format_exc()}")
             return {}
-    
+        
+    def _extract_financial_metrics(self, stock_id: str, data: Dict[str, pd.DataFrame]) -> List[Dict]:
+        """Extract financial metrics from raw data for a stock."""
+        try:
+            # Add debug logging to help diagnose issues
+            logger.debug(f"Extracting metrics for stock {stock_id}")
+            
+            # Extract metrics from financial statements, balance sheets, and cash flows
+            financial_records = []
+            
+            # Process financial statements
+            financial_stmt = data.get('financial_statement', pd.DataFrame())
+            balance_sheet = data.get('balance_sheet', pd.DataFrame())
+            cash_flow = data.get('cash_flow', pd.DataFrame())
+            price_data = data.get('price_data', pd.DataFrame())
+            
+            # Log data availability
+            logger.debug(f"Financial statement rows: {len(financial_stmt)}")
+            logger.debug(f"Balance sheet rows: {len(balance_sheet)}")
+            logger.debug(f"Cash flow rows: {len(cash_flow)}")
+            logger.debug(f"Price data rows: {len(price_data)}")
+            
+            # Check if data exists
+            if financial_stmt.empty or balance_sheet.empty:
+                logger.warning(f"Missing essential financial data for {stock_id}")
+                return []
+            
+            # Based on database inspection, we know the data is in long format with metric_type and value columns
+            # This is the most common format from FinMind database
+
+            # Group by date
+            if 'date' not in financial_stmt.columns:
+                logger.error(f"Date column missing in financial statement for {stock_id}")
+                return []
+            
+            # Get unique dates in financial statements
+            dates = sorted(financial_stmt['date'].unique())
+            logger.debug(f"Found {len(dates)} reporting periods for {stock_id}")
+            
+            for i, report_date in enumerate(dates):
+                try:
+                    # Filter data for this date
+                    period_fs = financial_stmt[financial_stmt['date'] == report_date]
+                    period_bs = balance_sheet[balance_sheet['date'] == report_date] if not balance_sheet.empty else pd.DataFrame()
+                    period_cf = cash_flow[cash_flow['date'] == report_date] if not cash_flow.empty else pd.DataFrame()
+                    
+                    # Skip if essential data is missing
+                    if period_fs.empty or period_bs.empty:
+                        logger.debug(f"Missing financial statement or balance sheet for {stock_id} on {report_date}")
+                        continue
+                    
+                    # Create a record for this period
+                    record = {
+                        'stock_id': stock_id,
+                        'timestamp': pd.to_datetime(report_date),
+                    }
+                    
+                    # Extract revenue
+                    revenue = None
+                    for revenue_type in ['Revenue', 'OperatingRevenue', 'NetRevenue', 'TotalRevenue']:
+                        rev_rows = period_fs[period_fs['metric_type'] == revenue_type]
+                        if not rev_rows.empty:
+                            revenue = float(rev_rows['value'].iloc[0])
+                            if revenue > 0:
+                                logger.debug(f"Found revenue ({revenue_type}) for {stock_id}: {revenue}")
+                                break
+                    
+                    if revenue is None or revenue <= 0:
+                        logger.debug(f"No valid revenue found for {stock_id} on {report_date}")
+                        continue
+                    
+                    record['revenue'] = revenue
+                    
+                    # Calculate prior period growth if available
+                    if i > 0:
+                        prior_date = dates[i-1]
+                        prior_fs = financial_stmt[financial_stmt['date'] == prior_date]
+                        prior_revenue = None
+                        
+                        for revenue_type in ['Revenue', 'OperatingRevenue', 'NetRevenue', 'TotalRevenue']:
+                            prior_rev_rows = prior_fs[prior_fs['metric_type'] == revenue_type]
+                            if not prior_rev_rows.empty:
+                                prior_revenue = float(prior_rev_rows['value'].iloc[0])
+                                if prior_revenue > 0:
+                                    break
+                        
+                        if prior_revenue is not None and prior_revenue > 0:
+                            growth_rate = (revenue - prior_revenue) / prior_revenue
+                            record['historical_growth'] = growth_rate
+                            logger.debug(f"Calculated growth rate for {stock_id}: {growth_rate:.2%}")
+                    
+                    # Extract operating income
+                    operating_income = None
+                    for op_type in ['OperatingIncome', 'OperatingProfit', 'GrossProfit']:
+                        op_rows = period_fs[period_fs['metric_type'] == op_type]
+                        if not op_rows.empty:
+                            operating_income = float(op_rows['value'].iloc[0])
+                            logger.debug(f"Found operating income ({op_type}) for {stock_id}: {operating_income}")
+                            break
+                    
+                    if operating_income is not None:
+                        record['operating_income'] = operating_income
+                        record['operating_margin'] = operating_income / revenue
+                    else:
+                        logger.debug(f"No operating income found for {stock_id} on {report_date}")
+                    
+                    # Extract net income
+                    net_income = None
+                    for net_type in ['NetIncome', 'ProfitAfterTax', 'NetProfit', 'NetIncomeLoss']:
+                        net_rows = period_fs[period_fs['metric_type'] == net_type]
+                        if not net_rows.empty:
+                            net_income = float(net_rows['value'].iloc[0])
+                            logger.debug(f"Found net income ({net_type}) for {stock_id}: {net_income}")
+                            break
+                    
+                    if net_income is not None:
+                        record['net_income'] = net_income
+                        record['net_margin'] = net_income / revenue
+                    else:
+                        logger.debug(f"No net income found for {stock_id} on {report_date}")
+                    
+                    # Extract total assets from balance sheet
+                    total_assets = None
+                    for asset_type in ['TotalAssets', 'Assets', 'ConsolidatedTotalAssets']:
+                        asset_rows = period_bs[period_bs['metric_type'] == asset_type]
+                        if not asset_rows.empty:
+                            total_assets = float(asset_rows['value'].iloc[0])
+                            if total_assets > 0:
+                                logger.debug(f"Found total assets ({asset_type}) for {stock_id}: {total_assets}")
+                                break
+                    
+                    if total_assets is not None and total_assets > 0:
+                        record['total_assets'] = total_assets
+                        
+                        # Calculate ROA if we have net income
+                        if net_income is not None:
+                            record['roa'] = net_income / total_assets
+                    else:
+                        logger.debug(f"No valid total assets found for {stock_id} on {report_date}")
+                    
+                    # Extract total equity from balance sheet
+                    total_equity = None
+                    for equity_type in ['TotalEquity', 'StockholdersEquity', 'Equity', 'TotalStockholdersEquity']:
+                        equity_rows = period_bs[period_bs['metric_type'] == equity_type]
+                        if not equity_rows.empty:
+                            total_equity = float(equity_rows['value'].iloc[0])
+                            if total_equity > 0:
+                                logger.debug(f"Found total equity ({equity_type}) for {stock_id}: {total_equity}")
+                                break
+                    
+                    if total_equity is not None and total_equity > 0:
+                        record['total_equity'] = total_equity
+                        
+                        # Calculate ROE if we have net income
+                        if net_income is not None:
+                            record['roe'] = net_income / total_equity
+                        
+                        # Calculate debt-to-equity if we have total assets
+                        if total_assets is not None:
+                            total_liabilities = total_assets - total_equity
+                            record['debt_to_equity'] = total_liabilities / total_equity
+                            record['equity_to_assets'] = total_equity / total_assets
+                    else:
+                        logger.debug(f"No valid total equity found for {stock_id} on {report_date}")
+                    
+                    # Extract cash flow data if available
+                    if not period_cf.empty:
+                        # Operating cash flow
+                        ocf = None
+                        for ocf_type in ['CashFlowsFromOperatingActivities', 'NetCashProvidedByOperatingActivities', 
+                                        'CashFromOperations', 'NetOperatingCashFlow']:
+                            ocf_rows = period_cf[period_cf['metric_type'] == ocf_type]
+                            if not ocf_rows.empty:
+                                ocf = float(ocf_rows['value'].iloc[0])
+                                logger.debug(f"Found operating cash flow ({ocf_type}) for {stock_id}: {ocf}")
+                                break
+                        
+                        if ocf is not None:
+                            record['operating_cash_flow'] = ocf
+                            record['ocf_to_revenue'] = ocf / revenue
+                        
+                        # Capital expenditure
+                        capex = None
+                        for capex_type in ['PropertyAndPlantAndEquipment', 'AcquisitionOfPropertyPlantAndEquipment',
+                                        'PurchaseOfPropertyPlantAndEquipment', 'CapitalExpenditure']:
+                            capex_rows = period_cf[period_cf['metric_type'] == capex_type]
+                            if not capex_rows.empty:
+                                capex_value = float(capex_rows['value'].iloc[0])
+                                # Capital expenditure is typically negative in cash flow statements
+                                capex = abs(capex_value)
+                                logger.debug(f"Found capital expenditure ({capex_type}) for {stock_id}: {capex}")
+                                break
+                        
+                        if capex is not None:
+                            record['capex'] = capex
+                            record['capex_to_revenue'] = capex / revenue
+                            
+                            # Calculate free cash flow
+                            if ocf is not None:
+                                fcf = ocf - capex
+                                record['free_cash_flow'] = fcf
+                                record['fcf_to_revenue'] = fcf / revenue
+                    
+                    # Get future performance from price data (if available)
+                    if not price_data.empty:
+                        # Convert report date to timestamp
+                        report_ts = pd.to_datetime(report_date)
+                        
+                        # Get price at report date (or nearest after)
+                        if 'date' in price_data.columns:
+                            # Ensure date is in datetime format
+                            if not pd.api.types.is_datetime64_any_dtype(price_data['date']):
+                                price_data['date'] = pd.to_datetime(price_data['date'])
+                            
+                            # Find closest date after report date
+                            future_prices = price_data[price_data['date'] >= report_ts]
+                            if not future_prices.empty:
+                                # Starting price (closest date after report)
+                                start_price = future_prices.iloc[0]['close']
+                                
+                                # Calculate 6-month future price
+                                future_date_6m = report_ts + pd.DateOffset(months=6)
+                                future_prices_6m = price_data[(price_data['date'] >= future_date_6m)]
+                                
+                                if not future_prices_6m.empty:
+                                    future_price_6m = future_prices_6m.iloc[0]['close']
+                                    future_return_6m = (future_price_6m - start_price) / start_price
+                                    record['future_6m_return'] = future_return_6m
+                                
+                                # Calculate 12-month future price
+                                future_date_12m = report_ts + pd.DateOffset(months=12)
+                                future_prices_12m = price_data[(price_data['date'] >= future_date_12m)]
+                                
+                                if not future_prices_12m.empty:
+                                    future_price_12m = future_prices_12m.iloc[0]['close']
+                                    future_return_12m = (future_price_12m - start_price) / start_price
+                                    record['future_12m_return'] = future_return_12m
+                    
+                    # Check if we have the minimum required fields
+                    required_fields = ['revenue']  # More lenient requirements
+                    recommended_fields = ['operating_margin', 'net_margin']
+                    
+                    if all(field in record for field in required_fields):
+                        # Check if we have at least some valuation-relevant metrics
+                        valuation_metrics = ['operating_margin', 'net_margin', 'roe', 'roa']
+                        if any(field in record for field in valuation_metrics):
+                            financial_records.append(record)
+                            logger.debug(f"Added record for {stock_id} on {report_date}")
+                        else:
+                            logger.debug(f"Skipping record for {stock_id} on {report_date} - insufficient valuation metrics")
+                    else:
+                        logger.debug(f"Skipping record for {stock_id} on {report_date} - missing required fields")
+                    
+                except Exception as e:
+                    logger.warning(f"Error processing period {report_date} for {stock_id}: {e}")
+            
+            # Calculate average historical growth and add to each record
+            if len(financial_records) > 1:
+                growth_rates = [r.get('historical_growth') for r in financial_records if 'historical_growth' in r]
+                if growth_rates:
+                    historical_growth_mean = np.mean(growth_rates)
+                    historical_growth_std = np.std(growth_rates)
+                    
+                    for r in financial_records:
+                        r['historical_growth_mean'] = historical_growth_mean
+                        r['historical_growth_std'] = historical_growth_std
+            
+            # Log how many records were extracted and their quality
+            logger.info(f"Extracted {len(financial_records)} valid financial records for {stock_id}")
+            
+            if financial_records:
+                # Log details of one sample record
+                sample = financial_records[0]
+                metrics = [k for k in sample.keys() if k not in ['stock_id', 'timestamp']]
+                logger.debug(f"Sample record metrics for {stock_id}: {metrics}")
+            else:
+                logger.warning(f"No valid financial records extracted for {stock_id}")
+            
+            return financial_records
+            
+        except Exception as e:
+            logger.error(f"Error extracting metrics for {stock_id}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return []
+
     def generate_industry_benchmarks(self, training_datasets=None) -> pd.DataFrame:
         """Generate benchmark financial metrics by industry."""
         try:
@@ -556,8 +890,8 @@ class IndustryValuationModel:
             if industry not in self.industry_models:
                 logger.warning(f"No model available for {industry}. Loading if exists or using nearest industry.")
                 
-                # Try to load model for this industry if it exists
-                model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model")
+                # Try to load model for this industry if it exists - add .keras extension
+                model_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_model.keras")
                 scaler_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_scaler.pkl")
                 
                 if os.path.exists(model_path) and os.path.exists(scaler_path):
@@ -725,18 +1059,18 @@ class IndustryValuationModel:
                     if 'historical_growth_mean_median' in industry_row:
                         growth_rate = float(industry_row['historical_growth_mean_median'])
                         # Higher growth industries deserve premium
-                        if growth_rate > 0.15:  # >15% growth
+                        if (growth_rate > 0.15):  # >15% growth
                             adjustment *= 1.1
-                        elif growth_rate < 0.05:  # <5% growth
+                        elif (growth_rate < 0.05):  # <5% growth
                             adjustment *= 0.9
                     
                     # 2. Profitability adjustment
                     if 'net_margin_median' in industry_row:
                         net_margin = float(industry_row['net_margin_median'])
                         # Higher margin industries deserve premium
-                        if net_margin > 0.15:  # >15% net margin
+                        if (net_margin > 0.15):  # >15% net margin
                             adjustment *= 1.1
-                        elif net_margin < 0.05:  # <5% net margin
+                        elif (net_margin < 0.05):  # <5% net margin
                             adjustment *= 0.95
                     
                     # 3. Industry-specific P/E or P/B factors
@@ -841,16 +1175,28 @@ class IndustryValuationModel:
         Returns:
             Dictionary of industry -> training metrics
         """
-        if self.background_collector is None:
-            logger.error("No background data collector provided")
-            return {}
+        # First check for existing CSV files in the data directory
+        found_data = False
         
-        # Prepare training data from database
-        training_data = self.prepare_training_data_from_db()
+        # Check if we have existing CSV files in the data directory
+        for file in os.listdir(self.data_dir):
+            if file.endswith('_training.csv'):
+                found_data = True
+                logger.info(f"Found existing training file: {file}")
+                break
         
-        if not training_data:
-            logger.error("Failed to prepare training data from database")
-            return {}
+        # Only prepare data if we don't already have it
+        if not found_data:
+            if self.background_collector is None:
+                logger.error("No background data collector provided")
+                return {}
+                
+            # Prepare training data from database
+            training_data = self.prepare_training_data_from_db()
+            
+            if not training_data:
+                logger.error("Failed to prepare training data from database")
+                return {}
         
         # Now train models using the prepared data
         return self.train_industry_models(industries, force_retrain)
