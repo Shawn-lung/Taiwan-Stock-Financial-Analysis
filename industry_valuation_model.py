@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import os  # Ensure this is at the top level
+import os  
 import pickle
 import logging
 from util.db_data_provider import DBFinancialDataProvider
@@ -22,13 +22,14 @@ logger = logging.getLogger(__name__)
 class IndustryValuationModel:
     """ML model for industry-specific financial valuation adjustments."""
     
-    def __init__(self, data_dir: str = "industry_data", background_collector = None, db_path: str = "finance_data.db"):
+    def __init__(self, data_dir: str = "industry_data", background_collector = None, db_path: str = "finance_data.db", load_pretrained: bool = True):
         """Initialize the industry valuation model.
         
         Args:
             data_dir: Directory containing industry data
             background_collector: Optional BackgroundDataCollector instance
             db_path: Path to the SQLite database file
+            load_pretrained: Whether to load pre-trained models at initialization
         """
         self.db_path = db_path
         self.db_provider = DBFinancialDataProvider(db_path)
@@ -57,7 +58,60 @@ class IndustryValuationModel:
         # Setup cache
         self.cache_dir = os.path.join(data_dir, "cache")
         os.makedirs(self.cache_dir, exist_ok=True)
+        
+        # Load pre-trained models if requested
+        if load_pretrained:
+            self.load_pretrained_models()
     
+    def load_pretrained_models(self):
+        """Load all pre-trained models from the model directory."""
+        try:
+            logger.info("Loading pre-trained industry valuation models...")
+            if not os.path.exists(self.model_dir):
+                logger.warning(f"Model directory {self.model_dir} does not exist")
+                return
+                
+            # Find all model files
+            model_files = [f for f in os.listdir(self.model_dir) if f.endswith('_model.keras')]
+            
+            if not model_files:
+                logger.warning("No pre-trained models found in directory")
+                return
+                
+            models_loaded = 0
+            
+            for model_file in model_files:
+                try:
+                    # Extract industry name from filename
+                    industry = model_file.replace('_model.keras', '').replace('_', ' ')
+                    
+                    # Construct full paths
+                    model_path = os.path.join(self.model_dir, model_file)
+                    scaler_path = os.path.join(self.model_dir, f"{industry.replace(' ', '_').lower()}_scaler.pkl")
+                    
+                    # Check if scaler exists
+                    if not os.path.exists(scaler_path):
+                        logger.warning(f"Scaler not found for model {model_file}, skipping")
+                        continue
+                    
+                    # Load model and scaler
+                    model = tf.keras.models.load_model(model_path)
+                    with open(scaler_path, 'rb') as f:
+                        scaler = pickle.load(f)
+                    
+                    # Store in memory
+                    self.industry_models[industry] = model
+                    self.industry_scalers[industry] = scaler
+                    models_loaded += 1
+                    
+                except Exception as e:
+                    logger.error(f"Error loading model {model_file}: {e}")
+            
+            logger.info(f"Successfully loaded {models_loaded} pre-trained industry models")
+            
+        except Exception as e:
+            logger.error(f"Error loading pre-trained models: {e}")
+
     def train_industry_models(self, industries: Optional[List[str]] = None,
                              force_retrain: bool = False) -> Dict[str, Dict]:
         """Train models for each industry.
@@ -902,11 +956,13 @@ class IndustryValuationModel:
                         
                         self.industry_models[industry] = model
                         self.industry_scalers[industry] = scaler
+                        logger.info(f"Successfully loaded model for {industry}")
                     except Exception as e:
                         logger.error(f"Error loading model for {industry}: {e}")
                         return self._fallback_prediction(industry, financial_metrics)
                 else:
                     # Use fallback prediction
+                    logger.info(f"No model found for {industry}, using fallback prediction")
                     return self._fallback_prediction(industry, financial_metrics)
             
             # Get model and scaler

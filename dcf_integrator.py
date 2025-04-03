@@ -28,9 +28,10 @@ class IntegratedValuationModel:
         self.db_path = db_path
         self.db_provider = DBFinancialDataProvider(db_path)
         
-        # Initialize industry model if needed
+        # Initialize industry model if needed - always load pretrained models
         if self.use_industry:
-            self.industry_model = IndustryValuationModel()
+            self.industry_model = IndustryValuationModel(load_pretrained=True)
+            logger.info("Using pre-trained industry valuation models")
         
     def run_valuation(self, ticker: str, industry: str = None) -> Dict:
         """Run a comprehensive valuation with all available models.
