@@ -540,3 +540,248 @@
 2025-04-03 15:53:42,688 - __main__ - INFO - Model saved to industry_data_from_db/models/materials_model.keras
 2025-04-03 15:53:42,756 - __main__ - INFO - Processing industry 9/34: Construction
 2025-04-03 15:53:42,757 - __main__ - INFO - Found 80 stocks in Construction industry
+2025-04-06 14:45:45,848 - __main__ - INFO - Starting fixed model training
+2025-04-06 14:45:45,853 - __main__ - INFO - Found 34 industries in database
+2025-04-06 14:45:45,853 - __main__ - INFO - Processing industry 1/34: Cement & Construction Materials
+2025-04-06 14:45:45,854 - __main__ - INFO - Found 8 stocks in Cement & Construction Materials industry
+2025-04-06 14:45:45,888 - __main__ - INFO - Saved 133 records for Cement & Construction Materials to industry_data_from_db\cement_&_construction_materials_training.csv
+2025-04-06 14:45:45,889 - __main__ - INFO - Training model for Cement & Construction Materials with 133 records
+2025-04-06 14:45:45,889 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:45:48,920 - __main__ - INFO - Model saved to industry_data_from_db\models\cement_&_construction_materials_model.keras
+2025-04-06 14:45:49,421 - __main__ - INFO - Processing industry 2/34: Other
+2025-04-06 14:45:49,423 - __main__ - INFO - Found 222 stocks in Other industry
+2025-04-06 14:45:49,850 - __main__ - INFO - Saved 1637 records for Other to industry_data_from_db\other_training.csv
+2025-04-06 14:45:49,851 - __main__ - INFO - Training model for Other with 1637 records
+2025-04-06 14:45:49,851 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:45:54,934 - __main__ - INFO - Model saved to industry_data_from_db\models\other_model.keras
+2025-04-06 14:45:54,972 - __main__ - INFO - Processing industry 3/34: Food & Beverage
+2025-04-06 14:45:54,974 - __main__ - INFO - Found 42 stocks in Food & Beverage industry
+2025-04-06 14:45:55,133 - __main__ - INFO - Saved 616 records for Food & Beverage to industry_data_from_db\food_&_beverage_training.csv
+2025-04-06 14:45:55,133 - __main__ - INFO - Training model for Food & Beverage with 616 records
+2025-04-06 14:45:55,134 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:45:58,757 - __main__ - INFO - Model saved to industry_data_from_db\models\food_&_beverage_model.keras
+2025-04-06 14:45:58,792 - __main__ - INFO - Processing industry 4/34: Electrical Equipment
+2025-04-06 14:45:58,794 - __main__ - INFO - Found 22 stocks in Electrical Equipment industry
+2025-04-06 14:45:58,875 - __main__ - INFO - Saved 336 records for Electrical Equipment to industry_data_from_db\electrical_equipment_training.csv
+2025-04-06 14:45:58,876 - __main__ - INFO - Training model for Electrical Equipment with 336 records
+2025-04-06 14:45:58,876 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:02,107 - __main__ - INFO - Model saved to industry_data_from_db\models\electrical_equipment_model.keras
+2025-04-06 14:46:02,147 - __main__ - INFO - Processing industry 5/34: Agricultural Technology
+2025-04-06 14:46:02,149 - __main__ - INFO - Found 6 stocks in Agricultural Technology industry
+2025-04-06 14:46:02,177 - __main__ - INFO - Saved 92 records for Agricultural Technology to industry_data_from_db\agricultural_technology_training.csv
+2025-04-06 14:46:02,177 - __main__ - INFO - Training model for Agricultural Technology with 92 records
+2025-04-06 14:46:02,177 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:05,011 - __main__ - INFO - Model saved to industry_data_from_db\models\agricultural_technology_model.keras
+2025-04-06 14:46:05,051 - __main__ - INFO - Processing industry 6/34: Tourism & Hospitality
+2025-04-06 14:46:05,053 - __main__ - INFO - Found 64 stocks in Tourism & Hospitality industry
+2025-04-06 14:46:05,233 - __main__ - INFO - Saved 954 records for Tourism & Hospitality to industry_data_from_db\tourism_&_hospitality_training.csv
+2025-04-06 14:46:05,233 - __main__ - INFO - Training model for Tourism & Hospitality with 954 records
+2025-04-06 14:46:05,234 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:09,220 - __main__ - INFO - Model saved to industry_data_from_db\models\tourism_&_hospitality_model.keras
+2025-04-06 14:46:09,255 - __main__ - INFO - Processing industry 7/34: Healthcare
+2025-04-06 14:46:09,257 - __main__ - INFO - Found 280 stocks in Healthcare industry
+2025-04-06 14:46:10,051 - __main__ - INFO - Saved 3663 records for Healthcare to industry_data_from_db\healthcare_training.csv
+2025-04-06 14:46:10,052 - __main__ - INFO - Training model for Healthcare with 3663 records
+2025-04-06 14:46:10,053 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:17,269 - __main__ - INFO - Model saved to industry_data_from_db\models\healthcare_model.keras
+2025-04-06 14:46:17,309 - __main__ - INFO - Processing industry 8/34: Materials
+2025-04-06 14:46:17,310 - __main__ - INFO - Found 29 stocks in Materials industry
+2025-04-06 14:46:17,409 - __main__ - INFO - Saved 494 records for Materials to industry_data_from_db\materials_training.csv
+2025-04-06 14:46:17,409 - __main__ - INFO - Training model for Materials with 494 records
+2025-04-06 14:46:17,410 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:20,621 - __main__ - INFO - Model saved to industry_data_from_db\models\materials_model.keras
+2025-04-06 14:46:20,659 - __main__ - INFO - Processing industry 9/34: Construction
+2025-04-06 14:46:20,660 - __main__ - INFO - Found 80 stocks in Construction industry
+2025-04-06 14:46:20,915 - __main__ - INFO - Saved 1462 records for Construction to industry_data_from_db\construction_training.csv
+2025-04-06 14:46:20,916 - __main__ - INFO - Training model for Construction with 1462 records
+2025-04-06 14:46:20,916 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:25,750 - __main__ - INFO - Model saved to industry_data_from_db\models\construction_model.keras
+2025-04-06 14:46:25,784 - __main__ - INFO - Processing industry 10/34: Automotive
+2025-04-06 14:46:25,786 - __main__ - INFO - Found 39 stocks in Automotive industry
+2025-04-06 14:46:25,922 - __main__ - INFO - Saved 641 records for Automotive to industry_data_from_db\automotive_training.csv
+2025-04-06 14:46:25,923 - __main__ - INFO - Training model for Automotive with 641 records
+2025-04-06 14:46:25,923 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:29,319 - __main__ - INFO - Model saved to industry_data_from_db\models\automotive_model.keras
+2025-04-06 14:46:29,364 - __main__ - INFO - Processing industry 11/34: Electronics Manufacturing
+2025-04-06 14:46:29,366 - __main__ - INFO - Found 246 stocks in Electronics Manufacturing industry
+2025-04-06 14:46:30,282 - __main__ - INFO - Saved 4215 records for Electronics Manufacturing to industry_data_from_db\electronics_manufacturing_training.csv
+2025-04-06 14:46:30,283 - __main__ - INFO - Training model for Electronics Manufacturing with 4215 records
+2025-04-06 14:46:30,284 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:38,432 - __main__ - INFO - Model saved to industry_data_from_db\models\electronics_manufacturing_model.keras
+2025-04-06 14:46:38,473 - __main__ - INFO - Processing industry 12/34: Green Energy
+2025-04-06 14:46:38,475 - __main__ - INFO - Found 56 stocks in Green Energy industry
+2025-04-06 14:46:38,633 - __main__ - INFO - Saved 626 records for Green Energy to industry_data_from_db\green_energy_training.csv
+2025-04-06 14:46:38,633 - __main__ - INFO - Training model for Green Energy with 626 records
+2025-04-06 14:46:38,634 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:42,052 - __main__ - INFO - Model saved to industry_data_from_db\models\green_energy_model.keras
+2025-04-06 14:46:42,090 - __main__ - INFO - Processing industry 13/34: Textiles
+2025-04-06 14:46:42,091 - __main__ - INFO - Found 59 stocks in Textiles industry
+2025-04-06 14:46:42,304 - __main__ - INFO - Saved 1049 records for Textiles to industry_data_from_db\textiles_training.csv
+2025-04-06 14:46:42,304 - __main__ - INFO - Training model for Textiles with 1049 records
+2025-04-06 14:46:42,305 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:46,353 - __main__ - INFO - Model saved to industry_data_from_db\models\textiles_model.keras
+2025-04-06 14:46:46,394 - __main__ - INFO - Processing industry 14/34: Sports & Leisure
+2025-04-06 14:46:46,395 - __main__ - INFO - Found 30 stocks in Sports & Leisure industry
+2025-04-06 14:46:46,492 - __main__ - INFO - Saved 462 records for Sports & Leisure to industry_data_from_db\sports_&_leisure_training.csv
+2025-04-06 14:46:46,492 - __main__ - INFO - Training model for Sports & Leisure with 462 records
+2025-04-06 14:46:46,493 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:49,725 - __main__ - INFO - Model saved to industry_data_from_db\models\sports_&_leisure_model.keras
+2025-04-06 14:46:49,763 - __main__ - INFO - Processing industry 15/34: Steel & Metals
+2025-04-06 14:46:49,764 - __main__ - INFO - Found 54 stocks in Steel & Metals industry
+2025-04-06 14:46:49,934 - __main__ - INFO - Saved 930 records for Steel & Metals to industry_data_from_db\steel_&_metals_training.csv
+2025-04-06 14:46:49,934 - __main__ - INFO - Training model for Steel & Metals with 930 records
+2025-04-06 14:46:49,935 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:53,845 - __main__ - INFO - Model saved to industry_data_from_db\models\steel_&_metals_model.keras
+2025-04-06 14:46:53,883 - __main__ - INFO - Processing industry 16/34: Industrial Equipment
+2025-04-06 14:46:53,884 - __main__ - INFO - Found 126 stocks in Industrial Equipment industry
+2025-04-06 14:46:54,278 - __main__ - INFO - Saved 2032 records for Industrial Equipment to industry_data_from_db\industrial_equipment_training.csv
+2025-04-06 14:46:54,279 - __main__ - INFO - Training model for Industrial Equipment with 2032 records
+2025-04-06 14:46:54,279 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:46:59,564 - __main__ - INFO - Model saved to industry_data_from_db\models\industrial_equipment_model.keras
+2025-04-06 14:46:59,604 - __main__ - INFO - Processing industry 17/34: Computer Hardware
+2025-04-06 14:46:59,606 - __main__ - INFO - Found 137 stocks in Computer Hardware industry
+2025-04-06 14:47:00,051 - __main__ - INFO - Saved 2213 records for Computer Hardware to industry_data_from_db\computer_hardware_training.csv
+2025-04-06 14:47:00,051 - __main__ - INFO - Training model for Computer Hardware with 2213 records
+2025-04-06 14:47:00,052 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:05,514 - __main__ - INFO - Model saved to industry_data_from_db\models\computer_hardware_model.keras
+2025-04-06 14:47:05,554 - __main__ - INFO - Processing industry 18/34: Chemicals
+2025-04-06 14:47:05,555 - __main__ - INFO - Found 23 stocks in Chemicals industry
+2025-04-06 14:47:05,634 - __main__ - INFO - Saved 305 records for Chemicals to industry_data_from_db\chemicals_training.csv
+2025-04-06 14:47:05,634 - __main__ - INFO - Training model for Chemicals with 305 records
+2025-04-06 14:47:05,635 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:08,882 - __main__ - INFO - Model saved to industry_data_from_db\models\chemicals_model.keras
+2025-04-06 14:47:08,919 - __main__ - INFO - Processing industry 19/34: Electronics
+2025-04-06 14:47:08,921 - __main__ - INFO - Found 452 stocks in Electronics industry
+2025-04-06 14:47:10,234 - __main__ - INFO - Saved 6885 records for Electronics to industry_data_from_db\electronics_training.csv
+2025-04-06 14:47:10,235 - __main__ - INFO - Training model for Electronics with 6885 records
+2025-04-06 14:47:10,236 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:21,454 - __main__ - INFO - Model saved to industry_data_from_db\models\electronics_model.keras
+2025-04-06 14:47:21,501 - __main__ - INFO - Processing industry 20/34: Glass & Ceramics
+2025-04-06 14:47:21,502 - __main__ - INFO - Found 5 stocks in Glass & Ceramics industry
+2025-04-06 14:47:21,521 - __main__ - INFO - Saved 95 records for Glass & Ceramics to industry_data_from_db\glass_&_ceramics_training.csv
+2025-04-06 14:47:21,521 - __main__ - INFO - Training model for Glass & Ceramics with 95 records
+2025-04-06 14:47:21,522 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:24,221 - __main__ - INFO - Model saved to industry_data_from_db\models\glass_&_ceramics_model.keras
+2025-04-06 14:47:24,267 - __main__ - INFO - Processing industry 21/34: Paper & Packaging
+2025-04-06 14:47:24,269 - __main__ - INFO - Found 8 stocks in Paper & Packaging industry
+2025-04-06 14:47:24,296 - __main__ - INFO - Saved 132 records for Paper & Packaging to industry_data_from_db\paper_&_packaging_training.csv
+2025-04-06 14:47:24,297 - __main__ - INFO - Training model for Paper & Packaging with 132 records
+2025-04-06 14:47:24,297 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:27,050 - __main__ - INFO - Model saved to industry_data_from_db\models\paper_&_packaging_model.keras
+2025-04-06 14:47:27,093 - __main__ - INFO - Processing industry 22/34: Home & Living
+2025-04-06 14:47:27,094 - __main__ - INFO - Found 21 stocks in Home & Living industry
+2025-04-06 14:47:27,166 - __main__ - INFO - Saved 318 records for Home & Living to industry_data_from_db\home_&_living_training.csv
+2025-04-06 14:47:27,166 - __main__ - INFO - Training model for Home & Living with 318 records
+2025-04-06 14:47:27,167 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:30,026 - __main__ - INFO - Model saved to industry_data_from_db\models\home_&_living_model.keras
+2025-04-06 14:47:30,065 - __main__ - INFO - Processing industry 23/34: Rubber & Plastics
+2025-04-06 14:47:30,066 - __main__ - INFO - Found 12 stocks in Rubber & Plastics industry
+2025-04-06 14:47:30,109 - __main__ - INFO - Saved 217 records for Rubber & Plastics to industry_data_from_db\rubber_&_plastics_training.csv
+2025-04-06 14:47:30,109 - __main__ - INFO - Training model for Rubber & Plastics with 217 records
+2025-04-06 14:47:30,109 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:32,938 - __main__ - INFO - Model saved to industry_data_from_db\models\rubber_&_plastics_model.keras
+2025-04-06 14:47:32,975 - __main__ - INFO - Processing industry 24/34: Shipping & Transportation
+2025-04-06 14:47:32,977 - __main__ - INFO - Found 36 stocks in Shipping & Transportation industry
+2025-04-06 14:47:33,099 - __main__ - INFO - Saved 614 records for Shipping & Transportation to industry_data_from_db\shipping_&_transportation_training.csv
+2025-04-06 14:47:33,099 - __main__ - INFO - Training model for Shipping & Transportation with 614 records
+2025-04-06 14:47:33,099 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:36,500 - __main__ - INFO - Model saved to industry_data_from_db\models\shipping_&_transportation_model.keras
+2025-04-06 14:47:36,539 - __main__ - INFO - Processing industry 25/34: Electronics Distribution
+2025-04-06 14:47:36,540 - __main__ - INFO - Found 48 stocks in Electronics Distribution industry
+2025-04-06 14:47:36,682 - __main__ - INFO - Saved 719 records for Electronics Distribution to industry_data_from_db\electronics_distribution_training.csv
+2025-04-06 14:47:36,682 - __main__ - INFO - Training model for Electronics Distribution with 719 records
+2025-04-06 14:47:36,683 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:40,099 - __main__ - INFO - Model saved to industry_data_from_db\models\electronics_distribution_model.keras
+2025-04-06 14:47:40,140 - __main__ - INFO - Processing industry 26/34: Retail
+2025-04-06 14:47:40,141 - __main__ - INFO - Found 37 stocks in Retail industry
+2025-04-06 14:47:40,258 - __main__ - INFO - Saved 652 records for Retail to industry_data_from_db\retail_training.csv
+2025-04-06 14:47:40,259 - __main__ - INFO - Training model for Retail with 652 records
+2025-04-06 14:47:40,259 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:43,711 - __main__ - INFO - Model saved to industry_data_from_db\models\retail_model.keras
+2025-04-06 14:47:43,748 - __main__ - INFO - Processing industry 27/34: Utilities
+2025-04-06 14:47:43,750 - __main__ - INFO - Found 13 stocks in Utilities industry
+2025-04-06 14:47:43,796 - __main__ - INFO - Saved 237 records for Utilities to industry_data_from_db\utilities_training.csv
+2025-04-06 14:47:43,797 - __main__ - INFO - Training model for Utilities with 237 records
+2025-04-06 14:47:43,797 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:46,698 - __main__ - INFO - Model saved to industry_data_from_db\models\utilities_model.keras
+2025-04-06 14:47:46,739 - __main__ - INFO - Processing industry 28/34: Cloud Computing
+2025-04-06 14:47:46,740 - __main__ - INFO - Found 23 stocks in Cloud Computing industry
+2025-04-06 14:47:47,075 - __main__ - INFO - Saved 166 records for Cloud Computing to industry_data_from_db\cloud_computing_training.csv
+2025-04-06 14:47:47,075 - __main__ - INFO - Training model for Cloud Computing with 166 records
+2025-04-06 14:47:47,076 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:50,266 - __main__ - INFO - Model saved to industry_data_from_db\models\cloud_computing_model.keras
+2025-04-06 14:47:50,308 - __main__ - INFO - Processing industry 29/34: Financial Services
+2025-04-06 14:47:50,309 - __main__ - INFO - Found 82 stocks in Financial Services industry
+2025-04-06 14:47:50,498 - __main__ - INFO - Saved 204 records for Financial Services to industry_data_from_db\financial_services_training.csv
+2025-04-06 14:47:50,498 - __main__ - INFO - Training model for Financial Services with 204 records
+2025-04-06 14:47:50,499 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:53,785 - __main__ - INFO - Model saved to industry_data_from_db\models\financial_services_model.keras
+2025-04-06 14:47:53,831 - __main__ - INFO - Processing industry 30/34: Media & Entertainment
+2025-04-06 14:47:53,832 - __main__ - INFO - Found 37 stocks in Media & Entertainment industry
+2025-04-06 14:47:53,963 - __main__ - INFO - Saved 582 records for Media & Entertainment to industry_data_from_db\media_&_entertainment_training.csv
+2025-04-06 14:47:53,964 - __main__ - INFO - Training model for Media & Entertainment with 582 records
+2025-04-06 14:47:53,964 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:47:58,120 - __main__ - INFO - Model saved to industry_data_from_db\models\media_&_entertainment_model.keras
+2025-04-06 14:47:58,174 - __main__ - INFO - Processing industry 31/34: Telecommunications
+2025-04-06 14:47:58,177 - __main__ - INFO - Found 55 stocks in Telecommunications industry
+2025-04-06 14:47:58,394 - __main__ - INFO - Saved 970 records for Telecommunications to industry_data_from_db\telecommunications_training.csv
+2025-04-06 14:47:58,394 - __main__ - INFO - Training model for Telecommunications with 970 records
+2025-04-06 14:47:58,395 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:48:03,269 - __main__ - INFO - Model saved to industry_data_from_db\models\telecommunications_model.keras
+2025-04-06 14:48:03,320 - __main__ - INFO - Processing industry 32/34: E-Commerce
+2025-04-06 14:48:03,321 - __main__ - INFO - Found 9 stocks in E-Commerce industry
+2025-04-06 14:48:03,362 - __main__ - INFO - Saved 168 records for E-Commerce to industry_data_from_db\e-commerce_training.csv
+2025-04-06 14:48:03,362 - __main__ - INFO - Training model for E-Commerce with 168 records
+2025-04-06 14:48:03,363 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:48:06,718 - __main__ - INFO - Model saved to industry_data_from_db\models\e-commerce_model.keras
+2025-04-06 14:48:06,762 - __main__ - INFO - Processing industry 33/34: Semiconductors
+2025-04-06 14:48:06,763 - __main__ - INFO - Found 125 stocks in Semiconductors industry
+2025-04-06 14:48:07,185 - __main__ - INFO - Saved 1905 records for Semiconductors to industry_data_from_db\semiconductors_training.csv
+2025-04-06 14:48:07,185 - __main__ - INFO - Training model for Semiconductors with 1905 records
+2025-04-06 14:48:07,186 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:48:13,405 - __main__ - INFO - Model saved to industry_data_from_db\models\semiconductors_model.keras
+2025-04-06 14:48:13,453 - __main__ - INFO - Processing industry 34/34: Technology Services
+2025-04-06 14:48:13,455 - __main__ - INFO - Found 46 stocks in Technology Services industry
+2025-04-06 14:48:13,597 - __main__ - INFO - Saved 680 records for Technology Services to industry_data_from_db\technology_services_training.csv
+2025-04-06 14:48:13,598 - __main__ - INFO - Training model for Technology Services with 680 records
+2025-04-06 14:48:13,598 - __main__ - WARNING - No future_6m_return in data, using synthetic values
+2025-04-06 14:48:17,207 - __main__ - INFO - Model saved to industry_data_from_db\models\technology_services_model.keras
+2025-04-06 14:48:17,252 - __main__ - INFO - Creating benchmarks from 34 industry datasets
+2025-04-06 14:48:17,254 - __main__ - INFO - Processed benchmarks for agricultural technology: 92 records
+2025-04-06 14:48:17,255 - __main__ - INFO - Processed benchmarks for automotive: 641 records
+2025-04-06 14:48:17,257 - __main__ - INFO - Processed benchmarks for cement & construction materials: 133 records
+2025-04-06 14:48:17,258 - __main__ - INFO - Processed benchmarks for chemicals: 305 records
+2025-04-06 14:48:17,259 - __main__ - INFO - Processed benchmarks for cloud computing: 166 records
+2025-04-06 14:48:17,262 - __main__ - INFO - Processed benchmarks for computer hardware: 2213 records
+2025-04-06 14:48:17,264 - __main__ - INFO - Processed benchmarks for construction: 1462 records
+2025-04-06 14:48:17,265 - __main__ - INFO - Processed benchmarks for e-commerce: 168 records
+2025-04-06 14:48:17,266 - __main__ - INFO - Processed benchmarks for electrical equipment: 336 records
+2025-04-06 14:48:17,268 - __main__ - INFO - Processed benchmarks for electronics distribution: 719 records
+2025-04-06 14:48:17,271 - __main__ - INFO - Processed benchmarks for electronics manufacturing: 4215 records
+2025-04-06 14:48:17,276 - __main__ - INFO - Processed benchmarks for electronics: 6885 records
+2025-04-06 14:48:17,278 - __main__ - INFO - Processed benchmarks for financial services: 204 records
+2025-04-06 14:48:17,279 - __main__ - INFO - Processed benchmarks for food & beverage: 616 records
+2025-04-06 14:48:17,280 - __main__ - INFO - Processed benchmarks for glass & ceramics: 95 records
+2025-04-06 14:48:17,281 - __main__ - INFO - Processed benchmarks for green energy: 626 records
+2025-04-06 14:48:17,285 - __main__ - INFO - Processed benchmarks for healthcare: 3663 records
+2025-04-06 14:48:17,286 - __main__ - INFO - Processed benchmarks for home & living: 318 records
+2025-04-06 14:48:17,289 - __main__ - INFO - Processed benchmarks for industrial equipment: 2032 records
+2025-04-06 14:48:17,290 - __main__ - INFO - Processed benchmarks for materials: 494 records
+2025-04-06 14:48:17,292 - __main__ - INFO - Processed benchmarks for media & entertainment: 582 records
+2025-04-06 14:48:17,294 - __main__ - INFO - Processed benchmarks for other: 1637 records
+2025-04-06 14:48:17,295 - __main__ - INFO - Processed benchmarks for paper & packaging: 132 records
+2025-04-06 14:48:17,296 - __main__ - INFO - Processed benchmarks for retail: 652 records
+2025-04-06 14:48:17,298 - __main__ - INFO - Processed benchmarks for rubber & plastics: 217 records
+2025-04-06 14:48:17,299 - __main__ - INFO - Processed benchmarks for semiconductors: 1905 records
+2025-04-06 14:48:17,300 - __main__ - INFO - Processed benchmarks for shipping & transportation: 614 records
+2025-04-06 14:48:17,302 - __main__ - INFO - Processed benchmarks for sports & leisure: 462 records
+2025-04-06 14:48:17,303 - __main__ - INFO - Processed benchmarks for steel & metals: 930 records
+2025-04-06 14:48:17,304 - __main__ - INFO - Processed benchmarks for technology services: 680 records
+2025-04-06 14:48:17,306 - __main__ - INFO - Processed benchmarks for telecommunications: 970 records
+2025-04-06 14:48:17,308 - __main__ - INFO - Processed benchmarks for textiles: 1049 records
+2025-04-06 14:48:17,310 - __main__ - INFO - Processed benchmarks for tourism & hospitality: 954 records
+2025-04-06 14:48:17,311 - __main__ - INFO - Processed benchmarks for utilities: 237 records
+2025-04-06 14:48:17,315 - __main__ - INFO - Saved industry benchmarks for 34 industries
+2025-04-06 14:48:17,315 - __main__ - INFO - Training completed in 0:02:31.466856. Successful: 34/34
+2025-04-06 14:48:17,315 - __main__ - INFO - Successful industries: ['Cement & Construction Materials', 'Other', 'Food & Beverage', 'Electrical Equipment', 'Agricultural Technology', 'Tourism & Hospitality', 'Healthcare', 'Materials', 'Construction', 'Automotive', 'Electronics Manufacturing', 'Green Energy', 'Textiles', 'Sports & Leisure', 'Steel & Metals', 'Industrial Equipment', 'Computer Hardware', 'Chemicals', 'Electronics', 'Glass & Ceramics', 'Paper & Packaging', 'Home & Living', 'Rubber & Plastics', 'Shipping & Transportation', 'Electronics Distribution', 'Retail', 'Utilities', 'Cloud Computing', 'Financial Services', 'Media & Entertainment', 'Telecommunications', 'E-Commerce', 'Semiconductors', 'Technology Services']
+2025-04-06 14:48:17,315 - __main__ - INFO - Training process completed

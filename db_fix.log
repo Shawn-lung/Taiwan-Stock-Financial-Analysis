@@ -5,3 +5,9 @@
 2025-04-03 13:07:06,981 - __main__ - INFO - Created backup at /Users/shawnlung/Documents/GitHub/Finance_stuff/util/db_data_provider.py.bak
 2025-04-03 13:07:06,981 - __main__ - INFO - Created/Fixed db_data_provider at /Users/shawnlung/Documents/GitHub/Finance_stuff/util/db_data_provider.py
 2025-04-03 13:07:06,981 - __main__ - INFO - All fixes applied. Run '/Users/shawnlung/Documents/GitHub/Finance_stuff/db_train_fixed.py' to train models
+2025-04-06 14:45:24,042 - __main__ - INFO - Starting DB data fixes
+2025-04-06 14:45:24,043 - __main__ - ERROR - File not found: c:\Users\shawn\OneDrive\文件\GitHub\Finance_stuff\db_train.py
+2025-04-06 14:45:24,044 - __main__ - INFO - Created fixed training script at c:\Users\shawn\OneDrive\文件\GitHub\Finance_stuff\db_train_fixed.py
+2025-04-06 14:45:24,056 - __main__ - INFO - Created backup at c:\Users\shawn\OneDrive\文件\GitHub\Finance_stuff\util\db_data_provider.py.bak
+2025-04-06 14:45:24,057 - __main__ - INFO - Created/Fixed db_data_provider at c:\Users\shawn\OneDrive\文件\GitHub\Finance_stuff\util\db_data_provider.py
+2025-04-06 14:45:24,057 - __main__ - INFO - All fixes applied. Run 'c:\Users\shawn\OneDrive\文件\GitHub\Finance_stuff\db_train_fixed.py' to train models

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class IndustryValuationModel:
     """ML model for industry-specific financial valuation adjustments."""
     
-    def __init__(self, data_dir: str = "industry_data", background_collector = None, db_path: str = "finance_data.db", load_pretrained: bool = True):
+    def __init__(self, data_dir: str = "industry_data_from_db", background_collector = None, db_path: str = "finance_data.db", load_pretrained: bool = True):
         """Initialize the industry valuation model.
         
         Args:
