@@ -1,0 +1,39 @@
+{
+  "industry": "Cloud Computing",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 166,
+  "train_size": 132,
+  "test_size": 34,
+  "train_loss": 0.05993443727493286,
+  "test_loss": 0.5037903189659119,
+  "train_mae": 0.040391705930233,
+  "test_mae": 0.4842475950717926,
+  "rmse": 0.6958790437471867,
+  "r2": -0.030218433672584144,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

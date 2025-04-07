@@ -683,6 +683,54 @@ class DCFModel:
         logger.info("Calculated Fair Price: %.2f per share", fair_price)
         return fair_price
 
+    def calculate_historical_growth_rates(self, years=3):
+        """Calculate historical growth rates for revenue based on available data.
+        
+        Args:
+            years (int): Number of years to consider for historical data
+            
+        Returns:
+            list: List of historical growth rates, or empty list if insufficient data
+        """
+        try:
+            if self.income_stmt.empty or len(self.income_stmt.columns) < 2:
+                return []
+                
+            # Get revenue data
+            rev_key = None
+            for key in ["Total Revenue", "Revenue"]:
+                if key in self.income_stmt.index:
+                    rev_key = key
+                    break
+                    
+            if not rev_key:
+                return []
+                
+            # Get sorted columns (dates)
+            cols = sorted(self.income_stmt.columns)
+            
+            # Calculate year-over-year growth rates
+            growth_rates = []
+            for i in range(1, min(years + 1, len(cols))):
+                if i >= len(cols):
+                    break
+                    
+                current_year = cols[-i]
+                prev_year = cols[-i-1]
+                
+                current_rev = self.income_stmt.loc[rev_key, current_year]
+                prev_rev = self.income_stmt.loc[rev_key, prev_year]
+                
+                if pd.notna(current_rev) and pd.notna(prev_rev) and prev_rev > 0:
+                    growth_rate = (current_rev - prev_rev) / prev_rev
+                    growth_rates.append(growth_rate)
+            
+            return growth_rates
+            
+        except Exception as e:
+            logger.error(f"Error calculating historical growth rates: {e}")
+            return []
+
     def perform_sensitivity_analysis(self, wacc_range=0.02, growth_range=0.01):
         """
         Perform sensitivity analysis on WACC and perpetual growth rate.
@@ -701,7 +749,7 @@ class DCFModel:
         growth_values = np.linspace(base_growth - growth_range, base_growth + growth_range, 5)
         
         sensitivity_matrix = {}
-        
+
         for w in wacc_values:
             row = {}
             self.wacc = w

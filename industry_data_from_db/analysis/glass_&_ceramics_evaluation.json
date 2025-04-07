@@ -1,0 +1,39 @@
+{
+  "industry": "Glass & Ceramics",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 95,
+  "train_size": 76,
+  "test_size": 19,
+  "train_loss": 0.14723432064056396,
+  "test_loss": 0.16853070259094238,
+  "train_mae": 0.12964311242103577,
+  "test_mae": 0.15093950927257538,
+  "rmse": 0.38850935829993216,
+  "r2": -1.2751381053378799,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

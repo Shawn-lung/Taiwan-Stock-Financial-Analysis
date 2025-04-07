@@ -1,0 +1,39 @@
+{
+  "industry": "Telecommunications",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 970,
+  "train_size": 776,
+  "test_size": 194,
+  "train_loss": 0.44828277826309204,
+  "test_loss": 0.14038726687431335,
+  "train_mae": 0.43235063552856445,
+  "test_mae": 0.12445513904094696,
+  "rmse": 0.35278200031700946,
+  "r2": -0.011055055466073993,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

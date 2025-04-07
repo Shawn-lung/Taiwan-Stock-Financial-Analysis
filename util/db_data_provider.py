@@ -15,6 +15,101 @@ class DBFinancialDataProvider:
         """Initialize the provider."""
         self.db_path = db_path
     
+    def get_financial_data(self, stock_id: str) -> list:
+        """Get consolidated financial data for deep learning models.
+        
+        Args:
+            stock_id: The stock ID to retrieve data for
+            
+        Returns:
+            List of financial data points with consistent format for deep learning
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            
+            # First, check the actual column names in the financial_statements table
+            cursor = conn.cursor()
+            cursor.execute("PRAGMA table_info(financial_statements)")
+            fs_columns = [col[1] for col in cursor.fetchall()]
+            
+            cursor.execute("PRAGMA table_info(balance_sheets)")
+            bs_columns = [col[1] for col in cursor.fetchall()]
+            
+            logger.debug(f"Financial statements columns: {fs_columns}")
+            logger.debug(f"Balance sheets columns: {bs_columns}")
+            
+            # Find appropriate column names for revenue, operating_income, net_income
+            revenue_col = next((col for col in fs_columns if 'revenue' in col.lower()), None)
+            op_income_col = next((col for col in fs_columns if 'operating_income' in col.lower() or 'op_income' in col.lower()), None)
+            net_income_col = next((col for col in fs_columns if 'net_income' in col.lower() or 'profit' in col.lower()), None)
+            
+            # Find appropriate column names for balance sheet data
+            assets_col = next((col for col in bs_columns if 'total_assets' in col.lower() or 'assets' in col.lower()), None)
+            equity_col = next((col for col in bs_columns if 'total_equity' in col.lower() or 'equity' in col.lower()), None)
+            
+            # Build a dynamic query based on available columns
+            select_parts = [f"fs.stock_id, fs.date"]
+            
+            if revenue_col:
+                select_parts.append(f"fs.{revenue_col} as revenue")
+            else:
+                select_parts.append("NULL as revenue")
+                
+            if op_income_col:
+                select_parts.append(f"fs.{op_income_col} as operating_income")
+            else:
+                select_parts.append("NULL as operating_income")
+                
+            if net_income_col:
+                select_parts.append(f"fs.{net_income_col} as net_income")
+            else:
+                select_parts.append("NULL as net_income")
+                
+            if assets_col:
+                select_parts.append(f"bs.{assets_col} as total_assets")
+            else:
+                select_parts.append("NULL as total_assets")
+                
+            if equity_col:
+                select_parts.append(f"bs.{equity_col} as total_equity")
+            else:
+                select_parts.append("NULL as total_equity")
+                
+            # Build and execute the query
+            query = f"""
+            SELECT {', '.join(select_parts)}
+            FROM financial_statements fs
+            LEFT JOIN balance_sheets bs ON fs.stock_id = bs.stock_id AND fs.date = bs.date
+            WHERE fs.stock_id = ?
+            ORDER BY fs.date DESC
+            """
+            
+            logger.debug(f"Executing query: {query}")
+            cursor.execute(query, (stock_id,))
+            results = cursor.fetchall()
+            
+            conn.close()
+            
+            # Convert to list of dictionaries for easier processing
+            financial_data = []
+            for row in results:
+                financial_data.append({
+                    'stock_id': row[0],
+                    'date': row[1],
+                    'revenue': row[2],
+                    'operating_income': row[3], 
+                    'net_income': row[4],
+                    'total_assets': row[5],
+                    'total_equity': row[6]
+                })
+            
+            logger.info(f"Retrieved {len(financial_data)} financial data points for {stock_id} from database")
+            return financial_data
+            
+        except Exception as e:
+            logger.error(f"Error retrieving financial data for {stock_id}: {e}")
+            return []
+    
     def get_stock_data(self, stock_id: str) -> Dict:
         """Get financial data for a stock from the database."""
         try:

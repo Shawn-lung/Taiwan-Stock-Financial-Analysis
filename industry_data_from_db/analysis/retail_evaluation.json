@@ -1,0 +1,39 @@
+{
+  "industry": "Retail",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 652,
+  "train_size": 521,
+  "test_size": 131,
+  "train_loss": 0.09532572329044342,
+  "test_loss": 0.07527214288711548,
+  "train_mae": 0.07622773945331573,
+  "test_mae": 0.05617418885231018,
+  "rmse": 0.23701093978464835,
+  "r2": -0.03085588385118898,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

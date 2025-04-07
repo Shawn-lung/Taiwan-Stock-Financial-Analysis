@@ -1,0 +1,39 @@
+{
+  "industry": "Other",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 1637,
+  "train_size": 1309,
+  "test_size": 328,
+  "train_loss": 0.15244999527931213,
+  "test_loss": 0.0995279997587204,
+  "train_mae": 0.13067302107810974,
+  "test_mae": 0.07775101065635681,
+  "rmse": 0.27883868369390213,
+  "r2": 0.0006177952154953203,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

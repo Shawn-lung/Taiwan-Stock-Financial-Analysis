@@ -1,0 +1,39 @@
+{
+  "industry": "Computer Hardware",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 2213,
+  "train_size": 1770,
+  "test_size": 443,
+  "train_loss": 0.18971846997737885,
+  "test_loss": 0.1743914932012558,
+  "train_mae": 0.174730584025383,
+  "test_mae": 0.15940362215042114,
+  "rmse": 0.399253829397137,
+  "r2": -0.0026417783568255526,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

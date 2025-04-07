@@ -1,0 +1,43 @@
+{
+  "industry": "Sports & Leisure",
+  "stocks_processed": 30,
+  "stocks_with_data": 29,
+  "total_records": 462,
+  "unique_stocks": 29,
+  "avg_records_per_stock": 15.931034482758621,
+  "feature_coverage": {
+    "stock_id": 100.0,
+    "timestamp": 100.0,
+    "revenue": 100.0,
+    "operating_income": 100.0,
+    "net_income": 0.0,
+    "total_assets": 100.0,
+    "total_equity": 100.0,
+    "gross_profit": 100.0,
+    "rd_expense": 0.0,
+    "total_liabilities": 100.0,
+    "current_assets": 100.0,
+    "current_liabilities": 100.0,
+    "cash": 100.0,
+    "operating_cash_flow": 0.0,
+    "capex": 0.0,
+    "free_cash_flow": 0.0,
+    "revenue_growth": 93.72294372294373,
+    "historical_growth_mean": 99.78354978354979,
+    "historical_growth_std": 99.78354978354979,
+    "operating_margin": 100.0,
+    "gross_margin": 100.0,
+    "operating_roa": 100.0,
+    "equity_to_assets": 100.0,
+    "debt_to_equity": 100.0,
+    "current_ratio": 100.0,
+    "cash_ratio": 100.0,
+    "future_3m_return": 99.56709956709958,
+    "future_6m_return": 93.93939393939394,
+    "future_12m_return": 82.46753246753246
+  },
+  "timestamp_range": [
+    "2020-06-30",
+    "2024-12-31"
+  ]
+}

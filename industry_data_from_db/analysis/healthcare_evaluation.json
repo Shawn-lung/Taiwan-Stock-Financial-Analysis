@@ -1,0 +1,39 @@
+{
+  "industry": "Healthcare",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 3663,
+  "train_size": 2930,
+  "test_size": 733,
+  "train_loss": 0.8421134948730469,
+  "test_loss": 0.9647241830825806,
+  "train_mae": 0.8222051858901978,
+  "test_mae": 0.9448161125183105,
+  "rmse": 0.9720165124107978,
+  "r2": -6.25501327502903,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

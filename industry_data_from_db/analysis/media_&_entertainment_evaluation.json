@@ -1,0 +1,39 @@
+{
+  "industry": "Media & Entertainment",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 582,
+  "train_size": 465,
+  "test_size": 117,
+  "train_loss": 0.843628466129303,
+  "test_loss": 0.8955205678939819,
+  "train_mae": 0.8228092193603516,
+  "test_mae": 0.8747013807296753,
+  "rmse": 0.9352546810650693,
+  "r2": -4.797003973580842,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

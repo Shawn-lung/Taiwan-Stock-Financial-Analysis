@@ -1,0 +1,39 @@
+{
+  "industry": "Industrial Equipment",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 2032,
+  "train_size": 1625,
+  "test_size": 407,
+  "train_loss": 0.12815898656845093,
+  "test_loss": 0.13548153638839722,
+  "train_mae": 0.12332189083099365,
+  "test_mae": 0.13064442574977875,
+  "rmse": 0.3614477131422355,
+  "r2": -0.007836331149778664,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

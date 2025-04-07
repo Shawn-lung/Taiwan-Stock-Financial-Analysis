@@ -1,0 +1,39 @@
+{
+  "industry": "Construction",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 1462,
+  "train_size": 1169,
+  "test_size": 293,
+  "train_loss": 29.58067512512207,
+  "test_loss": 9.444587707519531,
+  "train_mae": 29.56238555908203,
+  "test_mae": 9.426299095153809,
+  "rmse": 3.0702277379005865,
+  "r2": -119.00493839610611,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

@@ -1,0 +1,39 @@
+{
+  "industry": "Electronics Manufacturing",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 4215,
+  "train_size": 3372,
+  "test_size": 843,
+  "train_loss": 0.16669060289859772,
+  "test_loss": 0.18205679953098297,
+  "train_mae": 0.15121011435985565,
+  "test_mae": 0.1665763258934021,
+  "rmse": 0.40813762692979716,
+  "r2": -0.004014849008095789,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

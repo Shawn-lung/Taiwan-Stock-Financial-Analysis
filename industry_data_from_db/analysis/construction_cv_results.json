@@ -1,0 +1,14 @@
+{
+  "train_loss_mean": 68.5393168002367,
+  "train_loss_std": 90.73026613946163,
+  "val_loss_mean": 24.483415085077286,
+  "val_loss_std": 34.00926083314637,
+  "test_loss_mean": 20.34432208240032,
+  "test_loss_std": 25.03196092364167,
+  "train_mae_mean": 68.5188320338726,
+  "train_mae_std": 90.73017313213381,
+  "val_mae_mean": 24.462931020557882,
+  "val_mae_std": 34.00918986362856,
+  "test_mae_mean": 20.323834972083567,
+  "test_mae_std": 25.031837211424513
+}

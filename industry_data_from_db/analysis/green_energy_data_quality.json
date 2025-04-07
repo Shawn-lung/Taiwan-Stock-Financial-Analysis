@@ -1,0 +1,43 @@
+{
+  "industry": "Green Energy",
+  "stocks_processed": 56,
+  "stocks_with_data": 56,
+  "total_records": 626,
+  "unique_stocks": 56,
+  "avg_records_per_stock": 11.178571428571429,
+  "feature_coverage": {
+    "stock_id": 100.0,
+    "timestamp": 100.0,
+    "revenue": 100.0,
+    "operating_income": 100.0,
+    "net_income": 0.0,
+    "total_assets": 100.0,
+    "total_equity": 100.0,
+    "gross_profit": 100.0,
+    "rd_expense": 0.0,
+    "total_liabilities": 100.0,
+    "current_assets": 100.0,
+    "current_liabilities": 100.0,
+    "cash": 100.0,
+    "operating_cash_flow": 0.0,
+    "capex": 0.0,
+    "free_cash_flow": 0.0,
+    "revenue_growth": 91.05431309904152,
+    "historical_growth_mean": 99.20127795527156,
+    "historical_growth_std": 99.20127795527156,
+    "operating_margin": 100.0,
+    "gross_margin": 100.0,
+    "operating_roa": 100.0,
+    "equity_to_assets": 100.0,
+    "debt_to_equity": 100.0,
+    "current_ratio": 100.0,
+    "cash_ratio": 100.0,
+    "future_3m_return": 99.84025559105432,
+    "future_6m_return": 93.45047923322683,
+    "future_12m_return": 78.91373801916933
+  },
+  "timestamp_range": [
+    "2020-06-30",
+    "2024-12-31"
+  ]
+}

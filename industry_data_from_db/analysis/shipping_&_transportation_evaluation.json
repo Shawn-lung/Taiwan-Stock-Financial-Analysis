@@ -1,0 +1,39 @@
+{
+  "industry": "Shipping & Transportation",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 614,
+  "train_size": 491,
+  "test_size": 123,
+  "train_loss": 0.47298097610473633,
+  "test_loss": 0.34295225143432617,
+  "train_mae": 0.45581626892089844,
+  "test_mae": 0.32578757405281067,
+  "rmse": 0.5707780333579686,
+  "r2": -0.01068680854146642,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

@@ -1,0 +1,39 @@
+{
+  "industry": "Cement & Construction Materials",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 133,
+  "train_size": 106,
+  "test_size": 27,
+  "train_loss": 0.045845985412597656,
+  "test_loss": 0.10013797879219055,
+  "train_mae": 0.027263052761554718,
+  "test_mae": 0.08155503869056702,
+  "rmse": 0.2855784459654538,
+  "r2": -4.580011316845629,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

@@ -1,0 +1,39 @@
+{
+  "industry": "Utilities",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 237,
+  "train_size": 189,
+  "test_size": 48,
+  "train_loss": 0.08865973353385925,
+  "test_loss": 0.05626196786761284,
+  "train_mae": 0.0677158311009407,
+  "test_mae": 0.03531806543469429,
+  "rmse": 0.18793100818267253,
+  "r2": -0.952176091708153,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

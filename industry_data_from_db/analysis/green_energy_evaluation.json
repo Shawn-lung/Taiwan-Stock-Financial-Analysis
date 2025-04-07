@@ -1,0 +1,39 @@
+{
+  "industry": "Green Energy",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 626,
+  "train_size": 500,
+  "test_size": 126,
+  "train_loss": 0.14747868478298187,
+  "test_loss": 0.24586665630340576,
+  "train_mae": 0.1292756348848343,
+  "test_mae": 0.22766360640525818,
+  "rmse": 0.47714108380596043,
+  "r2": -0.005405773465617436,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

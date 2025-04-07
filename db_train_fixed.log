@@ -785,3 +785,724 @@
 2025-04-06 14:48:17,315 - __main__ - INFO - Training completed in 0:02:31.466856. Successful: 34/34
 2025-04-06 14:48:17,315 - __main__ - INFO - Successful industries: ['Cement & Construction Materials', 'Other', 'Food & Beverage', 'Electrical Equipment', 'Agricultural Technology', 'Tourism & Hospitality', 'Healthcare', 'Materials', 'Construction', 'Automotive', 'Electronics Manufacturing', 'Green Energy', 'Textiles', 'Sports & Leisure', 'Steel & Metals', 'Industrial Equipment', 'Computer Hardware', 'Chemicals', 'Electronics', 'Glass & Ceramics', 'Paper & Packaging', 'Home & Living', 'Rubber & Plastics', 'Shipping & Transportation', 'Electronics Distribution', 'Retail', 'Utilities', 'Cloud Computing', 'Financial Services', 'Media & Entertainment', 'Telecommunications', 'E-Commerce', 'Semiconductors', 'Technology Services']
 2025-04-06 14:48:17,315 - __main__ - INFO - Training process completed
+2025-04-07 00:37:53,878 - __main__ - INFO - Starting comprehensive model training
+2025-04-07 00:37:53,881 - __main__ - WARNING - No GPU found, using CPU instead
+2025-04-07 00:37:53,881 - __main__ - INFO - Using default configuration
+2025-04-07 00:37:53,881 - __main__ - INFO - Starting comprehensive model training at 2025-04-07 00:37:53.881705
+2025-04-07 00:37:53,892 - __main__ - INFO - Found 34 industries in database
+2025-04-07 00:37:53,893 - __main__ - INFO - Found 34 industries with at least 5 stocks
+2025-04-07 00:37:53,893 - __main__ - INFO - Processing industry 1/34: Electronics
+2025-04-07 00:37:53,895 - __main__ - INFO - Found 452 stocks in Electronics industry
+2025-04-07 00:38:07,301 - __main__ - INFO - Saved 6885 records for Electronics to industry_data_from_db\electronics_training.csv
+2025-04-07 00:38:08,363 - __main__ - INFO - Training model for Electronics with 6885 records
+2025-04-07 00:38:08,363 - __main__ - INFO - Training model for Electronics with 6885 records
+2025-04-07 00:38:08,363 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 00:38:08,365 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 00:38:08,478 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 00:38:08,479 - __main__ - INFO - Training fold 1/5
+2025-04-07 00:41:36,163 - __main__ - INFO - Training fold 2/5
+2025-04-07 00:41:36,223 - __main__ - ERROR - Error training model for Electronics: Unknown variable: <Variable path=sequential_2/dense_6/kernel, shape=(8, 16), dtype=float32, value=[[-2.60182500e-01  1.19856715e-01 -2.96494961e-01 -2.60183930e-01
+  -1.27410889e-02 -4.29572940e-01  2.70648360e-01  4.77019548e-02
+  -2.66630530e-01 -2.31459856e-01 -5.73873520e-02  3.05218339e-01
+  -7.95334578e-02  4.01954889e-01 -2.48183727e-01 -1.79829597e-02]
+ [-2.91081786e-01  4.46653366e-01 -4.75827098e-01 -3.96052361e-01
+   3.87796879e-01  2.67050505e-01  2.02268243e-01  4.30383801e-01
+   3.12312126e-01 -1.27381444e-01  3.61626267e-01  2.45876789e-01
+  -2.00702190e-01  2.38252759e-01  3.87897491e-01 -3.31291318e-01]
+ [ 1.85678482e-01 -1.38063073e-01  1.46647692e-02  3.71158481e-01
+  -1.37257099e-01  3.68775129e-02  2.93424249e-01  3.56435776e-04
+   1.40034199e-01  2.78065920e-01 -3.52684736e-01  1.00652575e-01
+  -4.32184696e-01  4.30027008e-01  1.16557002e-01 -4.68899012e-01]
+ [ 4.90850568e-01 -4.14882183e-01  3.54888439e-02  4.43149924e-01
+   1.48135781e-01  1.49024010e-01 -3.74801636e-01 -1.08873367e-01
+  -3.17394853e-01  9.37795639e-03 -6.52699471e-02 -3.28585625e-01
+   2.87690401e-01 -2.02464819e-01  2.87280083e-01  8.21021795e-02]
+ [-4.46233511e-01 -2.92557359e-01 -3.35228324e-01 -1.41910791e-01
+   3.00685763e-01  3.10366988e-01  1.37093782e-01  2.30015874e-01
+   4.55371380e-01  3.67390633e-01 -4.73510265e-01 -1.57181025e-02
+   2.24304080e-01  2.58030057e-01 -1.38183713e-01 -3.76469851e-01]
+ [-9.76516008e-02 -6.53512478e-02 -2.12639689e-01  7.73766041e-02
+  -2.24052906e-01  1.51618958e-01 -2.24432945e-02  3.19642067e-01
+  -3.13460708e-01 -1.51000381e-01  2.64016509e-01  1.65794134e-01
+   1.35138035e-02 -2.46683359e-02  3.01200509e-01 -2.27131724e-01]
+ [-2.07143188e-01 -2.44717240e-01 -2.54028082e-01  2.17364430e-01
+  -9.30595398e-03  2.24740505e-01  2.45207667e-01  2.09152699e-02
+  -3.50625277e-01 -4.05371189e-03  5.20288944e-02  3.21495414e-01
+  -3.99259090e-01  1.18890166e-01  1.71167135e-01 -2.73103237e-01]
+ [-2.89111137e-02  1.16678715e-01 -7.32456446e-02 -2.01135039e-01
+  -3.19263339e-01  4.61544514e-01  1.15657330e-01  3.03817868e-01
+   4.01399374e-01 -4.20363545e-01 -4.05378342e-02  4.95936513e-01
+   9.66299772e-02 -4.24103379e-01 -6.77371025e-03 -2.81089187e-01]]>. This optimizer can only be called for the variables it was originally built with. When working with a new set of variables, you should recreate a new optimizer instance.
+2025-04-07 00:41:36,242 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\shawn\OneDrive\คๅฅ๓\GitHub\Finance_stuff\db_train_fixed.py", line 626, in train_industry_model
+    fold_history = fold_model.fit(
+  File "C:\Users\shawn\AppData\Local\Programs\Python\Python310\lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\shawn\AppData\Local\Programs\Python\Python310\lib\site-packages\keras\src\optimizers\base_optimizer.py", line 329, in _check_variables_are_known
+    raise ValueError(
+ValueError: Unknown variable: <Variable path=sequential_2/dense_6/kernel, shape=(8, 16), dtype=float32, value=[[-2.60182500e-01  1.19856715e-01 -2.96494961e-01 -2.60183930e-01
+  -1.27410889e-02 -4.29572940e-01  2.70648360e-01  4.77019548e-02
+  -2.66630530e-01 -2.31459856e-01 -5.73873520e-02  3.05218339e-01
+  -7.95334578e-02  4.01954889e-01 -2.48183727e-01 -1.79829597e-02]
+ [-2.91081786e-01  4.46653366e-01 -4.75827098e-01 -3.96052361e-01
+   3.87796879e-01  2.67050505e-01  2.02268243e-01  4.30383801e-01
+   3.12312126e-01 -1.27381444e-01  3.61626267e-01  2.45876789e-01
+  -2.00702190e-01  2.38252759e-01  3.87897491e-01 -3.31291318e-01]
+ [ 1.85678482e-01 -1.38063073e-01  1.46647692e-02  3.71158481e-01
+  -1.37257099e-01  3.68775129e-02  2.93424249e-01  3.56435776e-04
+   1.40034199e-01  2.78065920e-01 -3.52684736e-01  1.00652575e-01
+  -4.32184696e-01  4.30027008e-01  1.16557002e-01 -4.68899012e-01]
+ [ 4.90850568e-01 -4.14882183e-01  3.54888439e-02  4.43149924e-01
+   1.48135781e-01  1.49024010e-01 -3.74801636e-01 -1.08873367e-01
+  -3.17394853e-01  9.37795639e-03 -6.52699471e-02 -3.28585625e-01
+   2.87690401e-01 -2.02464819e-01  2.87280083e-01  8.21021795e-02]
+ [-4.46233511e-01 -2.92557359e-01 -3.35228324e-01 -1.41910791e-01
+   3.00685763e-01  3.10366988e-01  1.37093782e-01  2.30015874e-01
+   4.55371380e-01  3.67390633e-01 -4.73510265e-01 -1.57181025e-02
+   2.24304080e-01  2.58030057e-01 -1.38183713e-01 -3.76469851e-01]
+ [-9.76516008e-02 -6.53512478e-02 -2.12639689e-01  7.73766041e-02
+  -2.24052906e-01  1.51618958e-01 -2.24432945e-02  3.19642067e-01
+  -3.13460708e-01 -1.51000381e-01  2.64016509e-01  1.65794134e-01
+   1.35138035e-02 -2.46683359e-02  3.01200509e-01 -2.27131724e-01]
+ [-2.07143188e-01 -2.44717240e-01 -2.54028082e-01  2.17364430e-01
+  -9.30595398e-03  2.24740505e-01  2.45207667e-01  2.09152699e-02
+  -3.50625277e-01 -4.05371189e-03  5.20288944e-02  3.21495414e-01
+  -3.99259090e-01  1.18890166e-01  1.71167135e-01 -2.73103237e-01]
+ [-2.89111137e-02  1.16678715e-01 -7.32456446e-02 -2.01135039e-01
+  -3.19263339e-01  4.61544514e-01  1.15657330e-01  3.03817868e-01
+   4.01399374e-01 -4.20363545e-01 -4.05378342e-02  4.95936513e-01
+   9.66299772e-02 -4.24103379e-01 -6.77371025e-03 -2.81089187e-01]]>. This optimizer can only be called for the variables it was originally built with. When working with a new set of variables, you should recreate a new optimizer instance.
+
+2025-04-07 00:41:36,242 - __main__ - WARNING - Failed to train model for Electronics
+2025-04-07 00:41:36,243 - __main__ - INFO - Processing industry 2/34: Healthcare
+2025-04-07 00:41:36,244 - __main__ - INFO - Found 280 stocks in Healthcare industry
+2025-04-07 00:41:43,364 - __main__ - INFO - Saved 3663 records for Healthcare to industry_data_from_db\healthcare_training.csv
+2025-04-07 00:41:49,586 - __main__ - INFO - Training model for Healthcare with 3663 records
+2025-04-07 00:41:49,586 - __main__ - INFO - Training model for Healthcare with 3663 records
+2025-04-07 00:41:49,586 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 00:41:49,587 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 00:41:49,622 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 00:41:49,622 - __main__ - INFO - Training fold 1/5
+2025-04-07 00:47:14,671 - __main__ - INFO - Starting comprehensive model training
+2025-04-07 00:47:14,672 - __main__ - WARNING - No GPU found, using CPU instead
+2025-04-07 00:47:14,672 - __main__ - INFO - Using default configuration
+2025-04-07 00:47:14,672 - __main__ - INFO - Starting comprehensive model training at 2025-04-07 00:47:14.672128
+2025-04-07 00:47:14,675 - __main__ - INFO - Found 34 industries in database
+2025-04-07 00:47:14,675 - __main__ - INFO - Found 34 industries with at least 5 stocks
+2025-04-07 00:47:14,675 - __main__ - INFO - Processing industry 1/34: Electronics
+2025-04-07 00:47:14,676 - __main__ - INFO - Found 452 stocks in Electronics industry
+2025-04-07 00:47:25,816 - __main__ - INFO - Saved 6885 records for Electronics to industry_data_from_db\electronics_training.csv
+2025-04-07 00:47:26,522 - __main__ - INFO - Training model for Electronics with 6885 records
+2025-04-07 00:47:26,522 - __main__ - INFO - Training model for Electronics with 6885 records
+2025-04-07 00:47:26,523 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 00:47:26,524 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 00:47:26,596 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 00:47:26,596 - __main__ - INFO - Training fold 1/5
+2025-04-07 00:51:03,808 - __main__ - INFO - Training fold 2/5
+2025-04-07 00:54:41,484 - __main__ - INFO - Training fold 3/5
+2025-04-07 00:58:15,715 - __main__ - INFO - Training fold 4/5
+2025-04-07 01:02:12,533 - __main__ - INFO - Training fold 5/5
+2025-04-07 01:10:18,895 - __main__ - INFO - Cross-validation results: Test MAE = 0.1688 กำ 0.0003
+2025-04-07 01:10:20,244 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 01:10:20,414 - __main__ - INFO - Saved model and artifacts for Electronics to industry_data_from_db\models\electronics_model.keras
+2025-04-07 01:10:20,428 - __main__ - INFO - Successfully trained model for Electronics
+2025-04-07 01:10:20,429 - __main__ - INFO - Processing industry 2/34: Healthcare
+2025-04-07 01:10:20,430 - __main__ - INFO - Found 280 stocks in Healthcare industry
+2025-04-07 01:10:28,113 - __main__ - INFO - Saved 3663 records for Healthcare to industry_data_from_db\healthcare_training.csv
+2025-04-07 01:10:34,833 - __main__ - INFO - Training model for Healthcare with 3663 records
+2025-04-07 01:10:34,833 - __main__ - INFO - Training model for Healthcare with 3663 records
+2025-04-07 01:10:34,833 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 01:10:34,835 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 01:10:34,871 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 01:10:34,871 - __main__ - INFO - Training fold 1/5
+2025-04-07 01:11:49,973 - __main__ - INFO - Training fold 2/5
+2025-04-07 01:12:49,353 - __main__ - INFO - Training fold 3/5
+2025-04-07 01:14:52,416 - __main__ - INFO - Training fold 4/5
+2025-04-07 01:15:58,225 - __main__ - INFO - Training fold 5/5
+2025-04-07 01:17:03,705 - __main__ - INFO - Cross-validation results: Test MAE = 5.4387 กำ 10.5419
+2025-04-07 01:17:04,457 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 01:17:04,617 - __main__ - INFO - Saved model and artifacts for Healthcare to industry_data_from_db\models\healthcare_model.keras
+2025-04-07 01:17:04,620 - __main__ - INFO - Successfully trained model for Healthcare
+2025-04-07 01:17:04,620 - __main__ - INFO - Processing industry 3/34: Electronics Manufacturing
+2025-04-07 01:17:04,621 - __main__ - INFO - Found 246 stocks in Electronics Manufacturing industry
+2025-04-07 01:17:13,235 - __main__ - INFO - Saved 4215 records for Electronics Manufacturing to industry_data_from_db\electronics_manufacturing_training.csv
+2025-04-07 01:17:21,174 - __main__ - INFO - Training model for Electronics Manufacturing with 4215 records
+2025-04-07 01:17:21,174 - __main__ - INFO - Training model for Electronics Manufacturing with 4215 records
+2025-04-07 01:17:21,175 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 01:17:21,176 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 01:17:21,210 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 01:17:21,211 - __main__ - INFO - Training fold 1/5
+2025-04-07 01:19:47,234 - __main__ - INFO - Training fold 2/5
+2025-04-07 01:22:25,543 - __main__ - INFO - Training fold 3/5
+2025-04-07 01:25:24,939 - __main__ - INFO - Training fold 4/5
+2025-04-07 01:28:48,893 - __main__ - INFO - Training fold 5/5
+2025-04-07 01:33:09,324 - __main__ - INFO - Cross-validation results: Test MAE = 0.4597 กำ 0.5834
+2025-04-07 01:33:10,405 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 01:33:10,603 - __main__ - INFO - Saved model and artifacts for Electronics Manufacturing to industry_data_from_db\models\electronics_manufacturing_model.keras
+2025-04-07 01:33:10,605 - __main__ - INFO - Successfully trained model for Electronics Manufacturing
+2025-04-07 01:33:10,605 - __main__ - INFO - Processing industry 4/34: Other
+2025-04-07 01:33:10,607 - __main__ - INFO - Found 222 stocks in Other industry
+2025-04-07 01:33:14,566 - __main__ - INFO - Saved 1637 records for Other to industry_data_from_db\other_training.csv
+2025-04-07 01:33:17,170 - __main__ - INFO - Training model for Other with 1637 records
+2025-04-07 01:33:17,171 - __main__ - INFO - Training model for Other with 1637 records
+2025-04-07 01:33:17,171 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 01:33:17,172 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 01:33:17,212 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 01:33:17,213 - __main__ - INFO - Training fold 1/5
+2025-04-07 01:34:40,647 - __main__ - INFO - Training fold 2/5
+2025-04-07 01:36:03,142 - __main__ - INFO - Training fold 3/5
+2025-04-07 01:37:25,704 - __main__ - INFO - Training fold 4/5
+2025-04-07 01:38:48,380 - __main__ - INFO - Training fold 5/5
+2025-04-07 01:40:59,781 - __main__ - INFO - Cross-validation results: Test MAE = 0.0927 กำ 0.0146
+2025-04-07 01:41:00,251 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 01:41:00,410 - __main__ - INFO - Saved model and artifacts for Other to industry_data_from_db\models\other_model.keras
+2025-04-07 01:41:00,412 - __main__ - INFO - Successfully trained model for Other
+2025-04-07 01:41:00,412 - __main__ - INFO - Processing industry 5/34: Computer Hardware
+2025-04-07 01:41:00,413 - __main__ - INFO - Found 137 stocks in Computer Hardware industry
+2025-04-07 01:41:04,789 - __main__ - INFO - Saved 2213 records for Computer Hardware to industry_data_from_db\computer_hardware_training.csv
+2025-04-07 01:41:05,405 - __main__ - INFO - Training model for Computer Hardware with 2213 records
+2025-04-07 01:41:05,405 - __main__ - INFO - Training model for Computer Hardware with 2213 records
+2025-04-07 01:41:05,406 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 01:41:05,407 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 01:41:05,438 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 01:41:05,439 - __main__ - INFO - Training fold 1/5
+2025-04-07 01:42:23,916 - __main__ - INFO - Training fold 2/5
+2025-04-07 01:43:41,945 - __main__ - INFO - Training fold 3/5
+2025-04-07 01:45:10,616 - __main__ - INFO - Training fold 4/5
+2025-04-07 01:46:35,279 - __main__ - INFO - Training fold 5/5
+2025-04-07 01:48:32,318 - __main__ - INFO - Cross-validation results: Test MAE = 0.1761 กำ 0.0338
+2025-04-07 01:48:32,908 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 01:48:33,067 - __main__ - INFO - Saved model and artifacts for Computer Hardware to industry_data_from_db\models\computer_hardware_model.keras
+2025-04-07 01:48:33,068 - __main__ - INFO - Successfully trained model for Computer Hardware
+2025-04-07 01:48:33,069 - __main__ - INFO - Processing industry 6/34: Industrial Equipment
+2025-04-07 01:48:33,070 - __main__ - INFO - Found 126 stocks in Industrial Equipment industry
+2025-04-07 01:48:37,196 - __main__ - INFO - Saved 2032 records for Industrial Equipment to industry_data_from_db\industrial_equipment_training.csv
+2025-04-07 01:48:37,782 - __main__ - INFO - Training model for Industrial Equipment with 2032 records
+2025-04-07 01:48:37,782 - __main__ - INFO - Training model for Industrial Equipment with 2032 records
+2025-04-07 01:48:37,783 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 01:48:37,783 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 01:48:37,820 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 01:48:37,821 - __main__ - INFO - Training fold 1/5
+2025-04-07 01:48:56,320 - __main__ - INFO - Training fold 2/5
+2025-04-07 01:50:15,117 - __main__ - INFO - Training fold 3/5
+2025-04-07 01:51:34,544 - __main__ - INFO - Training fold 4/5
+2025-04-07 01:52:51,954 - __main__ - INFO - Training fold 5/5
+2025-04-07 01:55:31,888 - __main__ - INFO - Cross-validation results: Test MAE = 0.1335 กำ 0.0069
+2025-04-07 01:55:32,410 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 01:55:32,598 - __main__ - INFO - Saved model and artifacts for Industrial Equipment to industry_data_from_db\models\industrial_equipment_model.keras
+2025-04-07 01:55:32,600 - __main__ - INFO - Successfully trained model for Industrial Equipment
+2025-04-07 01:55:32,600 - __main__ - INFO - Processing industry 7/34: Semiconductors
+2025-04-07 01:55:32,601 - __main__ - INFO - Found 125 stocks in Semiconductors industry
+2025-04-07 01:55:36,559 - __main__ - INFO - Saved 1905 records for Semiconductors to industry_data_from_db\semiconductors_training.csv
+2025-04-07 01:55:37,403 - __main__ - INFO - Training model for Semiconductors with 1905 records
+2025-04-07 01:55:37,404 - __main__ - INFO - Training model for Semiconductors with 1905 records
+2025-04-07 01:55:37,404 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 01:55:37,404 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 01:55:37,438 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 01:55:37,438 - __main__ - INFO - Training fold 1/5
+2025-04-07 01:56:52,242 - __main__ - INFO - Training fold 2/5
+2025-04-07 01:57:24,714 - __main__ - INFO - Training fold 3/5
+2025-04-07 01:58:10,124 - __main__ - INFO - Training fold 4/5
+2025-04-07 01:59:23,820 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:01:49,322 - __main__ - INFO - Cross-validation results: Test MAE = 0.3022 กำ 0.0047
+2025-04-07 02:01:49,840 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:01:50,011 - __main__ - INFO - Saved model and artifacts for Semiconductors to industry_data_from_db\models\semiconductors_model.keras
+2025-04-07 02:01:50,013 - __main__ - INFO - Successfully trained model for Semiconductors
+2025-04-07 02:01:50,013 - __main__ - INFO - Processing industry 8/34: Financial Services
+2025-04-07 02:01:50,015 - __main__ - INFO - Found 82 stocks in Financial Services industry
+2025-04-07 02:01:51,703 - __main__ - INFO - Saved 204 records for Financial Services to industry_data_from_db\financial_services_training.csv
+2025-04-07 02:01:52,589 - __main__ - INFO - Training model for Financial Services with 204 records
+2025-04-07 02:01:52,590 - __main__ - INFO - Training model for Financial Services with 204 records
+2025-04-07 02:01:52,590 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'revenue_growth']
+2025-04-07 02:01:52,591 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:01:52,623 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:01:52,623 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:01:58,819 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:02:13,507 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:02:25,086 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:02:39,403 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:03:05,065 - __main__ - INFO - Cross-validation results: Test MAE = 0.0870 กำ 0.0479
+2025-04-07 02:03:05,302 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:03:05,480 - __main__ - INFO - Saved model and artifacts for Financial Services to industry_data_from_db\models\financial_services_model.keras
+2025-04-07 02:03:05,482 - __main__ - INFO - Successfully trained model for Financial Services
+2025-04-07 02:03:05,482 - __main__ - INFO - Processing industry 9/34: Construction
+2025-04-07 02:03:05,484 - __main__ - INFO - Found 80 stocks in Construction industry
+2025-04-07 02:03:08,778 - __main__ - INFO - Saved 1462 records for Construction to industry_data_from_db\construction_training.csv
+2025-04-07 02:03:24,028 - __main__ - INFO - Training model for Construction with 1462 records
+2025-04-07 02:03:24,029 - __main__ - INFO - Training model for Construction with 1462 records
+2025-04-07 02:03:24,029 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:03:24,030 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:03:24,057 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:03:24,058 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:03:44,524 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:04:33,857 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:04:49,270 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:05:20,402 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:05:51,361 - __main__ - INFO - Cross-validation results: Test MAE = 20.3238 กำ 25.0318
+2025-04-07 02:05:51,777 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:05:51,929 - __main__ - INFO - Saved model and artifacts for Construction to industry_data_from_db\models\construction_model.keras
+2025-04-07 02:05:51,930 - __main__ - INFO - Successfully trained model for Construction
+2025-04-07 02:05:51,930 - __main__ - INFO - Processing industry 10/34: Tourism & Hospitality
+2025-04-07 02:05:51,932 - __main__ - INFO - Found 64 stocks in Tourism & Hospitality industry
+2025-04-07 02:05:54,686 - __main__ - INFO - Saved 954 records for Tourism & Hospitality to industry_data_from_db\tourism_&_hospitality_training.csv
+2025-04-07 02:05:55,276 - __main__ - INFO - Training model for Tourism & Hospitality with 954 records
+2025-04-07 02:05:55,276 - __main__ - INFO - Training model for Tourism & Hospitality with 954 records
+2025-04-07 02:05:55,276 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:05:55,277 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:05:55,306 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:05:55,307 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:06:07,538 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:06:39,686 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:07:11,885 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:07:53,809 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:09:14,009 - __main__ - INFO - Cross-validation results: Test MAE = 0.2164 กำ 0.0280
+2025-04-07 02:09:14,470 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:09:14,649 - __main__ - INFO - Saved model and artifacts for Tourism & Hospitality to industry_data_from_db\models\tourism_&_hospitality_model.keras
+2025-04-07 02:09:14,651 - __main__ - INFO - Successfully trained model for Tourism & Hospitality
+2025-04-07 02:09:14,651 - __main__ - INFO - Processing industry 11/34: Textiles
+2025-04-07 02:09:14,652 - __main__ - INFO - Found 59 stocks in Textiles industry
+2025-04-07 02:09:16,829 - __main__ - INFO - Saved 1049 records for Textiles to industry_data_from_db\textiles_training.csv
+2025-04-07 02:09:24,058 - __main__ - INFO - Training model for Textiles with 1049 records
+2025-04-07 02:09:24,058 - __main__ - INFO - Training model for Textiles with 1049 records
+2025-04-07 02:09:24,059 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:09:24,059 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:09:24,097 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:09:24,098 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:09:54,029 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:10:09,942 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:10:22,446 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:11:07,780 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:12:14,676 - __main__ - INFO - Cross-validation results: Test MAE = 0.2322 กำ 0.2225
+2025-04-07 02:12:15,078 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:12:15,247 - __main__ - INFO - Saved model and artifacts for Textiles to industry_data_from_db\models\textiles_model.keras
+2025-04-07 02:12:15,248 - __main__ - INFO - Successfully trained model for Textiles
+2025-04-07 02:12:15,248 - __main__ - INFO - Processing industry 12/34: Green Energy
+2025-04-07 02:12:15,250 - __main__ - INFO - Found 56 stocks in Green Energy industry
+2025-04-07 02:12:16,576 - __main__ - INFO - Saved 626 records for Green Energy to industry_data_from_db\green_energy_training.csv
+2025-04-07 02:12:17,153 - __main__ - INFO - Training model for Green Energy with 626 records
+2025-04-07 02:12:17,153 - __main__ - INFO - Training model for Green Energy with 626 records
+2025-04-07 02:12:17,153 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:12:17,154 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:12:17,194 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:12:17,195 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:12:40,812 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:13:10,327 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:13:36,992 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:14:06,910 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:14:53,153 - __main__ - INFO - Cross-validation results: Test MAE = 0.2604 กำ 0.0734
+2025-04-07 02:14:53,447 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:14:53,617 - __main__ - INFO - Saved model and artifacts for Green Energy to industry_data_from_db\models\green_energy_model.keras
+2025-04-07 02:14:53,619 - __main__ - INFO - Successfully trained model for Green Energy
+2025-04-07 02:14:53,619 - __main__ - INFO - Processing industry 13/34: Telecommunications
+2025-04-07 02:14:53,621 - __main__ - INFO - Found 55 stocks in Telecommunications industry
+2025-04-07 02:14:56,388 - __main__ - INFO - Saved 970 records for Telecommunications to industry_data_from_db\telecommunications_training.csv
+2025-04-07 02:14:57,027 - __main__ - INFO - Training model for Telecommunications with 970 records
+2025-04-07 02:14:57,028 - __main__ - INFO - Training model for Telecommunications with 970 records
+2025-04-07 02:14:57,028 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:14:57,029 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:14:57,060 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:14:57,061 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:15:38,351 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:15:53,765 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:16:32,647 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:17:14,853 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:18:41,832 - __main__ - INFO - Cross-validation results: Test MAE = 0.1254 กำ 0.0036
+2025-04-07 02:18:42,196 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:18:42,365 - __main__ - INFO - Saved model and artifacts for Telecommunications to industry_data_from_db\models\telecommunications_model.keras
+2025-04-07 02:18:42,367 - __main__ - INFO - Successfully trained model for Telecommunications
+2025-04-07 02:18:42,367 - __main__ - INFO - Processing industry 14/34: Steel & Metals
+2025-04-07 02:18:42,369 - __main__ - INFO - Found 54 stocks in Steel & Metals industry
+2025-04-07 02:18:44,476 - __main__ - INFO - Saved 930 records for Steel & Metals to industry_data_from_db\steel_&_metals_training.csv
+2025-04-07 02:18:45,098 - __main__ - INFO - Training model for Steel & Metals with 930 records
+2025-04-07 02:18:45,098 - __main__ - INFO - Training model for Steel & Metals with 930 records
+2025-04-07 02:18:45,099 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:18:45,099 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:18:45,130 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:18:45,130 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:19:25,840 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:19:45,797 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:20:00,975 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:20:39,869 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:21:39,154 - __main__ - INFO - Cross-validation results: Test MAE = 0.1749 กำ 0.0638
+2025-04-07 02:21:39,488 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:21:39,682 - __main__ - INFO - Saved model and artifacts for Steel & Metals to industry_data_from_db\models\steel_&_metals_model.keras
+2025-04-07 02:21:39,684 - __main__ - INFO - Successfully trained model for Steel & Metals
+2025-04-07 02:21:39,684 - __main__ - INFO - Processing industry 15/34: Electronics Distribution
+2025-04-07 02:21:39,686 - __main__ - INFO - Found 48 stocks in Electronics Distribution industry
+2025-04-07 02:21:41,422 - __main__ - INFO - Saved 719 records for Electronics Distribution to industry_data_from_db\electronics_distribution_training.csv
+2025-04-07 02:21:41,988 - __main__ - INFO - Training model for Electronics Distribution with 719 records
+2025-04-07 02:21:41,988 - __main__ - INFO - Training model for Electronics Distribution with 719 records
+2025-04-07 02:21:41,989 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:21:41,990 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:21:42,025 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:21:42,025 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:22:15,686 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:22:50,090 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:23:18,203 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:23:43,494 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:24:52,169 - __main__ - INFO - Cross-validation results: Test MAE = 0.1060 กำ 0.0051
+2025-04-07 02:24:52,512 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:24:52,693 - __main__ - INFO - Saved model and artifacts for Electronics Distribution to industry_data_from_db\models\electronics_distribution_model.keras
+2025-04-07 02:24:52,695 - __main__ - INFO - Successfully trained model for Electronics Distribution
+2025-04-07 02:24:52,695 - __main__ - INFO - Processing industry 16/34: Technology Services
+2025-04-07 02:24:52,696 - __main__ - INFO - Found 46 stocks in Technology Services industry
+2025-04-07 02:24:54,462 - __main__ - INFO - Saved 680 records for Technology Services to industry_data_from_db\technology_services_training.csv
+2025-04-07 02:24:55,106 - __main__ - INFO - Training model for Technology Services with 680 records
+2025-04-07 02:24:55,107 - __main__ - INFO - Training model for Technology Services with 680 records
+2025-04-07 02:24:55,107 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:24:55,108 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:24:55,145 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:24:55,146 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:25:11,052 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:25:23,194 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:25:47,506 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:26:01,681 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:26:34,019 - __main__ - INFO - Cross-validation results: Test MAE = 0.1383 กำ 0.0386
+2025-04-07 02:26:34,349 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:26:34,519 - __main__ - INFO - Saved model and artifacts for Technology Services to industry_data_from_db\models\technology_services_model.keras
+2025-04-07 02:26:34,521 - __main__ - INFO - Successfully trained model for Technology Services
+2025-04-07 02:26:34,521 - __main__ - INFO - Processing industry 17/34: Food & Beverage
+2025-04-07 02:26:34,522 - __main__ - INFO - Found 42 stocks in Food & Beverage industry
+2025-04-07 02:26:35,755 - __main__ - INFO - Saved 616 records for Food & Beverage to industry_data_from_db\food_&_beverage_training.csv
+2025-04-07 02:26:37,418 - __main__ - INFO - Training model for Food & Beverage with 616 records
+2025-04-07 02:26:37,419 - __main__ - INFO - Training model for Food & Beverage with 616 records
+2025-04-07 02:26:37,419 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:26:37,420 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:26:37,452 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:26:37,452 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:27:05,349 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:27:12,596 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:27:38,384 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:27:42,962 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:28:23,747 - __main__ - INFO - Cross-validation results: Test MAE = 5.8528 กำ 3.9259
+2025-04-07 02:28:23,990 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:28:24,130 - __main__ - INFO - Saved model and artifacts for Food & Beverage to industry_data_from_db\models\food_&_beverage_model.keras
+2025-04-07 02:28:24,131 - __main__ - INFO - Successfully trained model for Food & Beverage
+2025-04-07 02:28:24,131 - __main__ - INFO - Processing industry 18/34: Automotive
+2025-04-07 02:28:24,132 - __main__ - INFO - Found 39 stocks in Automotive industry
+2025-04-07 02:28:25,204 - __main__ - INFO - Saved 641 records for Automotive to industry_data_from_db\automotive_training.csv
+2025-04-07 02:28:25,740 - __main__ - INFO - Training model for Automotive with 641 records
+2025-04-07 02:28:25,741 - __main__ - INFO - Training model for Automotive with 641 records
+2025-04-07 02:28:25,741 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:28:25,742 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:28:25,773 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:28:25,774 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:28:51,162 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:29:14,488 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:29:43,584 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:30:09,112 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:30:41,320 - __main__ - INFO - Cross-validation results: Test MAE = 0.0837 กำ 0.0287
+2025-04-07 02:30:41,656 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:30:41,836 - __main__ - INFO - Saved model and artifacts for Automotive to industry_data_from_db\models\automotive_model.keras
+2025-04-07 02:30:41,837 - __main__ - INFO - Successfully trained model for Automotive
+2025-04-07 02:30:41,837 - __main__ - INFO - Processing industry 19/34: Retail
+2025-04-07 02:30:41,838 - __main__ - INFO - Found 37 stocks in Retail industry
+2025-04-07 02:30:43,798 - __main__ - INFO - Saved 652 records for Retail to industry_data_from_db\retail_training.csv
+2025-04-07 02:30:44,428 - __main__ - INFO - Training model for Retail with 652 records
+2025-04-07 02:30:44,428 - __main__ - INFO - Training model for Retail with 652 records
+2025-04-07 02:30:44,428 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:30:44,428 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:30:44,468 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:30:44,468 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:30:56,855 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:31:26,762 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:31:41,057 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:31:48,909 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:32:49,641 - __main__ - INFO - Cross-validation results: Test MAE = 0.1044 กำ 0.0443
+2025-04-07 02:32:49,940 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:32:50,123 - __main__ - INFO - Saved model and artifacts for Retail to industry_data_from_db\models\retail_model.keras
+2025-04-07 02:32:50,124 - __main__ - INFO - Successfully trained model for Retail
+2025-04-07 02:32:50,125 - __main__ - INFO - Processing industry 20/34: Media & Entertainment
+2025-04-07 02:32:50,127 - __main__ - INFO - Found 37 stocks in Media & Entertainment industry
+2025-04-07 02:32:51,287 - __main__ - INFO - Saved 582 records for Media & Entertainment to industry_data_from_db\media_&_entertainment_training.csv
+2025-04-07 02:32:53,378 - __main__ - INFO - Training model for Media & Entertainment with 582 records
+2025-04-07 02:32:53,378 - __main__ - INFO - Training model for Media & Entertainment with 582 records
+2025-04-07 02:32:53,379 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:32:53,380 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:32:53,416 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:32:53,417 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:33:10,186 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:33:35,825 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:33:50,447 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:34:03,341 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:34:33,390 - __main__ - INFO - Cross-validation results: Test MAE = 250.4337 กำ 485.1632
+2025-04-07 02:34:33,707 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:34:34,347 - __main__ - INFO - Saved model and artifacts for Media & Entertainment to industry_data_from_db\models\media_&_entertainment_model.keras
+2025-04-07 02:34:34,349 - __main__ - INFO - Successfully trained model for Media & Entertainment
+2025-04-07 02:34:34,349 - __main__ - INFO - Processing industry 21/34: Shipping & Transportation
+2025-04-07 02:34:34,351 - __main__ - INFO - Found 36 stocks in Shipping & Transportation industry
+2025-04-07 02:34:35,611 - __main__ - INFO - Saved 614 records for Shipping & Transportation to industry_data_from_db\shipping_&_transportation_training.csv
+2025-04-07 02:34:36,235 - __main__ - INFO - Training model for Shipping & Transportation with 614 records
+2025-04-07 02:34:36,235 - __main__ - INFO - Training model for Shipping & Transportation with 614 records
+2025-04-07 02:34:36,236 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:34:36,237 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:34:36,272 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:34:36,272 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:35:05,632 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:35:33,953 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:36:03,225 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:36:23,077 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:37:21,514 - __main__ - INFO - Cross-validation results: Test MAE = 0.3549 กำ 0.0230
+2025-04-07 02:37:21,796 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:37:21,974 - __main__ - INFO - Saved model and artifacts for Shipping & Transportation to industry_data_from_db\models\shipping_&_transportation_model.keras
+2025-04-07 02:37:21,976 - __main__ - INFO - Successfully trained model for Shipping & Transportation
+2025-04-07 02:37:21,976 - __main__ - INFO - Processing industry 22/34: Sports & Leisure
+2025-04-07 02:37:21,977 - __main__ - INFO - Found 30 stocks in Sports & Leisure industry
+2025-04-07 02:37:22,879 - __main__ - INFO - Saved 462 records for Sports & Leisure to industry_data_from_db\sports_&_leisure_training.csv
+2025-04-07 02:37:24,034 - __main__ - INFO - Training model for Sports & Leisure with 462 records
+2025-04-07 02:37:24,034 - __main__ - INFO - Training model for Sports & Leisure with 462 records
+2025-04-07 02:37:24,034 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:37:24,035 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:37:24,068 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:37:24,069 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:37:46,885 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:38:10,993 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:38:34,575 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:38:41,325 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:39:29,980 - __main__ - INFO - Cross-validation results: Test MAE = 0.0879 กำ 0.0063
+2025-04-07 02:39:30,257 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:39:30,437 - __main__ - INFO - Saved model and artifacts for Sports & Leisure to industry_data_from_db\models\sports_&_leisure_model.keras
+2025-04-07 02:39:30,439 - __main__ - INFO - Successfully trained model for Sports & Leisure
+2025-04-07 02:39:30,439 - __main__ - INFO - Processing industry 23/34: Materials
+2025-04-07 02:39:30,441 - __main__ - INFO - Found 29 stocks in Materials industry
+2025-04-07 02:39:31,425 - __main__ - INFO - Saved 494 records for Materials to industry_data_from_db\materials_training.csv
+2025-04-07 02:39:32,009 - __main__ - INFO - Training model for Materials with 494 records
+2025-04-07 02:39:32,010 - __main__ - INFO - Training model for Materials with 494 records
+2025-04-07 02:39:32,010 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:39:32,011 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:39:32,046 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:39:32,047 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:39:51,910 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:39:59,251 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:40:15,168 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:40:30,034 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:41:08,742 - __main__ - INFO - Cross-validation results: Test MAE = 0.0607 กำ 0.0101
+2025-04-07 02:41:09,035 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:41:09,208 - __main__ - INFO - Saved model and artifacts for Materials to industry_data_from_db\models\materials_model.keras
+2025-04-07 02:41:09,209 - __main__ - INFO - Successfully trained model for Materials
+2025-04-07 02:41:09,209 - __main__ - INFO - Processing industry 24/34: Cloud Computing
+2025-04-07 02:41:09,211 - __main__ - INFO - Found 23 stocks in Cloud Computing industry
+2025-04-07 02:41:09,558 - __main__ - INFO - Saved 166 records for Cloud Computing to industry_data_from_db\cloud_computing_training.csv
+2025-04-07 02:41:10,634 - __main__ - INFO - Training model for Cloud Computing with 166 records
+2025-04-07 02:41:10,634 - __main__ - INFO - Training model for Cloud Computing with 166 records
+2025-04-07 02:41:10,635 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:41:10,635 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:41:10,667 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:41:10,667 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:41:14,786 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:41:27,602 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:41:39,848 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:41:51,058 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:42:18,408 - __main__ - INFO - Cross-validation results: Test MAE = 0.5133 กำ 0.0508
+2025-04-07 02:42:18,634 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:42:18,794 - __main__ - INFO - Saved model and artifacts for Cloud Computing to industry_data_from_db\models\cloud_computing_model.keras
+2025-04-07 02:42:18,795 - __main__ - INFO - Successfully trained model for Cloud Computing
+2025-04-07 02:42:18,795 - __main__ - INFO - Processing industry 25/34: Chemicals
+2025-04-07 02:42:18,797 - __main__ - INFO - Found 23 stocks in Chemicals industry
+2025-04-07 02:42:19,433 - __main__ - INFO - Saved 305 records for Chemicals to industry_data_from_db\chemicals_training.csv
+2025-04-07 02:42:20,070 - __main__ - INFO - Training model for Chemicals with 305 records
+2025-04-07 02:42:20,070 - __main__ - INFO - Training model for Chemicals with 305 records
+2025-04-07 02:42:20,071 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:42:20,072 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:42:20,111 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:42:20,111 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:42:34,988 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:42:45,099 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:43:02,723 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:43:18,342 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:43:54,260 - __main__ - INFO - Cross-validation results: Test MAE = 0.1342 กำ 0.1363
+2025-04-07 02:43:54,493 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:43:55,174 - __main__ - INFO - Saved model and artifacts for Chemicals to industry_data_from_db\models\chemicals_model.keras
+2025-04-07 02:43:55,176 - __main__ - INFO - Successfully trained model for Chemicals
+2025-04-07 02:43:55,176 - __main__ - INFO - Processing industry 26/34: Electrical Equipment
+2025-04-07 02:43:55,178 - __main__ - INFO - Found 22 stocks in Electrical Equipment industry
+2025-04-07 02:43:55,830 - __main__ - INFO - Saved 336 records for Electrical Equipment to industry_data_from_db\electrical_equipment_training.csv
+2025-04-07 02:43:56,392 - __main__ - INFO - Training model for Electrical Equipment with 336 records
+2025-04-07 02:43:56,392 - __main__ - INFO - Training model for Electrical Equipment with 336 records
+2025-04-07 02:43:56,392 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:43:56,393 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:43:56,427 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:43:56,428 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:44:07,992 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:44:16,436 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:44:34,866 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:44:52,473 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:45:21,518 - __main__ - INFO - Cross-validation results: Test MAE = 0.1667 กำ 0.0150
+2025-04-07 02:45:21,766 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:45:21,951 - __main__ - INFO - Saved model and artifacts for Electrical Equipment to industry_data_from_db\models\electrical_equipment_model.keras
+2025-04-07 02:45:21,952 - __main__ - INFO - Successfully trained model for Electrical Equipment
+2025-04-07 02:45:21,952 - __main__ - INFO - Processing industry 27/34: Home & Living
+2025-04-07 02:45:21,954 - __main__ - INFO - Found 21 stocks in Home & Living industry
+2025-04-07 02:45:22,572 - __main__ - INFO - Saved 318 records for Home & Living to industry_data_from_db\home_&_living_training.csv
+2025-04-07 02:45:23,108 - __main__ - INFO - Training model for Home & Living with 318 records
+2025-04-07 02:45:23,109 - __main__ - INFO - Training model for Home & Living with 318 records
+2025-04-07 02:45:23,109 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:45:23,110 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:45:23,140 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:45:23,142 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:45:40,532 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:45:58,806 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:46:16,958 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:46:31,724 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:47:04,733 - __main__ - INFO - Cross-validation results: Test MAE = 0.0562 กำ 0.0027
+2025-04-07 02:47:04,977 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:47:05,145 - __main__ - INFO - Saved model and artifacts for Home & Living to industry_data_from_db\models\home_&_living_model.keras
+2025-04-07 02:47:05,146 - __main__ - INFO - Successfully trained model for Home & Living
+2025-04-07 02:47:05,146 - __main__ - INFO - Processing industry 28/34: Utilities
+2025-04-07 02:47:05,148 - __main__ - INFO - Found 13 stocks in Utilities industry
+2025-04-07 02:47:05,593 - __main__ - INFO - Saved 237 records for Utilities to industry_data_from_db\utilities_training.csv
+2025-04-07 02:47:06,122 - __main__ - INFO - Training model for Utilities with 237 records
+2025-04-07 02:47:06,123 - __main__ - INFO - Training model for Utilities with 237 records
+2025-04-07 02:47:06,123 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:47:06,124 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:47:06,155 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:47:06,156 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:47:14,207 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:47:19,882 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:47:25,009 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:47:34,237 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:47:53,023 - __main__ - INFO - Cross-validation results: Test MAE = 0.0708 กำ 0.0264
+2025-04-07 02:47:53,261 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:47:53,432 - __main__ - INFO - Saved model and artifacts for Utilities to industry_data_from_db\models\utilities_model.keras
+2025-04-07 02:47:53,434 - __main__ - INFO - Successfully trained model for Utilities
+2025-04-07 02:47:53,434 - __main__ - INFO - Processing industry 29/34: Rubber & Plastics
+2025-04-07 02:47:53,436 - __main__ - INFO - Found 12 stocks in Rubber & Plastics industry
+2025-04-07 02:47:53,879 - __main__ - INFO - Saved 217 records for Rubber & Plastics to industry_data_from_db\rubber_&_plastics_training.csv
+2025-04-07 02:47:54,440 - __main__ - INFO - Training model for Rubber & Plastics with 217 records
+2025-04-07 02:47:54,440 - __main__ - INFO - Training model for Rubber & Plastics with 217 records
+2025-04-07 02:47:54,441 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:47:54,441 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:47:54,475 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:47:54,476 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:47:59,603 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:48:14,309 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:48:28,954 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:48:43,615 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:49:15,824 - __main__ - INFO - Cross-validation results: Test MAE = 0.1232 กำ 0.0177
+2025-04-07 02:49:16,055 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:49:16,845 - __main__ - INFO - Saved model and artifacts for Rubber & Plastics to industry_data_from_db\models\rubber_&_plastics_model.keras
+2025-04-07 02:49:16,847 - __main__ - INFO - Successfully trained model for Rubber & Plastics
+2025-04-07 02:49:16,847 - __main__ - INFO - Processing industry 30/34: E-Commerce
+2025-04-07 02:49:16,849 - __main__ - INFO - Found 9 stocks in E-Commerce industry
+2025-04-07 02:49:17,190 - __main__ - INFO - Saved 168 records for E-Commerce to industry_data_from_db\e-commerce_training.csv
+2025-04-07 02:49:17,747 - __main__ - INFO - Training model for E-Commerce with 168 records
+2025-04-07 02:49:17,747 - __main__ - INFO - Training model for E-Commerce with 168 records
+2025-04-07 02:49:17,747 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:49:17,749 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:49:17,782 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:49:17,783 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:49:27,676 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:49:30,732 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:49:38,587 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:49:45,026 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:50:02,405 - __main__ - INFO - Cross-validation results: Test MAE = 0.2714 กำ 0.0362
+2025-04-07 02:50:02,631 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:50:02,803 - __main__ - INFO - Saved model and artifacts for E-Commerce to industry_data_from_db\models\e-commerce_model.keras
+2025-04-07 02:50:02,804 - __main__ - INFO - Successfully trained model for E-Commerce
+2025-04-07 02:50:02,804 - __main__ - INFO - Processing industry 31/34: Paper & Packaging
+2025-04-07 02:50:02,805 - __main__ - INFO - Found 8 stocks in Paper & Packaging industry
+2025-04-07 02:50:03,083 - __main__ - INFO - Saved 132 records for Paper & Packaging to industry_data_from_db\paper_&_packaging_training.csv
+2025-04-07 02:50:03,646 - __main__ - INFO - Training model for Paper & Packaging with 132 records
+2025-04-07 02:50:03,646 - __main__ - INFO - Training model for Paper & Packaging with 132 records
+2025-04-07 02:50:03,646 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:50:03,648 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:50:03,679 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:50:03,680 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:50:14,638 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:50:25,364 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:50:27,423 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:50:35,973 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:50:56,674 - __main__ - INFO - Cross-validation results: Test MAE = 0.4431 กำ 0.4224
+2025-04-07 02:50:56,871 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:50:57,037 - __main__ - INFO - Saved model and artifacts for Paper & Packaging to industry_data_from_db\models\paper_&_packaging_model.keras
+2025-04-07 02:50:57,038 - __main__ - INFO - Successfully trained model for Paper & Packaging
+2025-04-07 02:50:57,038 - __main__ - INFO - Processing industry 32/34: Cement & Construction Materials
+2025-04-07 02:50:57,040 - __main__ - INFO - Found 8 stocks in Cement & Construction Materials industry
+2025-04-07 02:50:57,278 - __main__ - INFO - Saved 133 records for Cement & Construction Materials to industry_data_from_db\cement_&_construction_materials_training.csv
+2025-04-07 02:50:58,326 - __main__ - INFO - Training model for Cement & Construction Materials with 133 records
+2025-04-07 02:50:58,327 - __main__ - INFO - Training model for Cement & Construction Materials with 133 records
+2025-04-07 02:50:58,327 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:50:58,328 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:50:58,358 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:50:58,359 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:51:09,100 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:51:19,696 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:51:30,530 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:51:41,552 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:52:06,799 - __main__ - INFO - Cross-validation results: Test MAE = 0.2037 กำ 0.1832
+2025-04-07 02:52:07,014 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:52:07,209 - __main__ - INFO - Saved model and artifacts for Cement & Construction Materials to industry_data_from_db\models\cement_&_construction_materials_model.keras
+2025-04-07 02:52:07,210 - __main__ - INFO - Successfully trained model for Cement & Construction Materials
+2025-04-07 02:52:07,211 - __main__ - INFO - Processing industry 33/34: Agricultural Technology
+2025-04-07 02:52:07,212 - __main__ - INFO - Found 6 stocks in Agricultural Technology industry
+2025-04-07 02:52:07,401 - __main__ - INFO - Saved 92 records for Agricultural Technology to industry_data_from_db\agricultural_technology_training.csv
+2025-04-07 02:52:07,936 - __main__ - INFO - Training model for Agricultural Technology with 92 records
+2025-04-07 02:52:07,936 - __main__ - INFO - Training model for Agricultural Technology with 92 records
+2025-04-07 02:52:07,936 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:52:07,937 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:52:07,967 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:52:07,968 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:52:12,148 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:52:21,585 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:52:31,174 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:52:37,128 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:52:56,315 - __main__ - INFO - Cross-validation results: Test MAE = 0.0180 กำ 0.0030
+2025-04-07 02:52:56,506 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:52:56,665 - __main__ - INFO - Saved model and artifacts for Agricultural Technology to industry_data_from_db\models\agricultural_technology_model.keras
+2025-04-07 02:52:56,667 - __main__ - INFO - Successfully trained model for Agricultural Technology
+2025-04-07 02:52:56,667 - __main__ - INFO - Processing industry 34/34: Glass & Ceramics
+2025-04-07 02:52:56,668 - __main__ - INFO - Found 5 stocks in Glass & Ceramics industry
+2025-04-07 02:52:56,844 - __main__ - INFO - Saved 95 records for Glass & Ceramics to industry_data_from_db\glass_&_ceramics_training.csv
+2025-04-07 02:52:57,326 - __main__ - INFO - Training model for Glass & Ceramics with 95 records
+2025-04-07 02:52:57,326 - __main__ - INFO - Training model for Glass & Ceramics with 95 records
+2025-04-07 02:52:57,326 - __main__ - INFO - Using features: ['revenue', 'operating_margin', 'historical_growth_mean', 'debt_to_equity', 'equity_to_assets', 'gross_margin', 'current_ratio', 'revenue_growth']
+2025-04-07 02:52:57,327 - __main__ - INFO - Using future_6m_return as target variable
+2025-04-07 02:52:57,364 - __main__ - INFO - Using 5-fold cross-validation
+2025-04-07 02:52:57,364 - __main__ - INFO - Training fold 1/5
+2025-04-07 02:52:59,456 - __main__ - INFO - Training fold 2/5
+2025-04-07 02:53:07,294 - __main__ - INFO - Training fold 3/5
+2025-04-07 02:53:11,503 - __main__ - INFO - Training fold 4/5
+2025-04-07 02:53:20,932 - __main__ - INFO - Training fold 5/5
+2025-04-07 02:53:41,827 - __main__ - INFO - Cross-validation results: Test MAE = 0.4796 กำ 0.7627
+2025-04-07 02:53:42,044 - __main__ - WARNING - Error calculating feature importance: Attempt to convert a value (None) with an unsupported type (<class 'NoneType'>) to a Tensor.
+2025-04-07 02:53:42,901 - __main__ - INFO - Saved model and artifacts for Glass & Ceramics to industry_data_from_db\models\glass_&_ceramics_model.keras
+2025-04-07 02:53:42,903 - __main__ - INFO - Successfully trained model for Glass & Ceramics
+2025-04-07 02:53:42,903 - __main__ - INFO - Creating benchmarks from 34 industry datasets
+2025-04-07 02:53:42,911 - __main__ - INFO - Processed benchmarks for agricultural technology: 92 records
+2025-04-07 02:53:42,919 - __main__ - INFO - Processed benchmarks for automotive: 641 records
+2025-04-07 02:53:42,928 - __main__ - INFO - Processed benchmarks for cement & construction materials: 133 records
+2025-04-07 02:53:42,935 - __main__ - INFO - Processed benchmarks for chemicals: 305 records
+2025-04-07 02:53:42,942 - __main__ - INFO - Processed benchmarks for cloud computing: 166 records
+2025-04-07 02:53:42,956 - __main__ - INFO - Processed benchmarks for computer hardware: 2213 records
+2025-04-07 02:53:42,971 - __main__ - INFO - Processed benchmarks for construction: 1462 records
+2025-04-07 02:53:42,979 - __main__ - INFO - Processed benchmarks for e-commerce: 168 records
+2025-04-07 02:53:42,988 - __main__ - INFO - Processed benchmarks for electrical equipment: 336 records
+2025-04-07 02:53:43,001 - __main__ - INFO - Processed benchmarks for electronics distribution: 719 records
+2025-04-07 02:53:43,026 - __main__ - INFO - Processed benchmarks for electronics manufacturing: 4215 records
+2025-04-07 02:53:43,067 - __main__ - INFO - Processed benchmarks for electronics: 6885 records
+2025-04-07 02:53:43,075 - __main__ - INFO - Processed benchmarks for financial services: 204 records
+2025-04-07 02:53:43,084 - __main__ - INFO - Processed benchmarks for food & beverage: 616 records
+2025-04-07 02:53:43,092 - __main__ - INFO - Processed benchmarks for glass & ceramics: 95 records
+2025-04-07 02:53:43,102 - __main__ - INFO - Processed benchmarks for green energy: 626 records
+2025-04-07 02:53:43,131 - __main__ - INFO - Processed benchmarks for healthcare: 3663 records
+2025-04-07 02:53:43,139 - __main__ - INFO - Processed benchmarks for home & living: 318 records
+2025-04-07 02:53:43,152 - __main__ - INFO - Processed benchmarks for industrial equipment: 2032 records
+2025-04-07 02:53:43,159 - __main__ - INFO - Processed benchmarks for materials: 494 records
+2025-04-07 02:53:43,167 - __main__ - INFO - Processed benchmarks for media & entertainment: 582 records
+2025-04-07 02:53:43,178 - __main__ - INFO - Processed benchmarks for other: 1637 records
+2025-04-07 02:53:43,183 - __main__ - INFO - Processed benchmarks for paper & packaging: 132 records
+2025-04-07 02:53:43,191 - __main__ - INFO - Processed benchmarks for retail: 652 records
+2025-04-07 02:53:43,197 - __main__ - INFO - Processed benchmarks for rubber & plastics: 217 records
+2025-04-07 02:53:43,209 - __main__ - INFO - Processed benchmarks for semiconductors: 1905 records
+2025-04-07 02:53:43,218 - __main__ - INFO - Processed benchmarks for shipping & transportation: 614 records
+2025-04-07 02:53:43,225 - __main__ - INFO - Processed benchmarks for sports & leisure: 462 records
+2025-04-07 02:53:43,234 - __main__ - INFO - Processed benchmarks for steel & metals: 930 records
+2025-04-07 02:53:43,243 - __main__ - INFO - Processed benchmarks for technology services: 680 records
+2025-04-07 02:53:43,254 - __main__ - INFO - Processed benchmarks for telecommunications: 970 records
+2025-04-07 02:53:43,263 - __main__ - INFO - Processed benchmarks for textiles: 1049 records
+2025-04-07 02:53:43,272 - __main__ - INFO - Processed benchmarks for tourism & hospitality: 954 records
+2025-04-07 02:53:43,278 - __main__ - INFO - Processed benchmarks for utilities: 237 records
+2025-04-07 02:53:43,380 - __main__ - INFO - Saved industry benchmarks for 34 industries
+2025-04-07 02:53:43,381 - __main__ - INFO - Training completed in 2:06:28.708187. Successful: 34/34
+2025-04-07 02:53:43,382 - __main__ - INFO - Successful industries: ['Electronics', 'Healthcare', 'Electronics Manufacturing', 'Other', 'Computer Hardware', 'Industrial Equipment', 'Semiconductors', 'Financial Services', 'Construction', 'Tourism & Hospitality', 'Textiles', 'Green Energy', 'Telecommunications', 'Steel & Metals', 'Electronics Distribution', 'Technology Services', 'Food & Beverage', 'Automotive', 'Retail', 'Media & Entertainment', 'Shipping & Transportation', 'Sports & Leisure', 'Materials', 'Cloud Computing', 'Chemicals', 'Electrical Equipment', 'Home & Living', 'Utilities', 'Rubber & Plastics', 'E-Commerce', 'Paper & Packaging', 'Cement & Construction Materials', 'Agricultural Technology', 'Glass & Ceramics']
+2025-04-07 02:53:43,382 - __main__ - INFO - Training process completed

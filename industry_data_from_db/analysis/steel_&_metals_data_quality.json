@@ -1,0 +1,43 @@
+{
+  "industry": "Steel & Metals",
+  "stocks_processed": 54,
+  "stocks_with_data": 52,
+  "total_records": 930,
+  "unique_stocks": 52,
+  "avg_records_per_stock": 17.884615384615383,
+  "feature_coverage": {
+    "stock_id": 100.0,
+    "timestamp": 100.0,
+    "revenue": 100.0,
+    "operating_income": 100.0,
+    "net_income": 0.0,
+    "total_assets": 100.0,
+    "total_equity": 100.0,
+    "gross_profit": 100.0,
+    "rd_expense": 0.0,
+    "total_liabilities": 100.0,
+    "current_assets": 100.0,
+    "current_liabilities": 100.0,
+    "cash": 100.0,
+    "operating_cash_flow": 0.0,
+    "capex": 0.0,
+    "free_cash_flow": 0.0,
+    "revenue_growth": 94.40860215053763,
+    "historical_growth_mean": 100.0,
+    "historical_growth_std": 100.0,
+    "operating_margin": 100.0,
+    "gross_margin": 100.0,
+    "operating_roa": 100.0,
+    "equity_to_assets": 100.0,
+    "debt_to_equity": 100.0,
+    "current_ratio": 100.0,
+    "cash_ratio": 100.0,
+    "future_3m_return": 99.89247311827957,
+    "future_6m_return": 94.73118279569891,
+    "future_12m_return": 83.97849462365592
+  },
+  "timestamp_range": [
+    "2020-06-30",
+    "2024-12-31"
+  ]
+}

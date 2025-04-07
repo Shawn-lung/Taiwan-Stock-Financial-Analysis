@@ -1,0 +1,39 @@
+{
+  "industry": "Steel & Metals",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 930,
+  "train_size": 744,
+  "test_size": 186,
+  "train_loss": 0.1602231115102768,
+  "test_loss": 0.2015743851661682,
+  "train_mae": 0.14051777124404907,
+  "test_mae": 0.1818690150976181,
+  "rmse": 0.4264610377084982,
+  "r2": -0.3508975003905417,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

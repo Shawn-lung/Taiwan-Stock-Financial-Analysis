@@ -1,0 +1,39 @@
+{
+  "industry": "Materials",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 494,
+  "train_size": 395,
+  "test_size": 99,
+  "train_loss": 0.08843974024057388,
+  "test_loss": 0.06404563039541245,
+  "train_mae": 0.07226421684026718,
+  "test_mae": 0.047870099544525146,
+  "rmse": 0.21879237679906144,
+  "r2": -0.04189799009918227,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

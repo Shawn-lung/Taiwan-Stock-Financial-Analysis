@@ -1,0 +1,43 @@
+{
+  "industry": "Technology Services",
+  "stocks_processed": 46,
+  "stocks_with_data": 45,
+  "total_records": 680,
+  "unique_stocks": 45,
+  "avg_records_per_stock": 15.11111111111111,
+  "feature_coverage": {
+    "stock_id": 100.0,
+    "timestamp": 100.0,
+    "revenue": 100.0,
+    "operating_income": 100.0,
+    "net_income": 0.0,
+    "total_assets": 100.0,
+    "total_equity": 100.0,
+    "gross_profit": 100.0,
+    "rd_expense": 0.0,
+    "total_liabilities": 100.0,
+    "current_assets": 100.0,
+    "current_liabilities": 100.0,
+    "cash": 100.0,
+    "operating_cash_flow": 0.0,
+    "capex": 0.0,
+    "free_cash_flow": 0.0,
+    "revenue_growth": 93.23529411764706,
+    "historical_growth_mean": 99.70588235294117,
+    "historical_growth_std": 99.70588235294117,
+    "operating_margin": 100.0,
+    "gross_margin": 100.0,
+    "operating_roa": 100.0,
+    "equity_to_assets": 100.0,
+    "debt_to_equity": 100.0,
+    "current_ratio": 100.0,
+    "cash_ratio": 100.0,
+    "future_3m_return": 99.11764705882354,
+    "future_6m_return": 93.67647058823529,
+    "future_12m_return": 82.5
+  },
+  "timestamp_range": [
+    "2020-06-30",
+    "2024-12-31"
+  ]
+}

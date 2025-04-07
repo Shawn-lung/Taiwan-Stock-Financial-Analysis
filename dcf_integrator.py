@@ -5,6 +5,9 @@ from ml_predictor import GrowthPredictor
 from deep_learning import DeepFinancialForecaster
 from industry_valuation_model import IndustryValuationModel
 from typing import Dict
+import pandas as pd
+import yfinance as yf
+from data_fetcher import FinancialDataFetcher  # Import FinancialDataFetcher to use its utilities
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -84,21 +87,40 @@ class IntegratedValuationModel:
         # 3. Add Deep Learning component if requested
         if self.use_dl and self.use_ml and 'ml_predictions' in results:
             try:
-                # Get financial data
-                financial_data = standard_dcf.get_financial_data()
+                # Get enhanced financial data from multiple sources
+                enhanced_data = self.enhance_financial_data(ticker)
                 
-                # Create deep learning forecaster
-                deep_forecaster = DeepFinancialForecaster()
-                
-                # Add stock info as an attribute to help with industry detection
-                if hasattr(financial_data, 'attrs'):
-                    financial_data.attrs['stock_code'] = ticker
+                if enhanced_data is not None and len(enhanced_data) > 2:  # Ensure we have enough data points
+                    logger.info(f"Using enhanced dataset with {len(enhanced_data)} records for deep learning")
+                    
+                    # Create deep learning forecaster
+                    deep_forecaster = DeepFinancialForecaster()
+                    
+                    # Get DL growth predictions using the enhanced data
+                    dl_growth_predictions = deep_forecaster.predict_future_growth(enhanced_data, forecast_years=5)
                 else:
-                    financial_data = financial_data.copy()
-                    financial_data.attrs = {'stock_code': ticker}
-                
-                # Get DL growth predictions
-                dl_growth_predictions = deep_forecaster.predict_future_growth(financial_data, forecast_years=5)
+                    # Fallback to standard data if enhanced data is insufficient
+                    logger.warning(f"Enhanced data insufficient, using standard financial data for {ticker}")
+                    
+                    # Get financial data from DCF model
+                    financial_data = standard_dcf.get_financial_data()
+                    
+                    # Add stock_code attribute
+                    if isinstance(financial_data, dict):
+                        financial_data['stock_code'] = ticker
+                    else:
+                        if hasattr(financial_data, 'attrs'):
+                            financial_data.attrs['stock_code'] = ticker
+                        else:
+                            try:
+                                financial_data = financial_data.copy()
+                                financial_data.attrs = {'stock_code': ticker}
+                            except:
+                                financial_data = {'data': financial_data, 'stock_code': ticker}
+                    
+                    # Get DL growth predictions
+                    deep_forecaster = DeepFinancialForecaster()
+                    dl_growth_predictions = deep_forecaster.predict_future_growth(financial_data, forecast_years=5)
                 
                 if dl_growth_predictions:
                     # Create an ensemble of ML + DL predictions
@@ -218,6 +240,141 @@ class IntegratedValuationModel:
             logger.error(f"Error extracting financial metrics: {e}")
         
         return metrics
+
+    def enhance_financial_data(self, ticker: str) -> pd.DataFrame:
+        """Fetch financial data from database and enhance it with additional data sources.
+        
+        This method addresses the problem of having insufficient data points for deep learning,
+        by combining data from both the database and yfinance.
+        
+        Args:
+            ticker: Stock ticker symbol
+            
+        Returns:
+            Enhanced DataFrame with more historical financial data
+        """
+        try:
+            logger.info(f"Enhancing financial data for {ticker} from multiple sources")
+            
+            # Step 1: Get data from database
+            db_data = self.db_provider.get_financial_data(ticker)
+            logger.info(f"Database provided {len(db_data)} records for {ticker}")
+            
+            # Step 2: Get data from yfinance using the FinancialDataFetcher
+            data_fetcher = FinancialDataFetcher()
+            yf_data = data_fetcher.get_financial_data(ticker, force_refresh=False)
+            
+            has_yf_data = yf_data and 'income_statement' in yf_data and not yf_data['income_statement'].empty
+            logger.info(f"YFinance data {'available' if has_yf_data else 'not available'} for {ticker}")
+            if has_yf_data:
+                logger.info(f"YFinance provided data with shape: {yf_data['income_statement'].shape}")
+            
+            # Step 3: Convert into a consistent format for deep learning
+            combined_data = {}
+            
+            # Process DB data first
+            if db_data and len(db_data) > 0:
+                # Extract key metrics we need for deep learning
+                metrics = []
+                for record in db_data:
+                    # Skip records with missing essential data
+                    if not record.get('revenue') or not record.get('operating_income'):
+                        continue
+                        
+                    metrics.append({
+                        'timestamp': record.get('date'),
+                        'revenue': record.get('revenue'),
+                        'operating_income': record.get('operating_income'),
+                        'net_income': record.get('net_income'),
+                        'stock_id': ticker
+                    })
+                
+                if metrics:
+                    combined_data.update({
+                        'db': pd.DataFrame(metrics)
+                    })
+            
+            # Process yfinance data next
+            if yf_data and 'income_statement' in yf_data and not yf_data['income_statement'].empty:
+                income_stmt = yf_data['income_statement']
+                
+                # Ensure correct orientation (dates in columns)
+                if isinstance(income_stmt.index[0], str):
+                    # Data is already correctly oriented
+                    metrics = []
+                    
+                    for col in income_stmt.columns:
+                        revenue = None
+                        op_income = None
+                        net_income = None
+                        
+                        # Try to extract revenue
+                        for rev_key in ['Total Revenue', 'Revenue']:
+                            if rev_key in income_stmt.index:
+                                val = income_stmt.loc[rev_key, col]
+                                if pd.notna(val) and val > 0:
+                                    revenue = float(val)
+                                    break
+                        
+                        # Try to extract operating income
+                        if 'Operating Income' in income_stmt.index:
+                            val = income_stmt.loc['Operating Income', col]
+                            if pd.notna(val):
+                                op_income = float(val)
+                        
+                        # Try to extract net income
+                        for ni_key in ['Net Income', 'Net Income Common Shareholders']:
+                            if ni_key in income_stmt.index:
+                                val = income_stmt.loc[ni_key, col]
+                                if pd.notna(val):
+                                    net_income = float(val)
+                                    break
+                        
+                        # Only add if we have the essential metrics
+                        if revenue is not None and op_income is not None:
+                            metrics.append({
+                                'timestamp': col,  # Date is in column
+                                'revenue': revenue,
+                                'operating_income': op_income,
+                                'net_income': net_income,
+                                'stock_id': ticker
+                            })
+                    
+                    if metrics:
+                        combined_data.update({
+                            'yfinance': pd.DataFrame(metrics)
+                        })
+            
+            # Merge data from both sources
+            if not combined_data:
+                logger.warning(f"No financial data found for {ticker} from any source")
+                return None
+                
+            # Combine dataframes from different sources
+            dfs = []
+            for source, df in combined_data.items():
+                if not df.empty:
+                    # Add source identifier
+                    df['source'] = source
+                    dfs.append(df)
+            
+            # Merge all dataframes
+            if not dfs:
+                return None
+                
+            merged_df = pd.concat(dfs, ignore_index=True)
+            
+            # Remove duplicates if any (prefer DB data)
+            if 'timestamp' in merged_df.columns:
+                merged_df.sort_values(['timestamp', 'source'], key=lambda x: x.map({'db': 0, 'yfinance': 1}) if x.name == 'source' else x, inplace=True)
+                merged_df.drop_duplicates(subset=['timestamp'], keep='first', inplace=True)
+            
+            logger.info(f"Enhanced data now has {len(merged_df)} records for {ticker}")
+            return merged_df
+            
+        except Exception as e:
+            logger.error(f"Error enhancing financial data: {e}")
+            return None
 
 # Example usage
 if __name__ == "__main__":

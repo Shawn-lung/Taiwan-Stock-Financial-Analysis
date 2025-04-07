@@ -1,0 +1,43 @@
+{
+  "industry": "Semiconductors",
+  "stocks_processed": 125,
+  "stocks_with_data": 123,
+  "total_records": 1905,
+  "unique_stocks": 123,
+  "avg_records_per_stock": 15.487804878048781,
+  "feature_coverage": {
+    "stock_id": 100.0,
+    "timestamp": 100.0,
+    "revenue": 100.0,
+    "operating_income": 100.0,
+    "net_income": 0.0,
+    "total_assets": 100.0,
+    "total_equity": 100.0,
+    "gross_profit": 100.0,
+    "rd_expense": 0.0,
+    "total_liabilities": 99.5275590551181,
+    "current_assets": 100.0,
+    "current_liabilities": 100.0,
+    "cash": 100.0,
+    "operating_cash_flow": 0.0,
+    "capex": 0.0,
+    "free_cash_flow": 0.0,
+    "revenue_growth": 93.49081364829395,
+    "historical_growth_mean": 99.73753280839895,
+    "historical_growth_std": 99.73753280839895,
+    "operating_margin": 100.0,
+    "gross_margin": 100.0,
+    "operating_roa": 100.0,
+    "equity_to_assets": 100.0,
+    "debt_to_equity": 99.5275590551181,
+    "current_ratio": 100.0,
+    "cash_ratio": 100.0,
+    "future_3m_return": 99.79002624671915,
+    "future_6m_return": 93.85826771653544,
+    "future_12m_return": 82.30971128608924
+  },
+  "timestamp_range": [
+    "2020-06-30",
+    "2024-12-31"
+  ]
+}

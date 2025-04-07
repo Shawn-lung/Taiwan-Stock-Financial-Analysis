@@ -1,0 +1,39 @@
+{
+  "industry": "Electronics Distribution",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 719,
+  "train_size": 575,
+  "test_size": 144,
+  "train_loss": 0.09484551101922989,
+  "test_loss": 0.10965751111507416,
+  "train_mae": 0.08707120269536972,
+  "test_mae": 0.10188319534063339,
+  "rmse": 0.3191914718240185,
+  "r2": 0.005725872354910733,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

@@ -1,0 +1,39 @@
+{
+  "industry": "Chemicals",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 305,
+  "train_size": 244,
+  "test_size": 61,
+  "train_loss": 0.18552179634571075,
+  "test_loss": 0.5011882781982422,
+  "train_mae": 0.16595607995986938,
+  "test_mae": 0.4816225469112396,
+  "rmse": 0.6939903040313126,
+  "r2": -7.968436856957267,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

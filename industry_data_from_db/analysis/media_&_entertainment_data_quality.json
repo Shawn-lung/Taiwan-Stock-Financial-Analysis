@@ -1,0 +1,43 @@
+{
+  "industry": "Media & Entertainment",
+  "stocks_processed": 37,
+  "stocks_with_data": 37,
+  "total_records": 582,
+  "unique_stocks": 37,
+  "avg_records_per_stock": 15.72972972972973,
+  "feature_coverage": {
+    "stock_id": 100.0,
+    "timestamp": 100.0,
+    "revenue": 100.0,
+    "operating_income": 100.0,
+    "net_income": 0.0,
+    "total_assets": 100.0,
+    "total_equity": 100.0,
+    "gross_profit": 100.0,
+    "rd_expense": 0.0,
+    "total_liabilities": 98.96907216494846,
+    "current_assets": 100.0,
+    "current_liabilities": 100.0,
+    "cash": 100.0,
+    "operating_cash_flow": 0.0,
+    "capex": 0.0,
+    "free_cash_flow": 0.0,
+    "revenue_growth": 93.81443298969072,
+    "historical_growth_mean": 100.0,
+    "historical_growth_std": 96.04810996563575,
+    "operating_margin": 100.0,
+    "gross_margin": 100.0,
+    "operating_roa": 100.0,
+    "equity_to_assets": 100.0,
+    "debt_to_equity": 98.96907216494846,
+    "current_ratio": 100.0,
+    "cash_ratio": 100.0,
+    "future_3m_return": 99.65635738831615,
+    "future_6m_return": 94.84536082474226,
+    "future_12m_return": 83.67697594501719
+  },
+  "timestamp_range": [
+    "2020-06-30",
+    "2024-12-31"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "industry": "Retail",
+  "stocks_processed": 37,
+  "stocks_with_data": 36,
+  "total_records": 652,
+  "unique_stocks": 35,
+  "avg_records_per_stock": 18.62857142857143,
+  "feature_coverage": {
+    "stock_id": 100.0,
+    "timestamp": 100.0,
+    "revenue": 100.0,
+    "operating_income": 100.0,
+    "net_income": 0.0,
+    "total_assets": 100.0,
+    "total_equity": 100.0,
+    "gross_profit": 100.0,
+    "rd_expense": 0.0,
+    "total_liabilities": 98.77300613496932,
+    "current_assets": 100.0,
+    "current_liabilities": 100.0,
+    "cash": 100.0,
+    "operating_cash_flow": 0.0,
+    "capex": 0.0,
+    "free_cash_flow": 0.0,
+    "revenue_growth": 94.6319018404908,
+    "historical_growth_mean": 100.0,
+    "historical_growth_std": 100.0,
+    "operating_margin": 100.0,
+    "gross_margin": 100.0,
+    "operating_roa": 100.0,
+    "equity_to_assets": 100.0,
+    "debt_to_equity": 98.77300613496932,
+    "current_ratio": 100.0,
+    "cash_ratio": 100.0,
+    "future_3m_return": 99.69325153374233,
+    "future_6m_return": 94.32515337423312,
+    "future_12m_return": 83.58895705521472
+  },
+  "timestamp_range": [
+    "2020-06-30",
+    "2024-12-31"
+  ]
+}

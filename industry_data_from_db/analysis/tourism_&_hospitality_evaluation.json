@@ -1,0 +1,39 @@
+{
+  "industry": "Tourism & Hospitality",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 954,
+  "train_size": 763,
+  "test_size": 191,
+  "train_loss": 0.1781647801399231,
+  "test_loss": 0.33920592069625854,
+  "train_mae": 0.1614650934934616,
+  "test_mae": 0.3225061893463135,
+  "rmse": 0.5678963166555011,
+  "r2": -0.6827821133751406,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

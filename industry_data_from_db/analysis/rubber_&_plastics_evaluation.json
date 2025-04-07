@@ -1,0 +1,39 @@
+{
+  "industry": "Rubber & Plastics",
+  "features_used": [
+    "revenue",
+    "operating_margin",
+    "historical_growth_mean",
+    "debt_to_equity",
+    "equity_to_assets",
+    "gross_margin",
+    "current_ratio",
+    "revenue_growth"
+  ],
+  "n_samples": 217,
+  "train_size": 173,
+  "test_size": 44,
+  "train_loss": 0.056081246584653854,
+  "test_loss": 0.12888701260089874,
+  "train_mae": 0.0384635291993618,
+  "test_mae": 0.11126930266618729,
+  "rmse": 0.33357051653941155,
+  "r2": 0.03761253765189709,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "learning_rate": 0.001,
+    "dropout_rate": 0.3,
+    "l2_regularization": 0.001,
+    "early_stopping_patience": 15,
+    "hidden_layers": [
+      16,
+      8
+    ],
+    "use_cross_validation": true,
+    "cv_folds": 5,
+    "min_delta": 0.0001
+  },
+  "feature_importance": {}
+}

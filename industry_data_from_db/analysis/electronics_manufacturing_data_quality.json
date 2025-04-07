@@ -1,0 +1,43 @@
+{
+  "industry": "Electronics Manufacturing",
+  "stocks_processed": 246,
+  "stocks_with_data": 239,
+  "total_records": 4215,
+  "unique_stocks": 239,
+  "avg_records_per_stock": 17.635983263598327,
+  "feature_coverage": {
+    "stock_id": 100.0,
+    "timestamp": 100.0,
+    "revenue": 100.0,
+    "operating_income": 100.0,
+    "net_income": 0.0,
+    "total_assets": 100.0,
+    "total_equity": 100.0,
+    "gross_profit": 100.0,
+    "rd_expense": 0.0,
+    "total_liabilities": 99.35943060498221,
+    "current_assets": 100.0,
+    "current_liabilities": 100.0,
+    "cash": 100.0,
+    "operating_cash_flow": 0.0,
+    "capex": 0.0,
+    "free_cash_flow": 0.0,
+    "revenue_growth": 94.32977461447213,
+    "historical_growth_mean": 99.95255041518388,
+    "historical_growth_std": 99.52550415183867,
+    "operating_margin": 100.0,
+    "gross_margin": 100.0,
+    "operating_roa": 100.0,
+    "equity_to_assets": 100.0,
+    "debt_to_equity": 99.35943060498221,
+    "current_ratio": 100.0,
+    "cash_ratio": 100.0,
+    "future_3m_return": 99.7864768683274,
+    "future_6m_return": 94.49584816132858,
+    "future_12m_return": 83.6061684460261
+  },
+  "timestamp_range": [
+    "2020-06-30",
+    "2024-12-31"
+  ]
+}
