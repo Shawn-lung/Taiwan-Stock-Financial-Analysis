@@ -655,7 +655,7 @@ class DCFModel:
             logger.info(f"Base Revenue: {self.current_revenue:,.2f}")
             logger.info(f"NPV of FCF: {npv_stage_1:,.2f}")
             logger.info(f"Normalized FCF for Terminal Value: {normalized_fcf:,.2f}")
-            logger.info(f"Terminal Value Multiple: {implied_tv_multiple:.1f}x")
+            logger.info(f"Terminal Value Multiple: {implied_tv_multiple:.1f}")
             if self.operating_income > 0:
                 logger.info(f"EV/EBITDA Multiple: {(enterprise_value/ebitda):.1f}x")
             logger.info(f"Enterprise Value: {enterprise_value:,.2f}")
@@ -890,6 +890,20 @@ class DCFModel:
                 'revenue': self.current_revenue or 0.0,
                 'operating_income': self.operating_income or 0.0
             }
+
+    def get_market_data(self):
+        """Get current market data including price and market capitalization.
+        
+        Returns:
+            dict: Dictionary containing market price data
+        """
+        try:
+            data_fetcher = FinancialDataFetcher()
+            market_data = data_fetcher.get_market_data(self.stock_code)
+            return market_data
+        except Exception as e:
+            logger.error(f"Error retrieving market data: {e}")
+            return None
 
 if __name__ == "__main__":
     dcf = DCFModel(

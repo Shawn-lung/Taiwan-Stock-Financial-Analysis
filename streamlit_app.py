@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
+import os
 from dcf_integrator import IntegratedValuationModel
 from dcf_model import DCFModel
 
@@ -23,6 +24,32 @@ if 'ticker' not in st.session_state:
     st.session_state.ticker = None
 if 'financial_data' not in st.session_state:
     st.session_state.financial_data = None
+if 'available_industries' not in st.session_state:
+    # Get available industry models from the industry_data_from_db folder
+    industry_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "industry_data_from_db")
+    available_industries = []
+    
+    if os.path.exists(industry_folder):
+        for filename in os.listdir(industry_folder):
+            if filename.endswith('_training.csv'):
+                # Extract industry name from filename (remove _training.csv)
+                industry_name = filename.replace('_training.csv', '')
+                # Convert underscores to spaces and capitalize words
+                industry_name = ' '.join(word.capitalize() for word in industry_name.split('_'))
+                available_industries.append(industry_name)
+    
+    # Add standard industries if no models found or as fallback
+    default_industries = [
+        "Semiconductors", "Electronics", "Banking", "Telecommunications", 
+        "Financial Services", "Computer Hardware", "Food & Beverage", "Retail", 
+        "Healthcare", "Utilities", "Materials", "Electronics Manufacturing"
+    ]
+    
+    # Create a combined and sorted list with Auto-detect at the top
+    all_industries = sorted(list(set(available_industries + default_industries)))
+    all_industries.insert(0, "Auto-detect")  # Put Auto-detect at the beginning
+    
+    st.session_state.available_industries = all_industries
 
 # Function to perform valuation
 def run_valuation(ticker, industry, forecast_years, perpetual_growth, use_ml, use_dl, use_industry):
@@ -45,6 +72,30 @@ def run_valuation(ticker, industry, forecast_years, perpetual_growth, use_ml, us
             # Get financial data
             dcf = DCFModel(stock_code=ticker)
             st.session_state.financial_data = dcf.get_financial_data()
+            
+            # Get current market data (price)
+            try:
+                market_data = dcf.get_market_data()
+                if market_data:
+                    result['current_price'] = market_data.get('price')
+                    result['market_cap'] = market_data.get('market_cap')
+            except Exception as e:
+                st.warning(f"Could not retrieve current market price: {str(e)}")
+            
+            # Get industry average growth if available
+            if industry and industry != "Auto-detect":
+                try:
+                    # Get industry benchmarks from industry_valuation_model
+                    if model.industry_model and model.industry_model.industry_benchmarks is not None:
+                        industry_benchmarks = model.industry_model.industry_benchmarks
+                        industry_row = industry_benchmarks[industry_benchmarks['industry'] == industry]
+                        
+                        if not industry_row.empty and 'historical_growth_mean_median' in industry_row.columns:
+                            result['industry_avg_growth'] = float(industry_row['historical_growth_mean_median'].iloc[0])
+                        elif not industry_row.empty and 'historical_growth_mean_mean' in industry_row.columns:
+                            result['industry_avg_growth'] = float(industry_row['historical_growth_mean_mean'].iloc[0])
+                except Exception as e:
+                    st.warning(f"Could not retrieve industry average growth: {str(e)}")
             
             return result
     except Exception as e:
@@ -158,9 +209,7 @@ def main():
     
     industry = st.sidebar.selectbox(
         "Industry:",
-        ["Auto-detect", "Semiconductors", "Electronics", "Banking", "Telecommunications", 
-         "Financial Services", "Computer Hardware", "Food & Beverage", "Retail", 
-         "Healthcare", "Utilities", "Materials", "Electronics Manufacturing", "Other"]
+        st.session_state.available_industries
     )
     
     forecast_years = st.sidebar.slider("Forecast Years:", 1, 15, 5)
@@ -368,6 +417,42 @@ def main():
                         dl_row.append(f"{rate:.1%}")
                     predictions_data.append(dl_row)
                 
+                # Industry average growth from new calculated industry growth stats
+                if 'industry_growth_stats' in result:
+                    industry_growth_rates = result['industry_growth_stats']['average_growth_rates']
+                    company_count = result['industry_growth_stats']['company_count']
+                    
+                    # Add a row with all growth rates for each year
+                    industry_avg_row = ["Industry Avg Growth"]
+                    for rate in industry_growth_rates[:min(5, len(industry_growth_rates))]:
+                        industry_avg_row.append(f"{rate:.1%}")
+                    predictions_data.append(industry_avg_row)
+                    
+                    # Add historical stats with more details
+                    hist_mean = result['industry_growth_stats']['historical_mean_growth']
+                    hist_median = result['industry_growth_stats']['historical_median_growth']
+                    hist_stats_row = ["Industry Historical"]
+                    hist_stats_row.append(f"Mean: {hist_mean:.1%}, Median: {hist_median:.1%}, Companies: {company_count}")
+                    predictions_data.append(hist_stats_row)
+                # Fallback to simple industry average growth benchmark
+                elif 'industry_avg_growth' in result:
+                    industry_row = ["Industry Avg Growth"]
+                    for i in range(min(5, len(ml_predictions.get('growth_rates', [])))):
+                        if i == 0:  # Only add the value to the first cell
+                            industry_row.append(f"{result['industry_avg_growth']:.1%}")
+                        else:
+                            industry_row.append("")  # Empty cells for other years
+                    predictions_data.append(industry_row)
+                
+                # Current stock price if available
+                if 'current_price' in result and result['current_price']:
+                    price_row = ["Current Stock Price"]
+                    price_row.append(f"{result['current_price']:,.2f}")
+                    # Add empty cells for other years to align table
+                    for _ in range(min(5, len(ml_predictions.get('growth_rates', []))) - 1):
+                        price_row.append("")
+                    predictions_data.append(price_row)
+                
                 # Display the predictions table
                 st.dataframe(pd.DataFrame(predictions_data, columns=headers), hide_index=True, use_container_width=True)
                 
@@ -392,6 +477,27 @@ def main():
                         [g*100 for g in dl_predictions], 
                         'r-s', 
                         label='DL Growth'
+                    )
+                
+                # Add industry average growth line from new calculation if available
+                if 'industry_growth_stats' in result:
+                    industry_growth_rates = result['industry_growth_stats']['average_growth_rates']
+                    ax.plot(
+                        years[:len(industry_growth_rates)], 
+                        [g*100 for g in industry_growth_rates], 
+                        color='purple',
+                        marker='o', 
+                        linestyle='--',
+                        label=f'Industry Avg (n={result["industry_growth_stats"]["company_count"]})'
+                    )
+                # Fallback to simple industry average if industry_growth_stats not available
+                elif 'industry_avg_growth' in result:
+                    industry_avg = result['industry_avg_growth'] * 100
+                    ax.axhline(
+                        y=industry_avg,
+                        color='purple',
+                        linestyle=':',
+                        label=f'Industry Avg ({industry_avg:.1f}%)'
                     )
                 
                 # Add terminal growth line
@@ -438,6 +544,30 @@ def main():
                         label='Deep Learning'
                     )
                     
+                    # Add industry average growth from new calculation if available
+                    if 'industry_growth_stats' in result:
+                        industry_growth_rates = result['industry_growth_stats']['average_growth_rates']
+                        
+                        # Only plot for the overlapping years
+                        max_years = min(len(dl_predictions), len(industry_growth_rates))
+                        ax.plot(
+                            index[:max_years], 
+                            [g*100 for g in industry_growth_rates[:max_years]], 
+                            color='purple',
+                            marker='o',
+                            linestyle='--',
+                            label=f'Industry Avg (n={result["industry_growth_stats"]["company_count"]})'
+                        )
+                    # Fallback to simple industry average
+                    elif 'industry_avg_growth' in result:
+                        industry_avg = result['industry_avg_growth'] * 100
+                        ax.axhline(
+                            y=industry_avg,
+                            color='purple',
+                            linestyle=':',
+                            label=f'Industry Avg ({industry_avg:.1f}%)'
+                        )
+                    
                     ax.set_title('ML vs Deep Learning Growth Predictions')
                     ax.set_xlabel('Year')
                     ax.set_ylabel('Growth Rate (%)')
@@ -448,6 +578,25 @@ def main():
                     plt.tight_layout()
                     
                     st.pyplot(fig)
+                    
+                # Add industry growth statistics details if available
+                if 'industry_growth_stats' in result:
+                    st.subheader("Industry Growth Statistics")
+                    
+                    stats = result['industry_growth_stats']
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.metric("Companies Analyzed", stats['company_count'])
+                        st.metric("Historical Mean Growth", f"{stats['historical_mean_growth']:.1%}")
+                    
+                    with col2:
+                        st.metric("Historical Median Growth", f"{stats['historical_median_growth']:.1%}")
+                        st.metric("Growth Dispersion", f"{stats['growth_dispersion']:.1%}")
+                    
+                    # Add range information
+                    min_growth, max_growth = stats['growth_range']
+                    st.text(f"Growth Range: {min_growth:.1%} to {max_growth:.1%}")
             else:
                 st.info("No growth predictions available. Enable ML model to see predictions.")
         
