@@ -13,3 +13,6 @@ data_cache/
 
 #database
 finance_data.db
+
+#environment variables
+finance_env_py310/
