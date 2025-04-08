@@ -54,53 +54,128 @@ if 'available_industries' not in st.session_state:
 # Function to perform valuation
 def run_valuation(ticker, industry, forecast_years, perpetual_growth, use_ml, use_dl, use_industry):
     try:
-        with st.spinner('Running valuation models...'):
-            model = IntegratedValuationModel(
-                use_ml=use_ml,
-                use_dl=use_dl,
-                use_industry=use_industry
-            )
-            
-            result = model.run_valuation(
-                ticker=ticker,
-                industry=industry if industry != "Auto-detect" else None
-            )
-            
-            st.session_state.valuation_results = result
-            st.session_state.ticker = ticker
-            
-            # Get financial data
-            dcf = DCFModel(stock_code=ticker)
-            st.session_state.financial_data = dcf.get_financial_data()
-            
-            # Get current market data (price)
+        st.info(f"Running valuation for {ticker}...")
+        
+        # Create the integrated model with all components
+        model = IntegratedValuationModel(
+            use_ml=use_ml, 
+            use_dl=use_dl, 
+            use_industry=use_industry
+        )
+        
+        # Handle auto-detect industry
+        detected_industry = None
+        if industry == "Auto-detect":
+            # First try to get industry from database
             try:
-                market_data = dcf.get_market_data()
-                if market_data:
-                    result['current_price'] = market_data.get('price')
-                    result['market_cap'] = market_data.get('market_cap')
+                from util.db_data_provider import DBFinancialDataProvider
+                db_provider = DBFinancialDataProvider("finance_data.db")
+                db_industry = db_provider.get_industry(ticker)
+                if db_industry:
+                    detected_industry = db_industry
+                    st.info(f"Detected industry from database: {detected_industry}")
             except Exception as e:
-                st.warning(f"Could not retrieve current market price: {str(e)}")
+                st.warning(f"Could not detect industry from database: {e}")
+                
+            # If database detection failed, will use the deep learning detector (built into the model)
+            industry = detected_industry
+        
+        # Run the valuation with all selected components
+        results = model.run_valuation(ticker, industry)
+        
+        # If industry was auto-detected within the model, display it
+        if detected_industry is None and 'detected_industry' in results:
+            detected_industry = results['detected_industry']
+            if detected_industry:
+                st.info(f"Detected industry: {detected_industry}")
+        
+        # Format results
+        models = results.get('models', {})
+        
+        # Display DCF valuation results
+        st.subheader("Valuation Results:")
+        
+        valuations = []
+        for model_name, price in models.items():
+            if pd.isna(price) or price <= 0:
+                continue
+                
+            display_name = model_name.replace('_', ' ').upper()
+            valuations.append({
+                'Model': display_name,
+                'Estimated Price': f"${price:.2f}"
+            })
+        
+        if valuations:
+            st.table(pd.DataFrame(valuations).set_index('Model'))
+        else:
+            st.warning("No valid valuation results available.")
+        
+        # Show ML predictions if available
+        if 'ml_predictions' in results:
+            st.subheader("ML Growth Predictions:")
+            growth_rates = results['ml_predictions']['growth_rates']
+            years = list(range(1, len(growth_rates) + 1))
             
-            # Get industry average growth if available
-            if industry and industry != "Auto-detect":
-                try:
-                    # Get industry benchmarks from industry_valuation_model
-                    if model.industry_model and model.industry_model.industry_benchmarks is not None:
-                        industry_benchmarks = model.industry_model.industry_benchmarks
-                        industry_row = industry_benchmarks[industry_benchmarks['industry'] == industry]
-                        
-                        if not industry_row.empty and 'historical_growth_mean_median' in industry_row.columns:
-                            result['industry_avg_growth'] = float(industry_row['historical_growth_mean_median'].iloc[0])
-                        elif not industry_row.empty and 'historical_growth_mean_mean' in industry_row.columns:
-                            result['industry_avg_growth'] = float(industry_row['historical_growth_mean_mean'].iloc[0])
-                except Exception as e:
-                    st.warning(f"Could not retrieve industry average growth: {str(e)}")
+            # Create a DataFrame for display
+            growth_df = pd.DataFrame({
+                'Year': years,
+                'Projected Growth': [f"{rate:.2%}" for rate in growth_rates]
+            })
+            st.table(growth_df.set_index('Year'))
             
-            return result
+        # Show DL predictions if available
+        if 'dl_predictions' in results:
+            st.subheader("Deep Learning Growth Predictions:")
+            growth_rates = results['dl_predictions']
+            years = list(range(1, len(growth_rates) + 1))
+            
+            # Create a DataFrame for display
+            growth_df = pd.DataFrame({
+                'Year': years,
+                'Projected Growth': [f"{rate:.2%}" for rate in growth_rates]
+            })
+            st.table(growth_df.set_index('Year'))
+            
+        # Show industry growth stats if available
+        if 'industry_growth_stats' in results:
+            st.subheader("Industry Growth Statistics:")
+            industry_growth = results['industry_growth_stats']
+            
+            # Create a DataFrame for display
+            if 'average_growth_rates' in industry_growth:
+                growth_rates = industry_growth['average_growth_rates']
+                years = list(range(1, len(growth_rates) + 1))
+                
+                growth_df = pd.DataFrame({
+                    'Year': years,
+                    'Industry Average Growth': [f"{rate:.2%}" for rate in growth_rates]
+                })
+                
+                st.table(growth_df.set_index('Year'))
+                
+                # Show industry statistics
+                stats = {
+                    'Companies in Sample': industry_growth.get('company_count', 0),
+                    'Mean Historical Growth': f"{industry_growth.get('historical_mean_growth', 0):.2%}",
+                    'Median Historical Growth': f"{industry_growth.get('historical_median_growth', 0):.2%}"
+                }
+                
+                st.info("Industry statistics:")
+                for key, value in stats.items():
+                    st.write(f"- {key}: {value}")
+                
+                # Show warning if using fallback data
+                if industry_growth.get('is_fallback', False):
+                    st.warning("⚠️ Limited industry data available - using estimated growth patterns")
+        
+        return models, results
+    
     except Exception as e:
         st.error(f"Error in valuation: {str(e)}")
-        return None
+        import traceback
+        st.error(traceback.format_exc())
+        return None, None
 
 # Function to perform sensitivity analysis
 def run_sensitivity_analysis(ticker, base_price):
@@ -224,9 +299,10 @@ def main():
     
     # Run valuation button
     if st.sidebar.button("Calculate Intrinsic Value", type="primary", use_container_width=True):
-        result = run_valuation(ticker, industry, forecast_years, perpetual_growth, use_ml, use_dl, use_industry)
+        models, result = run_valuation(ticker, industry, forecast_years, perpetual_growth, use_ml, use_dl, use_industry)
         if result:
-            st.success(f"Valuation completed for {result['ticker']}")
+            st.session_state.valuation_results = result
+            st.success(f"Valuation completed for {ticker}")
     
     # Display results if available
     if st.session_state.valuation_results:

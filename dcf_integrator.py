@@ -164,23 +164,19 @@ class IntegratedValuationModel:
                     deep_forecaster = DeepFinancialForecaster()
                     industry = deep_forecaster._detect_industry_from_financials(financial_data)
                 
-                # Get financial metrics for adjustment
-                metrics = self._extract_financial_metrics(standard_dcf)
-                
-                # Adjust each valuation model
-                for model_name, base_price in results['models'].items():
-                    if base_price is not None:
-                        adjustment = self.industry_model.adjust_dcf_valuation(
-                            industry=industry,
-                            base_valuation=base_price,
-                            financial_metrics=metrics
-                        )
-                        # Store adjustment details
-                        adjustment_key = f"{model_name}_industry_adjusted"
-                        results[adjustment_key] = adjustment
-                
                 # Store detected industry
                 results['detected_industry'] = industry
+                
+                # If industry is None and we have a db_provider, try to detect from database
+                if industry is None and hasattr(self, 'db_provider'):
+                    try:
+                        db_industry = self.db_provider.get_industry(ticker)
+                        if db_industry:
+                            logger.info(f"Found industry '{db_industry}' for {ticker} in database")
+                            industry = db_industry
+                            results['detected_industry'] = industry
+                    except Exception as e:
+                        logger.error(f"Error getting industry from database: {e}")
                 
                 # Calculate industry-wide average growth rates
                 if industry:
@@ -405,13 +401,57 @@ class IntegratedValuationModel:
                 self.industry_model = IndustryValuationModel(load_pretrained=True)
                 logger.info("Initialized industry model for growth rate calculation")
             
+            # Handle the 'default' industry case - try to find a better match
+            if industry == 'default' or industry is None:
+                logger.info("Default or None industry detected, attempting to find a suitable industry match")
+                
+                # Try to find an appropriate industry based on the ticker if available
+                ticker = getattr(self, 'ticker', None)
+                if ticker and isinstance(ticker, str):
+                    # Try to get industry from the database first
+                    try:
+                        db_industry = self.db_provider.get_industry(ticker)
+                        if db_industry and db_industry != 'default' and db_industry is not None:
+                            industry = db_industry
+                            logger.info(f"Using database-provided industry '{industry}' instead of default")
+                    except Exception as e:
+                        logger.debug(f"Could not get industry from database: {e}")
+                    
+                    # If still default, try pattern matching for Taiwan stocks
+                    if industry == 'default' or industry is None:
+                        if '.TW' in ticker:
+                            base_number = ticker.split('.')[0]
+                            # Match semiconductor companies
+                            if base_number in ['2330', '2454', '2379', '2337', '2308', '2303', '2409', '2344', '2351']:
+                                industry = 'semiconductors'
+                                logger.info(f"Matched ticker {ticker} to industry 'semiconductors'")
+                            # Match electronics companies    
+                            elif base_number.startswith('23') or base_number in ['2317', '2356']:
+                                industry = 'electronics'
+                                logger.info(f"Matched ticker {ticker} to industry 'electronics'")
+                            # Match computer hardware companies
+                            elif base_number in ['2382', '2353', '2357', '2324', '2376']:
+                                industry = 'computer_hardware'
+                                logger.info(f"Matched ticker {ticker} to industry 'computer_hardware'")
+                            # Match telecom companies
+                            elif base_number in ['2412', '3045', '4904', '4977']:
+                                industry = 'telecommunications'
+                                logger.info(f"Matched ticker {ticker} to industry 'telecommunications'")
+                            # Match financial service companies
+                            elif base_number.startswith('26') or base_number.startswith('27'):
+                                industry = 'financial_services' 
+                                logger.info(f"Matched ticker {ticker} to industry 'financial_services'")
+            
             # Check if industry name needs standardization
-            industry_lower = industry.lower()
+            industry_lower = industry.lower() if industry else 'default'
+            
+            # Convert spaces to underscores for file matching
+            industry_file_name = industry_lower.replace(' ', '_')
             
             # Get industry training data that has revenue information
             industry_file = os.path.join(
                 self.industry_model.data_dir, 
-                f"{industry_lower.replace(' ', '_')}_training.csv"
+                f"{industry_file_name}_training.csv"
             )
             
             # Debug: Check if file exists
@@ -428,191 +468,149 @@ class IntegratedValuationModel:
                     logger.info(f"Available industry files: {', '.join(potential_files)}")
                     
                     # Try to find a close match
+                    best_match = None
+                    best_score = 0
+                    
                     for file in potential_files:
-                        if industry_lower in file.lower():
-                            industry_file = os.path.join(self.industry_model.data_dir, file)
-                            logger.info(f"Found potential match: {file}")
-                            break
+                        # Remove _training.csv to get the industry name
+                        file_industry = file.replace('_training.csv', '')
+                        
+                        # Score based on string similarity
+                        score = 0
+                        if industry_lower in file_industry:
+                            # Direct substring match gets high score
+                            score = 10
+                        else:
+                            # Calculate word-based similarity 
+                            industry_words = set(industry_lower.split('_'))
+                            file_words = set(file_industry.split('_'))
+                            common_words = industry_words.intersection(file_words)
+                            score = len(common_words) * 5  # 5 points per common word
+                            
+                            # For industries with multiple words, partial matching
+                            if len(industry_words) > 1 or len(file_words) > 1:
+                                for i_word in industry_words:
+                                    for f_word in file_words:
+                                        if i_word in f_word or f_word in i_word:
+                                            score += 2  # 2 points per partial word match
+                            
+                        if score > best_score:
+                            best_score = score
+                            best_match = file
+                    
+                    # Use the best match if score is high enough
+                    if best_score > 0:
+                        industry_file = os.path.join(self.industry_model.data_dir, best_match)
+                        clean_industry_name = best_match.replace('_training.csv', '').replace('_', ' ')
+                        logger.info(f"Found potential match: {best_match} (score: {best_score})")
+                        industry = clean_industry_name  # Update the industry name
                 
                 # If still no match, use industry benchmarks if available
                 if not os.path.exists(industry_file):
                     logger.warning(f"Using fallback from industry benchmarks for {industry}")
                     return self._get_fallback_industry_growth(industry)
-                
-            # Load industry data
+            
+            # Load industry training data
             industry_df = pd.read_csv(industry_file)
-            logger.info(f"Loaded industry data for {industry} with {len(industry_df)} records")
-            logger.info(f"Industry data columns: {industry_df.columns.tolist()}")
+            logger.info(f"Loaded {len(industry_df)} records from {industry_file}")
             
-            # Check if key columns exist
-            required_cols = ['stock_id', 'timestamp', 'revenue']
-            missing_cols = [col for col in required_cols if col not in industry_df.columns]
-            if missing_cols:
-                logger.warning(f"Missing required columns: {missing_cols}")
-                
-                # Try to find alternative column names
-                if 'stock_id' in missing_cols and 'symbol' in industry_df.columns:
-                    industry_df['stock_id'] = industry_df['symbol']
-                    missing_cols.remove('stock_id')
-                
-                if 'timestamp' in missing_cols and 'date' in industry_df.columns:
-                    industry_df['timestamp'] = industry_df['date']
-                    missing_cols.remove('timestamp')
-                
-                if missing_cols:
-                    logger.warning(f"Cannot proceed with missing columns: {missing_cols}")
-                    return self._get_fallback_industry_growth(industry)
-            
-            # Get unique companies in this industry
-            companies = industry_df['stock_id'].unique() if 'stock_id' in industry_df.columns else []
-            company_count = len(companies)
-            
-            if company_count == 0:
-                logger.warning(f"No companies found in industry data for {industry}")
+            if 'revenue' not in industry_df.columns:
+                logger.warning(f"No revenue data found in {industry_file}")
                 return self._get_fallback_industry_growth(industry)
-                
-            logger.info(f"Found {company_count} companies in {industry} industry")
             
-            # Calculate historical growth rates for each company
-            company_growth_rates = []
+            # Calculate growth rates for each company
+            all_growth_rates = []
+            stats = {}
             
-            # First try to use historical_growth if available
-            historical_growth_found = False
-            if 'historical_growth' in industry_df.columns:
-                growth_values = industry_df['historical_growth'].dropna().values
-                if len(growth_values) >= 5:
-                    company_growth_rates = growth_values.tolist()
-                    historical_growth_found = True
-                    logger.info(f"Using {len(growth_values)} historical_growth values from dataset")
-            
-            if 'historical_growth_mean' in industry_df.columns:
-                growth_values = industry_df['historical_growth_mean'].dropna().values
-                if len(growth_values) >= 3:
-                    company_growth_rates = growth_values.tolist()
-                    historical_growth_found = True
-                    logger.info(f"Using {len(growth_values)} historical_growth_mean values from dataset")
-            
-            # If not enough data from historical_growth, calculate from revenue
-            companies_with_growth = 0
-            if len(company_growth_rates) < 5 and 'revenue' in industry_df.columns:
-                logger.info(f"Calculating growth rates from revenue data for {industry}")
-                
-                # Group by company to analyze growth rates
-                for company in companies:
-                    company_data = industry_df[industry_df['stock_id'] == company].sort_values('timestamp')
+            # Group by stock_id and calculate growth rates
+            for stock_id, data in industry_df.groupby('stock_id'):
+                if len(data) < 2:
+                    continue
                     
-                    # Need at least 2 data points to calculate growth
-                    if len(company_data) < 2:
-                        continue
+                # Sort by timestamp or date
+                time_field = 'timestamp' if 'timestamp' in data.columns else 'date' 
+                if time_field in data.columns:
+                    data = data.sort_values(time_field)
+                
+                # Calculate growth rate
+                if 'revenue' in data.columns:
+                    try:
+                        growth_rates = data['revenue'].pct_change().dropna()
                         
-                    # Calculate year-over-year growth rates
-                    revenues = company_data['revenue'].values
-                    company_growth = []
-                    
-                    for i in range(1, len(revenues)):
-                        if revenues[i-1] > 0:  # Avoid division by zero
-                            growth_rate = (revenues[i] - revenues[i-1]) / revenues[i-1]
-                            # Filter out extreme values
-                            if -0.5 <= growth_rate <= 2.0:  # Filter very extreme outliers
-                                company_growth.append(growth_rate)
-                    
-                    if company_growth:
-                        company_growth_rates.extend(company_growth)
-                        companies_with_growth += 1
-                
-                logger.info(f"Calculated growth rates for {companies_with_growth} out of {company_count} companies")
-            
-            # Process growth rates
-            if not company_growth_rates:
-                logger.warning(f"No valid growth rates found for {industry}")
-                return self._get_fallback_industry_growth(industry)
-                
-            logger.info(f"Total growth data points: {len(company_growth_rates)}")
-            
-            # Remove outliers using IQR method
-            growth_array = np.array(company_growth_rates)
-            
-            # Log original stats
-            original_mean = growth_array.mean()
-            original_median = np.median(growth_array)
-            logger.info(f"Original growth stats - Mean: {original_mean:.1%}, Median: {original_median:.1%}")
-            
-            # Filter outliers
-            q1, q3 = np.percentile(growth_array, [25, 75])
-            iqr = q3 - q1
-            lower_bound = q1 - (1.5 * iqr)
-            upper_bound = q3 + (1.5 * iqr)
-            filtered_growth = growth_array[(growth_array >= lower_bound) & (growth_array <= upper_bound)]
-            
-            if len(filtered_growth) == 0:
-                logger.warning(f"No valid growth rates after filtering outliers for {industry}")
-                # Use original array if filtering removed everything
-                filtered_growth = growth_array
+                        if growth_rates.empty:
+                            continue
+                            
+                        # Drop outliers (extreme growth rates)
+                        growth_rates = growth_rates[(growth_rates > -0.5) & (growth_rates < 2.0)]
+                        
+                        if not growth_rates.empty:
+                            all_growth_rates.extend(growth_rates.tolist())
+                    except Exception as e:
+                        logger.debug(f"Error calculating growth rates for {stock_id}: {e}")
+                        continue
             
             # Calculate statistics
-            mean_growth = filtered_growth.mean()
-            median_growth = np.median(filtered_growth)
-            std_growth = filtered_growth.std()
-            min_growth = filtered_growth.min()
-            max_growth = filtered_growth.max()
+            if not all_growth_rates:
+                logger.warning(f"No valid growth rates calculated for {industry}")
+                return self._get_fallback_industry_growth(industry)
+                
+            # Count unique companies
+            unique_companies = industry_df['stock_id'].nunique()
+            companies_with_growth = len(all_growth_rates) // 2  # Rough estimate
             
-            logger.info(f"Industry {industry} growth statistics after filtering - Mean: {mean_growth:.1%}, Median: {median_growth:.1%}, Std: {std_growth:.1%}")
-            logger.info(f"Growth range: {min_growth:.1%} to {max_growth:.1%}")
+            # Calculate key statistics
+            mean_growth = np.mean(all_growth_rates)
+            median_growth = np.median(all_growth_rates)
+            growth_dispersion = np.std(all_growth_rates)
+            growth_range = (min(all_growth_rates), max(all_growth_rates))
             
-            # Generate forecasted growth rates for future years with a declining pattern
-            # Typically, growth rates start higher and decline toward a longer-term average
-            forecasted_growth_rates = []
+            # Generate projected future growth rates with decay
+            # Start with the mean growth and apply decay
+            base_growth = max(0.03, min(0.25, mean_growth))  # Cap between 3% and 25%
             
-            # If we have historical_growth_mean in the benchmarks, use that as a reference
-            long_term_growth = None
-            if self.industry_model.industry_benchmarks is not None:
-                industry_row = self.industry_model.industry_benchmarks[
-                    self.industry_model.industry_benchmarks['industry'] == industry
-                ]
-                if not industry_row.empty:
-                    if 'historical_growth_mean_median' in industry_row.columns:
-                        long_term_growth = float(industry_row['historical_growth_mean_median'].iloc[0])
-                        logger.info(f"Using benchmark historical_growth_mean_median: {long_term_growth:.1%}")
-                    elif 'historical_growth_mean_mean' in industry_row.columns:
-                        long_term_growth = float(industry_row['historical_growth_mean_mean'].iloc[0])
-                        logger.info(f"Using benchmark historical_growth_mean_mean: {long_term_growth:.1%}")
+            # Define industry-specific decay factors
+            decay_by_industry = {
+                'semiconductors': 0.85,
+                'electronics': 0.87,
+                'telecommunications': 0.92,
+                'financial services': 0.90,
+                'computer hardware': 0.88,
+                'utilities': 0.95,
+                'default': 0.90
+            }
             
-            # If no benchmark data, use the calculated mean
-            if long_term_growth is None:
-                long_term_growth = mean_growth
-                logger.info(f"Using calculated mean as long-term growth: {long_term_growth:.1%}")
+            # Get decay factor for this industry
+            decay_factor = decay_by_industry.get(
+                industry.lower(), 
+                decay_by_industry['default']
+            )
             
-            # Generate forecast with gradual decline toward long-term average
-            for i in range(years):
-                # Start with slightly above mean and decline toward long-term
-                weight = 1.0 - (i / years)
-                year_growth = (mean_growth * 1.1) * weight + long_term_growth * (1 - weight)
-                forecasted_growth_rates.append(year_growth)
+            # Generate growth rates
+            growth_rates = [base_growth]
+            for i in range(1, years):
+                # Apply stronger decay in early years
+                year_decay = decay_factor ** (1 + 0.1 * min(i, 3))
+                next_growth = growth_rates[-1] * year_decay
+                # Apply minimum floor
+                next_growth = max(0.02, next_growth)
+                growth_rates.append(next_growth)
             
-            # Log the forecasted rates
-            forecast_str = ", ".join([f"{rate:.1%}" for rate in forecasted_growth_rates])
-            logger.info(f"Forecasted industry growth rates: {forecast_str}")
-            
-            # Prepare result
-            result = {
-                'average_growth_rates': forecasted_growth_rates,
-                'company_count': company_count,
+            # Format results
+            return {
+                'average_growth_rates': growth_rates,
+                'company_count': unique_companies,
                 'companies_with_growth': companies_with_growth,
                 'historical_mean_growth': mean_growth,
                 'historical_median_growth': median_growth,
-                'growth_dispersion': std_growth,
-                'growth_range': (min_growth, max_growth),
-                'data_points': len(filtered_growth)
+                'growth_dispersion': growth_dispersion,
+                'growth_range': growth_range,
+                'is_fallback': False
             }
-            
-            return result
             
         except Exception as e:
             logger.error(f"Error calculating industry growth rates: {e}")
-            import traceback
-            logger.error(f"Traceback: {traceback.format_exc()}")
             return self._get_fallback_industry_growth(industry)
-    
+
     def _get_fallback_industry_growth(self, industry: str) -> Dict:
         """Get fallback industry growth stats when calculation fails."""
         logger.info(f"Using fallback industry growth for {industry}")

@@ -665,8 +665,35 @@ class DeepFinancialForecaster:
                 forecast_years
             )
 
-    def _generate_industry_baseline_growth(self, industry: str, years: int) -> List[float]:
+    def _generate_industry_baseline_growth(self, industry: str, years: int = 5) -> List[float]:
         """Generate industry-specific growth pattern when models fail."""
+        # Try to map 'default' to a better industry based on any available info
+        if industry == 'default' or industry is None:
+            # Try to extract ticker information from financials if available
+            ticker = None
+            if hasattr(self, 'financials') and isinstance(self.financials, dict) and 'stock_code' in self.financials:
+                ticker = self.financials['stock_code']
+            elif hasattr(self, 'financials') and hasattr(self.financials, 'attrs') and 'stock_code' in self.financials.attrs:
+                ticker = self.financials.attrs['stock_code']
+                
+            # If ticker found, try to derive industry from it (especially Taiwan stocks)
+            if ticker and isinstance(ticker, str):
+                if '.TW' in ticker:
+                    base_number = ticker.split('.')[0]
+                    # Basic industry mapping
+                    if base_number in ['2330', '2454', '2379', '2337', '2308', '2303', '2409', '2344', '2351']:
+                        logger.info(f"Mapping {ticker} from 'default' to 'semiconductor' in baseline generator")
+                        industry = 'semiconductor'
+                    elif base_number.startswith('23') or base_number in ['2317', '2356']:
+                        logger.info(f"Mapping {ticker} from 'default' to 'tech' in baseline generator")
+                        industry = 'tech'
+                    elif base_number in ['2412', '3045', '4904', '4977']:
+                        logger.info(f"Mapping {ticker} from 'default' to 'telecom' in baseline generator")
+                        industry = 'telecom'
+                    elif base_number.startswith('26') or base_number.startswith('27'):
+                        logger.info(f"Mapping {ticker} from 'default' to 'finance' in baseline generator")
+                        industry = 'finance'
+        
         # Industry parameters
         industry_params = {
             'tech': {'base': 0.15, 'decay': 0.80, 'floor': 0.04},
@@ -677,11 +704,33 @@ class DeepFinancialForecaster:
             'telecom': {'base': 0.03, 'decay': 0.90, 'floor': 0.01},
             'consumer': {'base': 0.06, 'decay': 0.85, 'floor': 0.02},
             'energy': {'base': 0.08, 'decay': 0.80, 'floor': 0.02},
-            'default': {'base': 0.10, 'decay': 0.85, 'floor': 0.03}
+            'default': {'base': 0.10, 'decay': 0.85, 'floor': 0.03},
+            'electronics': {'base': 0.14, 'decay': 0.78, 'floor': 0.04},
+            'computer_hardware': {'base': 0.12, 'decay': 0.80, 'floor': 0.03}, 
+            'retail': {'base': 0.08, 'decay': 0.82, 'floor': 0.02},
+            'materials': {'base': 0.06, 'decay': 0.85, 'floor': 0.02},
+            'industrial': {'base': 0.07, 'decay': 0.82, 'floor': 0.02}
         }
         
-        # Get parameters for this industry
-        params = industry_params.get(industry, industry_params['default'])
+        # Get parameters for this industry - with more flexible matching
+        industry_key = industry.lower() if industry else 'default'
+        params = None
+        
+        # Try exact match first
+        if industry_key in industry_params:
+            params = industry_params[industry_key]
+        else:
+            # Try partial/fuzzy matching
+            for key in industry_params:
+                if key in industry_key or industry_key in key:
+                    logger.info(f"Using growth parameters for '{key}' instead of '{industry_key}'")
+                    params = industry_params[key]
+                    break
+        
+        # Fallback to default if still no match
+        if params is None:
+            logger.info(f"No matching industry parameters for '{industry_key}', using default")
+            params = industry_params['default']
         
         # Generate realistic growth pattern
         result = [params['base']]
@@ -696,7 +745,7 @@ class DeepFinancialForecaster:
             
             result.append(next_val)
         
-        logger.info(f"Generated industry-baseline pattern for {industry}: {[f'{x:.2%}' for x in result]}")
+        logger.info(f"Generated industry-baseline pattern for {industry_key}: {[f'{x:.2%}' for x in result]}")
         return result
 
     def _detect_industry_from_financials(self, financials: pd.DataFrame) -> str:
@@ -714,8 +763,10 @@ class DeepFinancialForecaster:
             if isinstance(financials, dict):
                 if 'stock_code' in financials:
                     stock_code = financials['stock_code']
-                # We can't use index-based detection with a dict, so we'll extract metrics directly
+                elif 'ticker' in financials:
+                    stock_code = financials['ticker']
                 
+                # We can't use index-based detection with a dict, so we'll extract metrics directly
                 if 'gross_margin' in financials:
                     metrics['gross_margin'] = financials['gross_margin']
                 elif 'operating_margin' in financials:
@@ -743,32 +794,59 @@ class DeepFinancialForecaster:
                     op_margin = np.mean([float(x) for x in financials.loc['Operating Margin'] if pd.notna(x)])
                     metrics['op_margin'] = op_margin
             
-            # Taiwan stock classification based on stock code
+            # Expanded Taiwan stock classification based on stock code
             if stock_code and isinstance(stock_code, str):
+                # Extract base number for Taiwan stocks
+                base_number = None
                 if '.' in stock_code:
                     parts = stock_code.split('.')
                     if len(parts) >= 2 and parts[1] in ['TW', 'TWO']:
                         base_number = parts[0]
                         
-                        # Taiwan semiconductors
-                        if base_number in ['2330', '2454', '2379', '2337', '2308', '2303', '2409', '2344', '2351', '2408']:
+                        # Taiwan semiconductors - expanded list
+                        if base_number in ['2330', '2454', '2379', '2337', '2308', '2303', '2409', '2344', '2351', '2408',
+                                         '3707', '5347', '3105', '3545', '6239']:
                             return 'semiconductor'
                             
-                        # Taiwan tech hardware
-                        if base_number in ['2317', '2382', '2354', '2353', '2474', '2357', '2324', '2327', '2356']:
+                        # Taiwan tech hardware - expanded list
+                        if base_number in ['2317', '2382', '2354', '2353', '2474', '2357', '2324', '2327', '2356',
+                                         '2377', '2395', '2376', '3231', '2301']:
                             return 'tech'
                             
                         # Taiwan telecom
-                        if base_number in ['2412', '3045', '4904', '4977']:
+                        if base_number in ['2412', '3045', '4904', '4977', '2406', '4977']:
                             return 'telecom'
                             
                         # Taiwan financial
-                        if base_number.startswith('26') or (base_number.startswith('27') and len(base_number) == 4):
+                        if (base_number.startswith('26') or 
+                            (base_number.startswith('27') and len(base_number) == 4) or
+                            base_number in ['2801', '2809', '2812', '2823', '2834', '2836', '2838', '2845', '2867']):
                             return 'finance'
                         
                         # Taiwan utilities
                         if base_number.startswith('9') and len(base_number) == 4:
                             return 'utilities'
+                            
+                        # Taiwan electronics
+                        if (base_number.startswith('23') or 
+                            base_number in ['6271', '6411', '6488', '8069', '8271', '2458', '2368']):
+                            return 'electronics'
+                            
+                        # Taiwan food & beverage
+                        if base_number in ['1101', '1216', '1301', '1326', '1333', '1789', '1909', '9945']:
+                            return 'consumer'
+                            
+                        # Taiwan healthcare
+                        if base_number in ['1476', '1762', '4103', '4107', '4119', '4133', '4137', '4142', '4144', '4164']:
+                            return 'healthcare'
+                            
+                        # Taiwan chemicals - adding chemical companies
+                        if base_number in ['1301', '1303', '1304', '1309', '1313', '1314', '1319', '1321', '1323', 
+                                         '1324', '1338', '1702', '1708', '1710', '1713', '1717', '1718', '1722', 
+                                         '1725', '1726', '1730', '1762', '4763', '4767', '4768', '4722', '4720',
+                                         '4737', '4744', '4746', '4755', '4762', '4764', '4766', '4772', '4774']:
+                            logger.info(f"Identified {stock_code} as chemicals industry")
+                            return 'chemicals'
             
             # Use ratios to identify industry when ticker-based detection fails
             if 'gross_margin' in metrics and 'op_margin' in metrics:

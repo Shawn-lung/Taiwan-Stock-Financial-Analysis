@@ -155,24 +155,33 @@ class DCFModel:
             # Adjust based on industry if available (simplified)
             try:
                 industry = self.stock.info.get('industry', '')
-                industry_adjustments = {
-                    'Technology': 0.01,       # Higher for tech
-                    'Software': 0.015,        # Higher for software
-                    'Healthcare': 0.005,      # Slightly higher for healthcare
-                    'Utilities': -0.02,       # Lower for utilities
-                    'Energy': 0.01,           # Higher for energy
-                    'Consumer Defensive': -0.01   # Lower for consumer defensive
-                }
-                adjustment = 0
-                for ind_keyword, adj in industry_adjustments.items():
-                    if ind_keyword.lower() in industry.lower():
-                        adjustment += adj
-                
-                wacc = base_rate + adjustment
-                logger.info(f"Using default WACC of {wacc:.2%} for {self.stock_code} (base: {base_rate:.2%}, industry adj: {adjustment:.2%})")
-                return max(wacc, self.perpetual_growth_rate + 0.03)  # Ensure minimum spread
-                
-            except:
+                # Ensure industry is a string and not None
+                if industry is not None and isinstance(industry, str):
+                    industry_adjustments = {
+                        'Technology': 0.01,       # Higher for tech
+                        'Software': 0.015,        # Higher for software
+                        'Healthcare': 0.005,      # Slightly higher for healthcare
+                        'Utilities': -0.02,       # Lower for utilities
+                        'Energy': 0.01,           # Higher for energy
+                        'Consumer Defensive': -0.01,   # Lower for consumer defensive
+                        'Chemicals': 0.005,       # Add chemicals industry
+                        'Basic Materials': 0.007  # Add basic materials
+                    }
+                    adjustment = 0
+                    for ind_keyword, adj in industry_adjustments.items():
+                        if ind_keyword.lower() in industry.lower():
+                            adjustment += adj
+                    
+                    wacc = base_rate + adjustment
+                    logger.info(f"Using default WACC of {wacc:.2%} for {self.stock_code} (base: {base_rate:.2%}, industry adj: {adjustment:.2%})")
+                    return max(wacc, self.perpetual_growth_rate + 0.03)  # Ensure minimum spread
+                else:
+                    # Industry is None or not a string
+                    logger.info(f"Using default WACC of {base_rate:.2%} for {self.stock_code} (no industry adjustment)")
+                    return max(base_rate, self.perpetual_growth_rate + 0.03)  # Ensure minimum spread
+                    
+            except Exception as e:
+                logger.debug(f"Error processing industry adjustment: {e}")
                 logger.info(f"Using default WACC of {base_rate:.2%} for {self.stock_code}")
                 return max(base_rate, self.perpetual_growth_rate + 0.03)  # Ensure minimum spread
                 
