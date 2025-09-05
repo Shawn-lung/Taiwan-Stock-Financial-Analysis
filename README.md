@@ -45,7 +45,7 @@ Detailed growth predictions showing:
 1. Clone the repository:
    ```
    git clone https://github.com/Shawn-lung/Taiwan-Stock-Financial-Analysis.git
-   cd Finance_stuff
+   cd Taiwan-Stock-Financial-Analysis
    ```
 
 2. Install required packages:
