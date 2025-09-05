@@ -25,7 +25,7 @@ This project provides a suite of tools for financial analysis and stock valuatio
 
 1. Clone the repository:
    ```
-   git clone https://github.com/Shawn-lung/Finance_stuff.git
+   git clone https://github.com/Shawn-lung/Taiwan-Stock-Financial-Analysis.git
    cd Finance_stuff
    ```
 
