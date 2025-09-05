@@ -342,15 +342,17 @@ def main():
                         
                     # Display the price with delta if adjusted value exists
                     with cols[i]:
-                        if adjusted_value:
+                        if adjusted_value and price is not None:
                             st.metric(
                                 display_name, 
                                 f"{price:,.2f}", 
                                 f"{adjusted_value - price:+,.2f} (Adj)",
                                 delta_color="normal"
                             )
-                        else:
+                        elif price is not None:
                             st.metric(display_name, f"{price:,.2f}")
+                        else:
+                            st.metric(display_name, "N/A")
             
             # Display model comparison chart
             if 'models' in result:
@@ -794,7 +796,10 @@ def main():
             if 'models' in result:
                 for model, price in result['models'].items():
                     display_name = model.replace('_', ' ').title()
-                    report.append(f"**{display_name}:** {price:,.2f}")
+                    if price is not None:
+                        report.append(f"**{display_name}:** {price:,.2f}")
+                    else:
+                        report.append(f"**{display_name}:** N/A")
             report.append("")
             
             # ML predictions if available

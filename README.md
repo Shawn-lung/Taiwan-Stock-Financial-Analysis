@@ -15,6 +15,25 @@ This project provides a suite of tools for financial analysis and stock valuatio
 - Chemical industry classification support
 - Robust error handling and fallbacks
 
+## Screenshots
+
+### Main Valuation Interface
+![Main Interface](img/main_interface.png)
+
+The main Streamlit interface showing comprehensive stock valuation results including:
+- Multiple valuation models (Standard DCF, ML DCF, ML+DL Ensemble)
+- Automatic industry detection
+- Real-time valuation calculations
+
+### Growth Predictions Dashboard
+![Growth Predictions](img/growth_predictions.png)
+
+Detailed growth predictions showing:
+- ML-powered growth rate forecasts
+- Deep learning growth predictions
+- Industry growth statistics and benchmarks
+- Year-over-year growth analysis
+
 ## Installation
 
 ### Prerequisites
